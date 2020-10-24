@@ -16,16 +16,25 @@
 
     {% if consoles %}
         <div class="container infoSection">
-            <h5>Consoles:</h5>
-            {% for console in consoles %}
-                    <a href="/console/{{ console.slug }}"> {{ console.name }} | {{ console.release.year }}</a><br>
-            {% endfor %}
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">Consoles</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for console in consoles %}
+                        <a href="/console/{{ console.slug }}">
+                            <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
+                            <div class="lowerLabel">
+                                <h7 class="font-weight-bold text-uppercase">{{ console.shortName }}</h7>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     {% endif %}
 
     {% if gameFranchises %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ company.name }} Franchises:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ company.name }} Franchises</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in gameFranchises %}
@@ -47,12 +56,18 @@
         </div>
     {% endif %}
 
-    {% if tv %}
+    {% if television %}
         <div class="container infoSection">
-            <h5>Television:</h5>
-            {% for t in tv %}
-                    <a href="/tv/{{ t.television.slug }}"> {{ t.television.title }} | {{ t.television.getYear }}</a><br>
-            {% endfor %}
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">Television</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for t in television %}
+                        <a href="/tv/{{ t.television.slug }}">
+                            <img class="item posterSmall" src="{{ t.television.poster.url }}" alt="{{ t.television.title }}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     {% endif %}
 
@@ -67,10 +82,16 @@
 
     {% if games %}
         <div class="container infoSection">
-            <h5>Games:</h5>
-            {% for g in games %}
-                    <a href="/video-games/{{ g.videoGame.slug }}"> {{ g.videoGame.title }} | {{ g.videoGame.getYear }} ({{ g.role }})</a><br>
-            {% endfor %}
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">Video Games</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for g in games %}
+                        <a href="/video-games/{{ g.slug }}">
+                            <img class="item posterSmall" src="{{ g.poster.url }}" alt="{{ g.title }}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     {% endif %}
 

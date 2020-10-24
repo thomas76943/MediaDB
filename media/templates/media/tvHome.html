@@ -5,19 +5,60 @@
     <div class="container infoSection">
         <h1 class="font-weight-bold text-uppercase">Television - Home</h1>
     </div>
-    <h3>All Shows:</h3>
-    {% for television in shows %}
-        <hr>
-        <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
-        {% if television.ongoing == False %}
-            {% if television.getYear != television.getEndYear %}
-                - {{ television.getEndYear }}
-            {% endif %}
-        {% else %}
-            -
-        {% endif %}</a>
-        {% endfor %}
 
-    <hr>
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1990s Shows</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in nineties %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">2000s Shows</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in naughties %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">2010s Shows</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in tens %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">All Shows</h5>
+        {% for television in shows %}
+            <br>
+            <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
+            {% if television.ongoing == False %}
+                {% if television.getYear != television.getEndYear %}
+                    - {{ television.getEndYear }}
+                {% endif %}
+            {% else %}
+                -
+            {% endif %}</a>
+            <br>
+        {% endfor %}
+    </div>
 
 {% endblock %}

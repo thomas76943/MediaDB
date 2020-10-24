@@ -5,6 +5,8 @@ from itertools import chain
 from operator import attrgetter
 import locale
 
+import collections
+
 from django import http
 from django.contrib import messages
 from datetime import datetime, date
@@ -161,7 +163,7 @@ def filmHome(request):
         'genres':Genre.objects.all(),
         'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"]),
         'eighties': Film.objects.all().filter(release__range=["1980-01-01", "1989-12-25"]),
-        'nineties': Film.objects.all().filter(release__range=["1990-01-01", "1999-12-25"]),
+        'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"]),
     }
     return render(request, 'media/filmHome.html', context)
 
@@ -169,6 +171,10 @@ def tvHome(request):
     context = {
         'shows': Television.objects.all(),
         'genres': Genre.objects.all(),
+        'nineties': Television.objects.all().filter(release__range=["1990-01-01", "1999-12-25"]),
+        'naughties': Television.objects.all().filter(release__range=["2000-01-01", "2009-12-25"]),
+        'tens': Television.objects.all().filter(release__range=["2010-01-01", "2019-12-25"]),
+
     }
     return render(request, 'media/tvHome.html', context)
 
@@ -387,10 +393,18 @@ class CompanyDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['consoles'] = Console.objects.filter(developer=self.object.id).order_by('release')
+        context['consoles'] = Console.objects.filter(developer=self.object.id).order_by('-release')
         context['films'] = FilmCompanyMapping.objects.filter(company=self.object.id).order_by('film__release')
-        context['tv'] = TelevisionCompanyMapping.objects.filter(company=self.object.id).order_by('television__release')
-        context['games'] = VideoGameCompanyMapping.objects.filter(company=self.object.id).order_by('videoGame__release')
+        context['television'] = TelevisionCompanyMapping.objects.filter(company=self.object.id).order_by('television__release')
+
+        gameMappings = VideoGameCompanyMapping.objects.all().order_by('videoGame__release')
+        games = []
+
+        for mapping in gameMappings:
+            if mapping.company.id == self.object.id and mapping.videoGame not in games:
+                    games.append(mapping.videoGame)
+        context['games'] = games
+
         context['books'] = BookCompanyMapping.objects.filter(company=self.object.id).order_by('book__release')
         context['webseries'] = WebSeriesCompanyMapping.objects.filter(company=self.object.id).order_by('webSeries__release')
         context['franchises'] = FranchiseCompanyMapping.objects.filter(company=self.object.id)
