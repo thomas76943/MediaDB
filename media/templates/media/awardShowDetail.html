@@ -1,0 +1,105 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2>{{ awardsshow.name }} | {{ awardsshow.date }}</h2>
+        <a href="/awards/type/{{ awardsshow.award.id }}">See all {{ awardsshow.award.name }} Shows</a>
+    </div>
+
+    {% if images %}
+            <h5>Images:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for image in images %}
+                        <a class="item" href="{{ image.filePath }}">
+                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h2 class="font-weight-bold text-uppercase">Winners:</h2>
+    </div>
+
+    {% for fn in filmNominees %}
+        {% if fn.win %}
+            <a href="/awards/category/{{ fn.category.id }}">{{ fn.category.name }}</a> -
+            <a href="/films/{{ fn.film.slug }}">{{ fn.film.title }} ({{ fn.film.getYear }})</a>
+            {% for credit in filmCredits %}
+                {% if credit.FilmAwardMapping == fn %}
+                    {% if credit.Person %}
+                        | <a href="/person/{{ credit.Person.id }}"> {{ credit.Person.getFullName }}</a>
+                    {% endif %}
+                    {% if credit.Company %}
+                        | <a href="/company/{{ credit.Company.slug }}"> {{ credit.Company.name }}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <br>
+        {% endif %}
+    {% endfor %}
+    <br><br>
+
+    <div class="container infoSection">
+        <h2 class="font-weight-bold text-uppercase">Full List of Nominations:</h2>
+    </div>
+
+    {% if categories %}
+        {% for category in categories %}
+            {% if filmNominees %}
+                <div class="container infoSection">
+                    <h5 class="font-weight-bold text-uppercase border-bottom mb-0">
+                        <a href="/awards/category/{{ category.id }}">{{ category.name }}</a>
+                    </h5>
+                    <div class="scroller">
+                        <ul class="hs full">
+                        {% for fn in filmNominees %}
+                            {% if fn.category == category %}
+                                {% if category.personCompanyPriority %}
+                                        {% for credit in filmCredits %}
+                                            {% if credit.FilmAwardMapping == fn %}
+                                                <a href="/person/{{ credit.Person.id }}">
+                                                {% if fn.win %}
+                                                    <img class="item additionalImage winner" src="{{credit.Person.image.url}}" alt="{{credit.Person.getFullName}}">
+                                                {% else %}
+                                                    <img class="item additionalImage" src="{{credit.Person.image.url}}" alt="{{credit.Person.getFullName}}">
+                                                {% endif %}
+                                                {{ credit.Person.getFullName }}<br>
+                                                <p href="/films/{{ fn.film.slug }}">{{ fn.film.title }}</p>
+
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                {% else %}
+                                    <a href="/films/{{ fn.film.slug }}">
+                                    {% if fn.win %}
+                                        <img class="item posterSmall winner" src="{{fn.film.poster.url}}" alt="{{fn.film.title}}"> {{ fn.Person.getFullName }}
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{fn.film.poster.url}}" alt="{{fn.film.title}}"> {{ fn.Person.getFullName }}
+                                    {% endif %}
+                                        {% for credit in filmCredits %}
+                                            {% if credit.FilmAwardMapping == fn %}
+                                                {{ credit.Person.getFullName }}<br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <br>
+
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+
+
+{% endblock %}

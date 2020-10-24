@@ -1,0 +1,106 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h1>Search Results for '{{ searchQuery }}'</h1>
+    </div>
+
+    {% if people %}
+        <div class="container infoSection">
+            <h5>People:</h5>
+            {% for person in people %}
+                <a href="/person/{{ person.id }}"> {{ person.firstName }} {{ person.surname }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5>Franchises:</h5>
+            {% for franchise in franchises %}
+                <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if videogamefranchises %}
+        <div class="container infoSection">
+            <h5>Video Game Franchises:</h5>
+            {% for videoGameFranchise in videogamefranchises %}
+                <a href="/video-game-franchises/{{ videoGameFranchise.slug }}"> {{ videoGameFranchise.title }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if consoles %}
+        <div class="container infoSection">
+            <h5>Video Game Consoles:</h5>
+            {% for console in consoles %}
+                <a href="/console/{{ console.slug }}"> {{ console.name }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if films %}
+        <div class="container infoSection">
+            <h5>Films:</h5>
+            {% for film in films %}
+                <a href="/films/{{ film.slug }}"> {{ film.title }} | {{ film.getYear }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if tv %}
+        <div class="container infoSection">
+            <h5>Television:</h5>
+            {% for television in tv %}
+                <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
+                {% if television.ongoing == False %}
+                    {% if television.getYear != television.getEndYear %}
+                        - {{ television.getEndYear }}
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}</a><br>
+                {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if books %}
+        <div class="container infoSection">
+            <h5>Books:</h5>
+            {% for book in books %}
+                <a href="/books/{{ book.slug }}"> {{ book.title }} | {{ book.getYear }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if games %}
+        <div class="container infoSection">
+            <h5>Video Games:</h5>
+            {% for videoGame in games %}
+                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if webseries %}
+        <div class="container infoSection">
+            <h5>Web Series:</h5>
+            {% for ws in webseries %}
+                <a href="/web-series/{{ ws.slug }}"> {{ ws.title }} | {{ ws.getYear }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if companies %}
+        <div class="container infoSection">
+            <h5>Companies:</h5>
+            {% for company in companies %}
+                <a href="/company/{{ company.slug }}"> {{ company.name }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <hr>
+
+{% endblock %}

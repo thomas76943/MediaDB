@@ -1,0 +1,139 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2>Browse Genre - {{genre.title}}</h2>
+    </div>
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ genre.title }} Franchises:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in franchises %}
+                        <a href="/franchises/{{ f.franchise.slug }}">
+                        <img class="item box" src="{{f.franchise.image.url}}" alt="{{f.franchise.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if naughtiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">00's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in naughtiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if ninetiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">90's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in ninetiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if eightiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">80's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in eightiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if seventiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">70's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in seventiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if sixtiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">60's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in sixtiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>>
+    {% endif %}
+
+    {% if fiftiesFilms %}
+        <div class="container infoSection">
+            <h5>50's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in fiftiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>>
+    {% endif %}
+
+    {% if tv %}
+        <hr>
+        <h5>Television:</h5>
+        {% for t in tv %}
+                <a href="/tv/{{ t.television.slug }}"> {{ t.television.title }} | {{ t.television.getYear }}</a><br>
+        {% endfor %}
+    {% endif %}
+
+    {% if books %}
+        <hr>
+        <h5>Books:</h5>
+        {% for b in books %}
+                <a href="/books/{{ b.book.slug }}"> {{ b.book.title }} | {{ b.book.getYear }}</a><br>
+        {% endfor %}
+    {% endif %}
+
+    {% if webseries %}
+        <hr>
+        <h5>Web Series:</h5>
+        {% for w in webseries %}
+                <a href="/web-series/{{ w.webSeries.slug }}"> {{ w.webSeries.title }} | {{ w.webSeries.getYear }}</a><br>
+        {% endfor %}
+    {% endif %}
+
+    <hr><br>
+
+{% endblock %}

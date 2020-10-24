@@ -1,0 +1,17 @@
+{% extends "media/base.html" %}
+
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Books - Home</h1>
+    </div>
+
+    <h3>All Books:</h3>
+    {% for book in books %}
+        <hr>
+        <a href="/books/{{ book.slug }}">{{ book.title }} | {{ book.getYear }}</a>
+    {% endfor %}
+
+    <hr>
+
+{% endblock %}

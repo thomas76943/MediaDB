@@ -1,0 +1,105 @@
+{% extends "media/base.html" %}
+{% block title %}{{person.getFullName}}{% endblock title %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2>{{person.firstName}} {{ person.surname }}</h2>
+        <h5>Born: {{ person.DoB }}</h5>
+        {% if person.alive is False %}
+        <h5>Died: {{ person.DoD }}</h5>
+        {% endif %}
+    </div>
+
+    <div class="container infoSection">
+        <div class="media">
+            <img class="item personDetail" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+            {% if person.bio %}
+                <div class="media-body" style="padding-left:15px">
+                    {{ person.bio }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if nominationCount != 0 or winCount != 0 %}
+        <div class="container infoSection">
+            {% if nominationCount != 0 %}
+                {{ nominationCount }} Nomination{% if nominationCount > 1 %}s{% endif %}
+            {% endif %}
+            {% if winCount != 0 %}
+                 | {{ winCount }} Win{% if winCount > 1 %}s{% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+    {% if images %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Images:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for image in images %}
+                        <a href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ person.getFullName }}>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if films %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Films</h5>
+            {% for f in films %}
+                <br>
+                <a href="/films/{{ f.film.slug }}"> {{ f.film.title }} | {{ f.film.getYear }} ({{ f.role }})</a><br>
+                {% if f.character %}
+                    <a>{{ f.character }}</a><br>
+                {% endif %}
+            {% endfor %}
+            <br>
+        </div>
+    {% endif %}
+
+    {% if tv %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Television</h5>
+            {% for t in tv %}
+                <br>
+                <a href="/tv/{{ t.television.slug }}"> {{ t.television.title }} | {{ t.television.getYear }} ({{ t.role }})</a><br>
+                {% if t.character %}
+                    <a>{{ t.character }}</a><br>
+                {% endif %}
+            {% endfor %}
+            <br>
+        </div>
+    {% endif %}
+
+    {% if books %}
+        <hr>
+        <h5>Books:</h5>
+        {% for b in books %}
+                <a href="/books/{{ b.book.slug }}"> {{ b.book.title }} | {{ b.book.getYear }} ({{ b.role }})</a><br>
+        {% endfor %}
+    {% endif %}
+
+    {% if games %}
+        <hr>
+        <h5>Games:</h5>
+        {% for g in games %}
+                <a href="/video-games/{{ g.videoGame.slug }}"> {{ g.videoGame.title }} | {{ g.videoGame.getYear }} ({{ g.role }})</a><br>
+        {% endfor %}
+    {% endif %}
+
+    {% if webseries %}
+        <hr>
+        <h5>Web Series:</h5>
+        {% for w in webseries %}
+                <a href="/web-series/{{ w.webSeries.slug }}"> {{ w.webSeries.title }} | {{ w.webSeries.getYear }} ({{ w.role }})</a><br>
+        {% endfor %}
+    {% endif %}
+
+
+
+{% endblock %}

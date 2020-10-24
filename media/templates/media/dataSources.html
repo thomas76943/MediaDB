@@ -1,0 +1,32 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Data Sources</h1>
+    </div>
+
+    <div class="container infoSection">
+        <h4>Film IDs 1-118, Television IDs 1-25:</h4>
+        <h5>Data: IMDb, Wikipedia</h5>
+        <h5>Images: m.media-amazon.com</h5>
+    </div>
+
+    <div class="container infoSection">
+        <h4>Film IDs 119-169:</h4>
+        <h5>Data: data.world/crowdflower/blockbuster-database</h5>
+        <h5>Data: data.world/jamesgaskin/movies/</h5>
+        <h5>Images: Flixster.com, m.media-amazon.com</h5>
+    </div>
+
+    {% for image in images %}
+        <div class="container profileSection">
+            <div class="media">
+                <img class="item smallImage" src="{{ image.image.url }}">
+                <div class="media-body" style="padding-left:15px; word-wrap: break-word">
+                    {{ image.filePath }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

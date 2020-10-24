@@ -1,0 +1,101 @@
+{% extends "media/base.html" %}
+{% block title %}{{videogame.title}}{% endblock title %}
+{% block content %}
+
+    {% if videogame.cover %}
+        <style type="text/css">
+        .blur {
+            background-image: url("{{ videogame.cover.url }}");
+        }
+        </style>
+        <div class="blur"></div>
+    {% endif %}
+
+    <div class="container titleSection">
+        <h2>{{videogame.title}} | {{ videogame.getYear }}</h2>
+        <h5>{{ videogame.release }}</h5>
+        {% if genres %}
+            {% for genre in genres %}
+                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+
+    {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
+        <div class="container posterTrailerContainer">
+            <div class="row" style="padding: 10px">
+                {% if webseries.poster != 'MissingIcon.png' %}
+                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
+                {% endif %}
+                {% if videogame.trailerVideoPath %}
+                    <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% if consoles %}
+        <div class="container infoSection">
+            <h5>Released On:</h5>
+            {% for console in consoles %}
+                <a style="padding-right:10px" href="/console/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if videogame.synopsis %}
+        <div class="container infoSection">
+            <h5>Synopsis:</h5>
+            <h6>{{ videogame.synopsis }}</h6>
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5>Franchise:</h5>
+            {% for franchise in franchises %}
+                <a href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h6>Release Date: {{ videogame.release }}</h6>
+    </div>
+
+     {% if developers %}
+        <div class="container infoSection">
+            <h6>Developed by:</h6>
+            {% for company in developers %}
+                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if publishers %}
+        <div class="container infoSection">
+            <h6>Published by:</h6>
+            {% for company in publishers %}
+                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if images %}
+        <div class="container infoSection">
+            <h5>Additional Posters, Stills, Concept Art, Behind the Scenes:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for image in images %}
+                        <a class="item" href="{{ image.filePath }}">
+                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

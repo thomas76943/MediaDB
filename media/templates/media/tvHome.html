@@ -1,0 +1,23 @@
+{% extends "media/base.html" %}
+
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Television - Home</h1>
+    </div>
+    <h3>All Shows:</h3>
+    {% for television in shows %}
+        <hr>
+        <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
+        {% if television.ongoing == False %}
+            {% if television.getYear != television.getEndYear %}
+                - {{ television.getEndYear }}
+            {% endif %}
+        {% else %}
+            -
+        {% endif %}</a>
+        {% endfor %}
+
+    <hr>
+
+{% endblock %}

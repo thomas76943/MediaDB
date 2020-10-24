@@ -1,0 +1,24 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <h2>
+    <a href="/awards/type/{{ awardscategories.awardType.id }}">The {{ awardscategories.awardType }}s</a> -
+    {{ awardscategories.name }}
+    </h2>
+
+    <h4>Winners:</h4>
+    {% if films %}
+        {% for film in films %}
+            <a href="/awards/show/{{ film.FilmAwardMapping.awardsShow.id }}">{{ film.FilmAwardMapping.awardsShow.date.year }}</a> -
+            <a href="/films/{{ film.FilmAwardMapping.film.slug }}">{{ film.FilmAwardMapping.film.title }}</a>
+            {% if film.Person %}
+                | <a href="/person/{{ film.Person.id }}">{{ film.Person.getFullName }}</a>
+            {% endif %}
+            {% if film.Company %}
+                | <a href="/company/{{ film.Company.slug }}">{{ film.Company.name }}</a>
+            {% endif %}
+            <br>
+        {% endfor %}
+    {%  endif %}
+
+{% endblock %}

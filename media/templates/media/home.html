@@ -1,0 +1,259 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <!--Carousel-->
+    <div id="c1" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#c1" data-slide-to="0" class="active"></li>
+          <li data-target="#c1" data-slide-to="1"></li>
+          <li data-target="#c1" data-slide-to="2"></li>
+          <li data-target="#c1" data-slide-to="3"></li>
+          <li data-target="#c1" data-slide-to="4"></li>
+        </ul>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img class="carousel Image1" width="1400" height="300">
+            <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>FILMS</span></h2>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <img class="carousel Image2" width="1400" height="300">
+            <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Television</span></h2>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <img class="carousel Image3" width="1400" height="300">
+              <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Video Games</span></h2>
+              </div>
+          </div>
+
+          <div class="carousel-item">
+            <img class="carousel Image4" width="1400" height="300">
+              <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Books</span></h2>
+              </div>
+          </div>
+
+          <div class="carousel-item">
+            <img class="carousel Image5" width="1400" height="300">
+              <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Web Series</span></h2>
+              </div>
+          </div>
+
+        </div>
+
+        <!-- LR controls -->
+        <a class="carousel-control-prev" href="#c1" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#c1" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+    </div>
+
+    <script>
+    $('#c1').carousel({
+      interval: 30000,
+      cycle: true
+    });
+    </script>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Highest Rated <a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for film, rating in highestRatedFilms.items %}
+                    <div class="bottomOverlay">
+                        <a href="/films/{{ film.slug }}">
+                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            <div class="content">
+                                <h6 class = "font-weight-bold text-uppercase" >
+                                    {{ rating }}
+                                    <div class="ratingStars small" style="--rating: {{ rating }};"></div>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+    <h5 class="font-weight-bold text-uppercase border-bottom mb-0">HIGHEST GROSSING <a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for film, gross in topGrossing.items %}
+                    <div class="bottomOverlay">
+                        <a href="/films/{{ film.slug }}">
+                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            <div class="content">
+                                <h6 class = "font-weight-bold text-uppercase" >{{ gross }}</h6>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">OLDEST PEOPLE</h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for person in people %}
+                    <a href="/person/{{ person.id }}">
+                        <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <br>
+
+    {% if bornToday %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BORN TODAY</h5>
+            <div class="scroller" >
+                <ul class="hs full">
+                    {% for person in bornToday %}
+                        <a href="/person/{{ person.id }}">
+                            <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">OLDEST FILMS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in newestFilms %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">LONGEST RUNNING TELEVISION SERIES</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in longestRunningTV %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL FILMS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in films %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL VIDEO GAMES</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for game in games %}
+                    <a href="/video-games/{{ game.slug }}">
+                    <img class="item posterSmall" src="{{game.poster.url}}" alt="{{game.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL BOOKS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in books %}
+                    <a href="/books/{{ book.slug }}">
+                    <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL WEB SERIES</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for ws in webseries %}
+                    <a href="/web-series/{{ ws.slug }}">
+                    <img class="item posterSmall" src="{{ws.poster.url}}" alt="{{ws.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--
+    <div class="scroller">
+        <ul class="hs full">
+            <a class="item">Demo Disk</a>2020-07-06
+            <a class="item">Ray Gun Recap</a>
+            <a class="item">Content Cop</a>
+            <a class="item">That's Cringe</a>
+            <a class="item">Best of the Worst</a>
+            <a class="item">Dunkview</a>
+            <a class="item">Dude Soup</a>
+            <a class="item">Alternative Lifestyle</a>
+            <a class="item">Weekly Planet Podcast</a>
+            <a class="item">Jeff's Barbershop</a>
+            <a class="item">Don't Hug Me I'm Scared</a>
+            <a class="item">Your Grammar Sucks</a>
+            <a class="item">Meme Review</a>
+            <a class="item">VFX Arists React</a>
+            <a class="item">Inside Gaming Daily</a>
+            <a class="item">Amazon Prime Time</a>
+            <a class="item">Adam Savage's One Day Builds</a>
+        </ul>
+    </div>
+    -->
+
+    <hr>
+
+
+{% endblock %}

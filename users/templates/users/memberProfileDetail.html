@@ -1,0 +1,105 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}{{memberProfile.username}}{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <div class="media">
+            <img class="item additionalImage" alt="profilePicture" src={{ memberProfile.profile.image.url }}>
+            <div class="media-body" style="padding-left:15px">
+                <h2 class="account-heading">{{memberProfile.username}}</h2>
+                <p class="text-secondary">{{ memberProfile.email }}</p>
+                <p>{{ memberProfile.profile.bio }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if ratings %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Recent Activity <a style="float:right" href="/user/{{ memberProfile.username }}/activity">See All</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for rating in ratings %}
+                        <div class="bottomOverlay">
+                            {%  if rating.film != NULL %}
+                                <a class="item" href="/films/{{ rating.film.slug }}">
+                                <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                </a>
+
+                            {% endif %}
+                            {%  if rating.television != NULL %}
+                                <a class="item" href="/tv/{{ rating.television.slug }}">
+                                <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if rating.videoGame != NULL %}
+                                <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
+                                <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if rating.book != NULL %}
+                                <a class="item" href="/books/{{ rating.book.slug }}">
+                                <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if rating.webSeries != NULL %}
+                                <a class="item" href="/web-series/{{ rating.webSeries.slug }}">
+                                <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                                </a>
+                            {% endif %}
+                            <div class="content">
+                                <h6 class = "font-weight-bold text-uppercase" >
+                                    {{ rating.rating }}
+                                    <div class="ratingStars small" style="--rating: {{ rating.rating }};"></div>
+                                </h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if profileSections %}
+        {% for section in profileSections %}
+            <div class="container infoSection">
+                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ section.sectionName }}</h5>
+                <div class="scroller">
+                    <ul class="hs full">
+                        {% with var=section.sectionName %}
+                        {% dynamicVariableValue var as var_url %}
+                        {% for entry in var_url %}
+                            {%  if entry.film != NULL %}
+                                <a class="item" href="/films/{{ entry.film.slug }}">
+                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.television != NULL %}
+                                <a class="item" href="/tv/{{ entry.television.slug }}">
+                                <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.videoGame != NULL %}
+                                <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.book != NULL %}
+                                <a class="item" href="/books/{{ entry.book.slug }}">
+                                <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.webSeries != NULL %}
+                                <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

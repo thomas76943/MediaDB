@@ -1,0 +1,61 @@
+{% extends "media/base.html" %}
+{% block title %}{{book.title}}{% endblock title %}
+{% block content %}
+
+    <h2>{{book.title}} | {{ book.getYear }}</h2>
+    <h5>{{ film.release }}</h5>
+
+    {% if genres %}
+        {% for genre in genres %}
+            <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+        {% endfor %}
+    {% endif %}
+
+
+    <br><br>
+
+    <img class="item detailPoster" src="{{book.image.url}}" alt="{{book.title}}">
+
+    <hr>
+
+     {% if authors %}
+        <h5 style="padding-top:10px"> Written by:</h5>
+        {% for author in authors %}
+            <a style="padding-right:10px" href="/person/{{ author.person.id }}"> {{ author.getPerson }}</a>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+
+    <h5>Synopsis:</h5>
+    <h6>{{ book.synopsis }}</h6>
+
+    {% if franchises %}
+        <hr>
+        <h5>Part of the Following Franchises:</h5>
+        {% for franchise in franchises %}
+            <a href="/franchises/{{ franchise.franchise.slug }}"> {{ franchise.franchise.title }} </a><br>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+
+    {% if publishers %}
+        <h6 style="padding-top:10px"> Published by:</h6>
+        {% for company in publishers %}
+            <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5>Franchise:</h5>
+            {% for franchise in franchises %}
+                <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}

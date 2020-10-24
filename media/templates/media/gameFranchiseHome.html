@@ -1,0 +1,21 @@
+{% extends "media/base.html" %}
+
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="nav-link font-weight-bold text-uppercase">Video Games - Franchises</h1>
+    </div>
+
+    <div class="container infoSection">
+        <ul class="auto-grid franchiseGrid">
+            {% for franchise in franchises %}
+                <li class="module franchiseModule" style="list-style-type: none; white-space: normal">
+                    <a href="/video-game-franchises/{{ franchise.slug }}">
+                    <img class="item box white" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2 class="font-weight-bold text-uppercase">Top Rated Films</h2>
+    </div>
+
+    {% for film, rating in topRated.items %}
+        <div class="container infoSection">
+            <div class="media">
+                <a class="item smallImage" href="/films/{{ film.slug }}">
+                    <img class="item smallImage" src="{{film.poster.url}}" alt="{{film.title}}">
+                </a>
+                <div class="media-body" style="padding-left:15px">
+                    <a href="/films/{{ film.slug }}">
+                        <h5 class="font-weight-bold border-bottom mb-0">
+                            {{ film.title }} ({{ film.getYear }})
+                            <div style="float:right">
+                                <div class="ratingStars medium" style="--rating: {{ rating }};"></div>
+                                {{ rating }}
+                            </div>
+                        </h5>
+                    </a>
+                    {% if film.synopsis %}
+                        {{ film.synopsis }}
+                    {% else %}
+                        <p>Add a Review</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

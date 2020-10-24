@@ -1,0 +1,66 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Video Games - Home</h1>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BROWSE BY FRANCHISE<a style="float:right;" href="{% url 'media-videogamefranchise-home' %}">See All</a></h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for franchise in franchises %}
+                    <a href="/video-game-franchises/{{ franchise.slug }}">
+                    <img class="item box white" style="padding:10px" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BROWSE BY CONSOLE</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for console in consoles %}
+                    <a href="/console/{{ console.slug }}">
+                        <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
+                        <div class="lowerLabel">
+                            <h7 class="font-weight-bold text-uppercase">{{ console.shortName }}</h7>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BROWSE BY GENRE</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for genre in genres %}
+                    <a href="/video-game-genre/{{ genre.id }}">
+                        <img class="item box white" src="{{console.image.url}}" alt="|">
+                        <div class="lowerLabel">
+                            <h7 class="font-weight-bold text-uppercase">{{ genre.title }}</h7>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BROWSE BY COMPANY</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for company in companies %}
+                    <a href="/company/{{ company.slug }}">
+                            <img class="item box white" {% if company.image %} src="{{company.image.url}}" {% else %} src="#" {% endif %} alt="{{ company.name }}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

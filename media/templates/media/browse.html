@@ -1,0 +1,53 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Browse Media</h1>
+    </div>
+
+    <div class="container infoSection">
+        <ul class="auto-grid">
+            {% for film in films %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/films/{{ film.slug }}">
+                        {% if film in seenFilms %}
+                            <img class="item posterSmall seen" src="{{film.poster.url}}" alt="{{film.title}}">
+                        Seen
+                        {% else %}
+                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+            {% for television in tv %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/tv/{{ television.slug }}">
+                        <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for videoGame in videoGames %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/video-games/{{ videoGame.slug }}">
+                        <img class="item posterSmall" src="{{videoGame.poster.url}}" alt="{{videoGame.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for book in books %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for ws in webSeries %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/web-series/{{ ws.slug }}">
+                        <img class="item posterSmall" src="{{ws.poster.url}}" alt="{{ws.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}{{franchise.title}}{% endblock title %}
+
+{% block content %}
+
+    <div class="container infoSection">
+        <img class="item franchiseBanner" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+    </div>
+
+    {% if franchise.description %}
+        <p>{{ franchise.description }}</p>
+    {% endif %}
+
+    {% if subcategories %}
+        {% for subcategory in subcategories %}
+            <div class="container infoSection">
+                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ subcategory.title }}</h5>
+                <div class="scroller">
+                    <ul class="hs full">
+                        {% with var=subcategory.title %}
+                        {% dynamicVariableValue var as var_url %}
+                        {% for entry in var_url %}
+                            {%  if entry.film != NULL %}
+                                <a class="item" href="/films/{{ entry.film.slug }}">
+                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.television != NULL %}
+                                <a class="item" href="/tv/{{ entry.television.slug }}">
+                                <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                </a>
+                            {% endif %}
+                            {%  if entry.videogame != NULL %}
+                                <a class="item posterSmall" style="background:url({{entry.videogame.poster.url}})" href="/video-games/{{ entry.videogame.slug }}"></a>
+                            {% endif %}
+                            {%  if entry.book != NULL %}
+                                <a class="item posterSmall" style="background:url({{entry.book.image.url}})" href="/books/{{ entry.book.slug }}"></a>
+                            {% endif %}
+                            {%  if entry.webseries != NULL %}
+                                <a class="item posterSmall" style="background:url({{entry.webseries.poster.url}})" href="/webseries/{{ entry.webseries.slug }}"></a>
+                            {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+{% endblock %}

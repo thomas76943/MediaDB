@@ -1,0 +1,11 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <h2>The {{ awardtype.name }}s</h2>
+    {% if shows %}
+        {% for show in shows %}
+            <a href="/awards/show/{{ show.id }}">{{ show.name }}</a><br>
+        {% endfor %}
+    {%  endif %}
+
+{% endblock %}

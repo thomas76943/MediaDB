@@ -1,0 +1,25 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <h2>{{videogamegenre.title}} Video Games</h2>
+
+    <hr>
+
+    {% if franchises %}
+    <h5>{{ videogamegenre.title }} Franchises:</h5>
+    <div class="scroller">
+        <ul class="hs full">
+            {% for f in franchises %}
+                <a href="/video-game-franchises/{{ f.franchise.slug }}">
+                <img class="item box white" src="{{f.franchise.image.url}}" alt="{{f.franchise.title}}">
+                </a>
+            {% endfor %}
+        </ul>
+    </div><br>
+    {% endif %}
+
+    {% for game in projects %}
+        <a href="/video-games/{{ game.videoGame.slug }}"> {{ game.videoGame.title }} | {{ game.videoGame.getYear }}</a><br>
+    {% endfor %}
+
+{% endblock %}

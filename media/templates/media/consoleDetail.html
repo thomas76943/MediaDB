@@ -1,0 +1,45 @@
+{% extends "media/base.html" %}
+{% block content %}
+    <div class="container infoSection">
+        <h2>{{console.name}}</h2>
+        <h6>Released: {{ console.release }}<h6>
+        <h6>Developed by: <a href="/company/{{ console.developer.slug }}"> {{ console.developer }}</a><h6>
+    </div>
+
+    <div class="container infoSection">
+        <img class="item franchiseBanner gameFranchiseBanner" src="{{console.image.url}}" alt="{{console.name}}">
+    </div>
+
+    {% if versions %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Versions:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for version in versions %}
+                        <a href="/console/{{ console.slug }}">
+                            <img class="item box white" src="{{version.image.url}}" alt="{{version.name}}">
+                            <div class="lowerLabel">
+                                <h7 class="font-weight-bold text-uppercase">{{ version.shortName }}</h7>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if games %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Games:</h5>
+            {% for game in games %}
+            {%  if game.videoGame != NULL %}
+                <br>
+                <a href="/video-games/{{ game.videoGame.slug }}"> {{ game.videoGame.title }} | {{ game.videoGame.getYear }}</a><br>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endif %}
+
+
+
+{% endblock %}

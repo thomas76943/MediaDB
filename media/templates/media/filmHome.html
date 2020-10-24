@@ -1,0 +1,80 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Films - Home</h1>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY FRANCHISE
+            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
+        </h5>
+         <div class="scroller">
+            <ul class="hs full">
+                {% for franchise in franchises %}
+                    <a href="/franchises/{{ franchise.slug }}">
+                    <img class="item box" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY GENRE
+            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a>
+        </h5>
+         <div class="scroller">
+            <ul class="hs full">
+                {% for genre in genres %}
+                    <a href="/genre/{{ genre.id }}">
+                        <img class="item box" src="#" alt="|">
+                        <div class="lowerLabel">
+                            <h7 class="font-weight-bold text-uppercase">{{ genre.title }}</h7>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+         </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1970s FILMS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in seventies %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-1">1980s FILMS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in eighties %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1990s FILMS</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in nineties %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

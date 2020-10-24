@@ -1,0 +1,142 @@
+{% extends "media/base.html" %}
+{% block title %}{{memberProfile.username}}{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <div class="media">
+            <img class="item additionalImage" alt="profilePicture" src={{ memberProfile.profile.image.url }}>
+            <div class="media-body" style="padding-left:15px">
+                <h2 class="account-heading">{{memberProfile.username}}</h2>
+                <p class="text-secondary">{{ memberProfile.email }}</p>
+                <p>{{ memberProfile.profile.bio }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container profileSection">
+        <a href="/user/{{ user.username }}">Back to Profile Page</a>
+    </div>
+
+    {% if ratings %}
+        {% for rating in ratings %}
+                {%  if rating.film != NULL %}
+                    <div class="container profileSection">
+                        <div class="media">
+                            <a class="item" href="/films/{{ rating.film.slug }}">
+                                <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                            </a>
+                            <div class="media-body" style="padding-left:15px">
+                                    <h5 class="font-weight-bold border-bottom mb-0">
+                                        <a href="/films/{{ rating.film.slug }}">
+                                            {{ rating.film.title }} ({{ rating.film.getYear }})
+                                        </a>
+                                        - <div class="ratingStars medium" style="--rating: {{ rating.rating }};"></div>
+                                    </h5>
+                                {% if rating.review %}
+                                    {{ rating.review }}
+                                {% else %}
+                                    <p>Add a Review</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.television != NULL %}
+                    <div class="container profileSection">
+                        <div class="media">
+                            <a class="item" href="/tv/{{ rating.television.slug }}">
+                                <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                            </a>
+                            <div class="media-body" style="padding-left:15px">
+                                    <h5 class="font-weight-bold border-bottom mb-0">
+                                        <a href="/tv/{{ rating.television.slug }}">
+                                            {{ rating.television.title }} ({{ rating.television.getYear }})
+                                        </a>
+                                        - <div class="ratingStars medium" style="--rating: {{ rating.rating }};"></div>
+                                    </h5>
+
+                                {% if rating.review %}
+                                    {{ rating.review }}
+                                {% else %}
+                                    <p>Add a Review</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.videoGame != NULL %}
+                    <div class="container profileSection">
+                        <div class="media">
+                            <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
+                                <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                            </a>
+                            <div class="media-body" style="padding-left:15px">
+                                    <h5 class="font-weight-bold border-bottom mb-0">
+                                        <a href="/video-games/{{ rating.videoGame.slug }}">
+                                            {{ rating.videoGame.title }} ({{ rating.videoGame.getYear }})
+                                        </a>
+                                        - <span class="ratingStars medium" style="--rating: {{ rating.rating }};"></span>
+                                    </h5>
+                                {% if rating.review %}
+                                    {{ rating.review }}
+                                {% else %}
+                                    <p>Add a Review</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.book != NULL %}
+                    <div class="container profileSection">
+                        <div class="media">
+                            <a class="item" href="/books/{{ rating.book.slug }}">
+                                <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                            </a>
+                            <div class="media-body" style="padding-left:15px">
+                                    <h5 class="font-weight-bold border-bottom mb-0">
+                                        <a href="/books/{{ rating.book.slug }}">
+                                            {{ rating.book.title }} ({{ rating.book.getYear }})
+                                        </a>
+                                        - <span class="ratingStars medium" style="--rating: {{ rating.rating }};"></span>
+                                    </h5>
+                                {% if rating.review %}
+                                    {{ rating.review }}
+                                {% else %}
+                                    <p>Add a Review</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.webSeries != NULL %}
+                    <div class="container profileSection">
+                        <div class="media">
+                            <a class="item" href="/web-series/{{ rating.webSeries.slug }}">
+                                <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                            </a>
+                            <div class="media-body" style="padding-left:15px">
+                                    <h5 class="font-weight-bold border-bottom mb-0">
+                                        <a href="/web-series/{{ rating.webSeries.slug }}">
+                                            {{ rating.webSeries.title }} ({{ rating.webSeries.getYear }})
+                                        </a>
+                                        - <div class="ratingStars medium" style="--rating: {{ rating.rating }};"></div>
+                                    </h5>
+
+                                {% if rating.review %}
+                                    {{ rating.review }}
+                                {% else %}
+                                    <p>Add a Review</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+        {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}

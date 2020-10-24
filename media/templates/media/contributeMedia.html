@@ -1,0 +1,60 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <h3>Contribute</h3>
+    <hr>
+
+    {% for form in forms %}
+        <h4>Add {{ form.Meta.model.Meta.verbose_name }}</h4>
+        <div style="width:60%; max-width:100%">
+            <form action="" method="post">
+                {% csrf_token %}
+                <fieldset>
+                    {% for field in form %}
+                        {{ field.label }}
+                    {% endfor %}
+                    {{ form.as_p }}
+                </fieldset>
+                <div class="formSuccess">
+                    <button type="submit" class="btn btn-warning">Add Film</button><br>
+
+                    {% if messages %}
+                        <br>
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>{{ message }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        <hr>
+    {% endfor %}
+
+    <h4>Add Television Series</h4>
+    <form>
+
+    </form>
+    <hr>
+
+    <h4>Add Video Game</h4>
+    <form>
+
+    </form>
+    <hr>
+
+    <h4>Add Book</h4>
+    <form>
+
+    </form>
+    <hr>
+
+    <h4>Add Web Series</h4>
+    <form>
+
+    </form>
+    <hr>
+
+{% endblock %}

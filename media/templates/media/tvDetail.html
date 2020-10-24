@@ -1,0 +1,162 @@
+{% extends "media/base.html" %}
+{% block title %}{{television.title}}{% endblock title %}
+{% block content %}
+
+    {% if television.cover %}
+        <style type="text/css">
+        .blur {
+            background-image: url("{{ television.cover.url }}");
+        }
+        </style>
+        <div class="blur"></div>
+    {% endif %}
+
+
+    <br>
+
+    <div class="container titleSection">
+        <h2>
+        {{television.title}} | {{ television.getYear }}
+        {% if television.ongoing == False %}
+            {% if television.getYear != television.getEndYear %}
+                - {{ television.getEndYear }}
+            {% endif %}
+        {% else %}
+            -
+        {% endif %}
+        </h2>
+
+        <h5>{{ television.episodes }} Episodes | Seasons: {{ television.seasons }}</h5>
+
+        {% if genres %}
+            {% for genre in genres %}
+                <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <br>
+
+    <div class="container posterTrailerContainer">
+        <div class="row" style="padding: 10px">
+            <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
+                {% if television.trailerVideoPath %}
+                    <iframe class="trailer" width="711" height="400" src={{television.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
+                {% if averageRating %}
+                    <div class="col">
+                        <div class="container ratingBox">
+                            <h5>Average Rating: </h5>
+                            <h4>{{ averageRating }}</h4>
+                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                        </div>
+                        {% if user.is_authenticated %}
+                            {% if userRating  %}
+                                <div class="container ratingBox">
+                                    <h4>My Rating:</h4>
+                                    <h4>{{ userRating }}</h4>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+
+        </div>
+    </div>
+
+    {% if showrunners or writers or producers %}
+        <div class="container infoSection">
+            {% if showrunners %}
+                    <h5>Created by:</h5>
+                    {% for showrunner in showrunners %}
+                        <a style="padding-right:10px" href="/person/{{ showrunner.person.id }}"> {{ showrunner.getPerson }}</a>
+                    {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:10px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.id }}"> {{ writer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.id }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+        <h6>{{ television.synopsis }}</h6>
+    </div>
+
+    {% if cast %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in cast %}
+                        <a class="item" href="/person/{{ actor.person.id }}">
+                        <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5>Franchise:</h5>
+            {% for franchise in franchises %}
+                <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h6>First Episode Air  Date: {{ television.release }}</h6>
+        {% if television.ongoing == False %}
+            <h6>Final Episode Air Date: {{ television.end }}</h6>
+        {% endif %}
+    </div>
+
+     {% if productionCompanies %}
+         <div class="container infoSection">
+            <h6> Produced by:</h6>
+            {% for company in productionCompanies %}
+                <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+            {% endfor %}
+         </div>
+    {% endif %}
+
+    {% if networks %}
+        <div class="container infoSection">
+            <h6> Networks:</h6>
+            {% for company in networks %}
+                <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if images %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Posters, Stills, Concept Art, Behind the Scenes</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for image in images %}
+                        <a class="item" href="{{ image.filePath }}">
+                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

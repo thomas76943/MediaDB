@@ -1,0 +1,22 @@
+{% extends "media/base.html" %}
+
+{% block content %}
+
+    <div class="container infoSection">
+        <h1 class="font-weight-bold text-uppercase">Web Series - Home</h1>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="border-bottom mb-0">ALL WEB SERIES</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for ws in webSeries %}
+                    <a href="/web-series/{{ ws.slug }}">
+                    <img class="item posterSmall" src="{{ws.poster.url}}" alt="{{ws.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <h1>CSV Upload</h1>
+
+    <form method ="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h4>Films - Select a file</h4>
+        <input type="file" name="filmsFile">
+        <button type="submit">Upload</button>
+    </form><br>
+
+    <form method ="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h4>Television - Select a file</h4>
+        <input type="file" name="tvFile">
+        <button type="submit">Upload</button>
+    </form><br>
+
+    <form method ="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h4>Video Games - Select a file</h4>
+        <input type="file" name="videogamesFile">
+        <button type="submit">Upload</button>
+    </form><br>
+
+    <form method ="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h4>Books - Select a file</h4>
+        <input type="file" name="booksFile">
+        <button type="submit">Upload</button>
+    </form><br>
+
+
+{% endblock %}
