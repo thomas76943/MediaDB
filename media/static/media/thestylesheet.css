@@ -486,11 +486,11 @@ h2 span {
   align-content: center;
   max-width: 100%;
   padding-left: 0;
-  padding-right: 12px;
+  padding-right: 15px;
   --auto-grid-min-size: 3.5rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--auto-grid-min-size), 1fr));
-  grid-gap: 1.1rem;
+  grid-gap: 2rem;
 }
 
 .auto-grid.franchiseGrid {

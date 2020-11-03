@@ -682,9 +682,11 @@ class ConsoleDetailView(generic.DetailView):
 from rest_framework import viewsets, permissions
 from .serializers import *
 
+
 class FilmSerializerView(viewsets.ModelViewSet):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
+
 
 class TelevisionSerializerView(viewsets.ModelViewSet):
     queryset = Television.objects.all()
