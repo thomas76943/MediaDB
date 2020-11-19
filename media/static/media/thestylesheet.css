@@ -21,6 +21,11 @@ html {
   background: none;
   border: 2px lightgrey;
   width: 100%;
+
+  height: 720px;
+  max-height: 720px;
+  overflow-y: scroll;
+
   position: absolute;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -149,9 +154,6 @@ ul {
   border: solid white;
   border-width: 1px 1px;
   object-fit: cover;
-  animation: itemEntrance 300ms ease-out;
-  animation-fill-mode: backwards;
-
 }
 
 .item.detailPoster {
@@ -235,6 +237,7 @@ ul {
     -webkit-mask-image:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
     mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
     padding-bottom: 300px;
+    border: none;
 }
 
 
@@ -389,33 +392,16 @@ h3 {
 
 /*Carousel*/
 .carousel {
-  width: 100%;
   object-fit: cover;
   z-index: 0;
   -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
   -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
   box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+  width:1400px;
+  height:300px
+
 }
 
-.carousel.Image1 {
-  content: url("../../../resources/carouselImages/SpritiedAway.jpg");
-}
-
-.carousel.Image2 {
-  content: url("../../../resources/carouselImages/peaky-blinders-banner-4.jpg");
-}
-
-.carousel.Image3 {
-  content: url("../../../resources/carouselImages/Cyberpunk2077.jpg");
-}
-
-.carousel.Image4 {
-  content: url("../../../resources/carouselImages/HarryPotter.png");
-}
-
-.carousel.Image5 {
-  content: url("../../../resources/carouselImages/VlogSquad.jpg");
-}
 
 /*Poster and Trailer Containers*/
 .responsive-iframe {
@@ -485,16 +471,19 @@ h2 span {
 .auto-grid {
   align-content: center;
   max-width: 100%;
-  padding-left: 0;
-  padding-right: 15px;
-  --auto-grid-min-size: 3.5rem;
+  padding-left: initial;
+  padding-right: 1.75rem;
+
+  /*--auto-grid-min-size: 4%;*/
+  --auto-grid-min-size: 2.5rem;
+
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--auto-grid-min-size), 1fr));
   grid-gap: 2rem;
 }
 
 .auto-grid.franchiseGrid {
-  --auto-grid-min-size: 5.5rem;
+  --auto-grid-min-size: 4.5rem;
   grid-template-columns: repeat(auto-fill, minmax(var(--auto-grid-min-size), 1fr));
 }
 
@@ -608,11 +597,59 @@ h2 span {
 }
 
 
-@media screen and (max-width: 550px) {
+@media screen and (max-width: 675px) {
+
+    .carousel {
+        width: 100%;
+        min-height: 100px;
+        max-height: 100px;
+    }
+
+    .carousel-caption {
+        display: none;
+    }
+
+    .carousel-indicators {
+        display: none;
+    }
+
+    .blur {
+        min-height: 200px;
+    }
+
+    .hs {
+      grid-template-columns: repeat(100, minmax(80px, 1fr));
+    }
+
+    .item {
+        width:80px;
+        height:119px;
+    }
+
+    .item.box {
+        height: 80px;
+    }
+
+    .item.box {
+        height: 80px;
+    }
 
     .item.detailPoster {
         width: 100px;
         height: auto;
+    }
+
+    .item.personDetail {
+       width: 100px;
+       height: auto;
+    }
+
+    .bottomOverlay.content {
+        display: none;
+    }
+
+    .content {
+        display: none;
     }
 
     .trailer {
@@ -628,13 +665,8 @@ h2 span {
     .ratingBox {
         float: none;
         padding-left: 5px;
-        padding-right: 5px;
         margin-left: auto;
         margin-right: auto;
-    }
-
-    div.blur {
-        height: 50px;
     }
 
     div {
@@ -654,6 +686,17 @@ h2 span {
     h5 {
         font-size: 15px;
     }
+
+    .module.franchiseModule {
+      width:70px;
+      height:70px;
+    }
+
+    .auto-grid.franchiseGrid {
+      --auto-grid-min-size: 2.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(var(--auto-grid-min-size), 1fr));
+    }
+
 }
 
 @media screen and (max-width: 275px) {
@@ -662,6 +705,8 @@ h2 span {
     }
 }
 
+
+/*Removing box shadows and selection highlights from inputs*/
 textarea:hover,
 input:hover,
 textarea:active,
@@ -675,10 +720,9 @@ label:focus,
 .btn:active,
 .btn.active
 {
-    outline:0px !important;
+    outline:0 !important;
     -webkit-appearance:none;
-    box-shadow: none !important;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
-    box-shadow: none;
+    box-shadow: none !important;
 }

@@ -103,3 +103,4 @@ admin.site.register(WebSeriesAwardCreditMapping)
 #Tag Mappings
 admin.site.register(Tag)
 admin.site.register(FilmTagMapping)
+admin.site.register(TelevisionTagMapping)

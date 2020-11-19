@@ -49,11 +49,18 @@
 
     {% if films %}
         <div class="container infoSection">
-            <h5>Films:</h5>
-            {% for f in films %}
-                    <a href="/films/{{ f.film.slug }}"> {{ f.film.title }} | {{ f.film.getYear }}</a><br>
-            {% endfor %}
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">Films</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in films %}
+                        <a href="/films/{{ f.film.slug }}">
+                            <img class="item posterSmall" src="{{ f.film.poster.url }}" alt="{{ f.film.title }}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+
     {% endif %}
 
     {% if television %}

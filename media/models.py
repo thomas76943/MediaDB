@@ -984,7 +984,7 @@ class WebSeriesImages(models.Model):
 
 # ---Media Tags and Mappings---------------------------------------------------------------------------------------------------------#
 class Tag(models.Model):
-    name = models.CharField(max_length=50, default='')
+    name = models.CharField(max_length=50, default='', primary_key=True)
 
     def __str__(self):
         return (self.name)
@@ -992,6 +992,10 @@ class Tag(models.Model):
     class Meta:
         verbose_name = "Tag"
         verbose_name_plural = "Tags"
+
+    def save(self, *args, **kwargs):
+        self.name = slugify(self.name)
+        super(Tag, self).save(*args, **kwargs)
 
 
 class FilmTagMapping(models.Model):
@@ -1002,5 +1006,17 @@ class FilmTagMapping(models.Model):
         return (self.tag.name + " - " + self.film.title)
 
     class Meta:
-        verbose_name = "Film - Tag"
-        verbose_name_plural = "Films - Tags"
+        verbose_name = "Film - Tag Mapping"
+        verbose_name_plural = "Films - Tag Mappings"
+
+
+class TelevisionTagMapping(models.Model):
+    television = models.ForeignKey(Television, on_delete=models.PROTECT)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return (self.tag.name + " - " + self.television.title)
+
+    class Meta:
+        verbose_name = "Television - Tag Mapping"
+        verbose_name_plural = "Television - Tag Mappings"

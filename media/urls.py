@@ -36,6 +36,8 @@ urlpatterns = [
     path('genre/<int:pk>', views.GenreDetailView.as_view(), name='media-genre-detail'),
     path('video-game-genre/<int:pk>', views.VideoGameGenreDetailView.as_view(), name='media-gamegenre-detail'),
 
+    path('tag/<str:pk>', views.TagDetailView.as_view(), name='media-tag-detail'),
+
     path('awards/', views.AwardsHome, name='media-awards-home'),
     path('awards/type/<int:pk>', views.AwardsTypeDetail.as_view(), name='media-awardstype-detail'),
     path('awards/show/<int:pk>', views.AwardsShowDetail.as_view(), name='media-awardsshow-detail'),

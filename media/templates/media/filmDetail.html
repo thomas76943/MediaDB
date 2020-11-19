@@ -4,11 +4,14 @@
 
         {% if film.cover %}
             <style type="text/css">
+
             .blur {
                 background-image: url("{{ film.cover.url }}");
                 padding-bottom: 50px;
             }
+
             </style>
+
             <div class="blur"></div>
         {% endif %}
 
@@ -94,8 +97,8 @@
 
         {% if film.synopsis %}
             <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
-                <h6>{{ film.synopsis }}</h6>
+                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Synopsis</h5>
+                {{ film.synopsis }}
             </div>
         {% endif %}
 
@@ -105,9 +108,14 @@
                 <div class="scroller">
                     <ul class="hs full">
                         {% for actor in cast %}
-                            <a class="item" href="/person/{{ actor.person.id }}">
-                            <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
-                            </a>
+                            <div class="bottomOverlay">
+                                <a class="item" href="/person/{{ actor.person.id }}">
+                                    <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                                </a>
+                                <div class="content">
+                                    <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                                </div>
+                            </div>
                         {% endfor %}
                     </ul>
                 </div>
@@ -116,13 +124,32 @@
 
         {% if franchises %}
             <div class="container infoSection">
-                <h5>Franchise:</h5>
+                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise</h5>
                 {% for franchise in franchises %}
-                    <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+                    <br>
+                    <h6><a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a></h6>
                 {% endfor %}
             </div>
         {% endif %}
 
+        {% if tags %}
+            <div class="container infoSection">
+                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Tags</h5>
+                <br>
+                <ul class="cloud-tags">
+                    {% for t in tags %}
+                        <li class="font-weight-bold text-uppercase"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <script>
+            $(function(){
+                $(".cloud-tags").prettyTag({randomColor:true});
+            });
+            </script>
+
+        {% endif %}
 
         <div class="container infoSection">
             <h6>US Release Date: {{ film.release }}</h6>

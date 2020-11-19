@@ -2,14 +2,18 @@
 {% block title %}{{television.title}}{% endblock title %}
 {% block content %}
 
-    {% if television.cover %}
-        <style type="text/css">
-        .blur {
-            background-image: url("{{ television.cover.url }}");
-        }
-        </style>
-        <div class="blur"></div>
-    {% endif %}
+        {% if television.cover %}
+            <style type="text/css">
+
+            .blur {
+                background-image: url("{{ television.cover.url }}");
+                padding-bottom: 50px;
+            }
+
+            </style>
+
+            <div class="blur"></div>
+        {% endif %}
 
 
     <br>
@@ -101,9 +105,14 @@
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
-                        <a class="item" href="/person/{{ actor.person.id }}">
-                        <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
-                        </a>
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.id }}">
+                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
                     {% endfor %}
                 </ul>
             </div>
@@ -150,8 +159,8 @@
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
-                        <a class="item" href="{{ image.filePath }}">
-                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        <a class="item" href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
                         </a>
                     {% endfor %}
                 </ul>

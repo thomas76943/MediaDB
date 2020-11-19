@@ -144,6 +144,8 @@ def browse(request):
         'videoGames': VideoGame.objects.all(),
         'books': Book.objects.all(),
         'webSeries': WebSeries.objects.all(),
+        'people': Person.objects.all(),
+
     }
 
     if request.user.is_authenticated:
@@ -228,7 +230,6 @@ def contributeMedia(request):
 
     context = {
         'forms':forms,
-
     }
 
     if request.method == 'POST':
@@ -276,8 +277,6 @@ def AwardsHome(request):
     }
     return render(request, 'media/awardsHome.html', context)
 
-
-
 def franchiseHome(request):
     context = {
         'franchises':Franchise.objects.all()
@@ -291,7 +290,6 @@ def videoGameFranchiseHome(request):
     }
     return render(request, 'media/gameFranchiseHome.html', context)
 
-
 def topGrossing(request):
 
     topGrossing = {}
@@ -303,13 +301,11 @@ def topGrossing(request):
     }
     return render(request, 'media/topGrossing.html', context)
 
-
 def topRated(request):
     context = {
         'topRated':calculateRatings(100, True),
     }
     return render(request, 'media/topRated.html', context)
-
 
 class AwardsShowDetail(generic.DetailView):
     model = AwardsShow
@@ -478,6 +474,7 @@ class FilmDetailView(generic.DetailView):
         context['images'] = FilmImages.objects.filter(film=self.object.id)
         context['nominationCount'] = FilmAwardMapping.objects.filter(film=self.object.id).count()
         context['winCount'] = FilmAwardMapping.objects.filter(film=self.object.id, win=True).count()
+        context['tags'] = FilmTagMapping.objects.filter(film=self.object.id)
 
         franchises = []
         for x in FilmFranchiseSubcategoryMapping.objects.filter(film=self.object.id):
@@ -527,6 +524,7 @@ class FilmCrewDetailView(generic.DetailView):
         context['producers'] = FilmPersonMapping.objects.filter(role=6, film=self.object.id).order_by('billing')
         context['distributors'] = FilmCompanyMapping.objects.filter(role=1, film=self.object.id)
         context['productionCompanies'] = FilmCompanyMapping.objects.filter(role=2, film=self.object.id)
+        context['tags'] = FilmTagMapping.objects.filter(film=self.object.id)
         return context
 
 
@@ -655,6 +653,19 @@ class GenreDetailView(generic.DetailView):
         context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')
         context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('webSeries__release')
         return context
+
+
+class TagDetailView(generic.DetailView):
+    model = Tag
+    template_name = 'media/tagDetail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['films'] = FilmTagMapping.objects.filter(tag=self.object.name)
+        context['television'] = TelevisionTagMapping.objects.filter(tag=self.object.name)
+
+        return context
+
 
 class VideoGameGenreDetailView(generic.DetailView):
     model = VideoGameGenre

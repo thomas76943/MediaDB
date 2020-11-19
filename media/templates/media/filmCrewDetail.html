@@ -1,8 +1,9 @@
 {% extends "media/base.html" %}
 {% block content %}
 
-    <h2>{{film.title}} | {{ film.getYear }}</h2>
-    <h5>{{ film.length }} mins | {{ film.release }} {% if film.rating %} | {{ film.rating }} {% endif %}</h5>
+    <div class="container infoSection">
+        <h2>{{film.title}} | {{ film.getYear }}</h2>
+        <h5>{{ film.length }} mins | {{ film.release }} {% if film.rating %} | {{ film.rating }} {% endif %}</h5>
 
     {% if genres %}
         {% for genre in genres %}
@@ -10,61 +11,65 @@
         {% endfor %}
         <br>
     {% endif %}
-    <br>
-
-    <h6><a href="/films/{{ film.slug }}">Back to Main Page</a></h6>
-
-    <div class="detailInfo">
-
-        {% if directors %}
-            <hr>
-            <h5>Directed by:</h5>
-            {% for director in directors %}
-                <a style="padding-right:10px" href="/person/{{ director.person.id }}"> {{ director.getPerson }}</a>
-            {% endfor %}
-        {% endif %}
-
-        {% if writers %}
-            <h5 style="padding-top:10px"> Written by:</h5>
-            {% for writer in writers %}
-                <a style="padding-right:10px" href="/person/{{ writer.person.id }}"> {{ writer.getPerson }} </a>
-            {% endfor %}
-        {% endif %}
-
-        {% if producers %}
-            <h5 style="padding-top:10px"> Produced by:</h5>
-            {% for producer in producers %}
-                <a style="padding-right:10px" href="/person/{{ producer.person.id }}"> {{ producer.getPerson }} </a>
-            {% endfor %}
-        {% endif %}
-
-        {% if cast %}
-            <hr>
-            <h5>Cast:</h5>
-                    {% for actor in cast %}
-                        <a href="/person/{{ actor.person.id }}">{{actor.getPerson}}</a>
-                        {% if actor.character %} - {{ actor.character }}{% endif %}
-                        <br>
-                    {% endfor %}
-        {% endif %}
-
-        {% if distributors %}
-            <h6 style="padding-top:10px"> Distributed by:</h6>
-            {% for company in distributors %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
-        {% endif %}
-
-        {% if productionCompanies %}
-            <h6 style="padding-top:10px"> Produced by:</h6>
-            {% for company in productionCompanies %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
-        {% endif %}
-
-        <hr>
-
-
     </div>
+
+    <div class="container infoSection">
+        <h6><a href="/films/{{ film.slug }}">Back to Main Page</a></h6>
+    </div>
+
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5>Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.id }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:10px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.id }}"> {{ writer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5 style="padding-top:10px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.id }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+    {% if cast %}
+        <div class="container infoSection">
+            <h5>Cast:</h5>
+                {% for actor in cast %}
+                    <a href="/person/{{ actor.person.id }}">{{actor.getPerson}}</a>
+                    {% if actor.character %} - {{ actor.character }}{% endif %}
+                    <br>
+                {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if distributors or productionCompanies %}
+        <div class="container infoSection">
+            {% if distributors %}
+                <h6 style="padding-top:10px"> Distributed by:</h6>
+                {% for company in distributors %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
+
+            {% if productionCompanies %}
+                <h6 style="padding-top:10px"> Produced by:</h6>
+                {% for company in productionCompanies %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
 
 {% endblock %}

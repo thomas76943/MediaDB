@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    {% load static %}
+
     <!--Default Template Title-->
     <title>{% block title %}Home{% endblock title %} - MediaDB</title>
 
@@ -24,8 +27,11 @@
     <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
 
+    <!--Colorful Tag jQuery Plugin -->
+    <link rel="stylesheet" href="{% static 'media/prettytag.css' %}" type="text/css">
+    <script src="{% static 'media/jquery.prettytag.js' %}"></script>
+
     <!--Custom CSS-->
-    {% load static %}
     <link rel="stylesheet" href="{% static 'media/thestylesheet.css' %}" type="text/css">
     <link rel="shortcut icon" type="image/png" href="{% static 'media/favicon.png' %}"/>
 

@@ -1,0 +1,50 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Browsing: </h5>
+        <br>
+        <ul class="cloud-tags-container">
+            <li class="font-weight-bold text-uppercase"><a class="cloud-tags" href="/tag/{{tag.name}}"> {{tag.name}}</a></li>
+        </ul>
+    </div>
+
+    <script>
+    $(function(){
+        $(".cloud-tags").prettyTag({randomColor:true});
+    });
+    </script>
+
+    {% if films %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ tag.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in films %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if television %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ tag.title }} Television:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for t in television %}
+                        <a href="/films/{{ t.television.slug }}">
+                        <img class="item posterSmall" src="{{t.television.poster.url}}" alt="{{t.television.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <hr><br>
+
+{% endblock %}
