@@ -121,9 +121,15 @@ def searchResults(request):
     context = {}
 
     if title_contains != '' and title_contains is not None:
+        people = []
+        for p in Person.objects.all():
+            if p.getFullName().lower().__contains__(title_contains):
+              people.append(p)
+
         context = {
             'searchQuery':title_contains,
-            'people':Person.objects.all().filter(Q(firstName__icontains=title_contains) | Q(surname__icontains=title_contains)).order_by('surname'),
+            #'people':Person.objects.all().filter(Q(firstName__icontains=title_contains) | Q(surname__icontains=title_contains)).order_by('surname'),
+            'people':people,
             'franchises': Franchise.objects.all().filter(title__icontains=title_contains).order_by('title'),
             'videogamefranchises': VideoGameFranchise.objects.all().filter(title__icontains=title_contains).order_by('title'),
             'consoles' : Console.objects.all().filter(Q(name__icontains=title_contains) | Q(shortName__icontains=title_contains)).order_by('name'),
@@ -504,6 +510,15 @@ class FilmDetailView(generic.DetailView):
                 r = FilmRating.objects.filter(user=self.request.user, film=self.object.id).first()
                 if r is not None:
                     context['userRating'] = r.rating
+
+        if self.request.user.is_authenticated:
+            context['inList'] = False
+            for listFilm in UserListFilmMapping.objects.filter(user=self.request.user):
+                if listFilm.film.id == self.object.id:
+                    context['inList'] = True
+                    break
+
+        listForm = FilmListForm()
 
         context['ratingForm'] = filmRatingForm()
 

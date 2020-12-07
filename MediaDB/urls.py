@@ -33,6 +33,8 @@ urlpatterns = [
     path('user/<str:username>', user_views.memberProfile.as_view(), name='member-profile-detail'),
     path('user/<str:username>/activity', user_views.memberProfileActivity.as_view(), name='member-profile-activity-detail'),
 
+    path('list/', user_views.userList.as_view(), name='user-List'),
+
     #MediaDB URLs
     path('', include('media.urls')),
 

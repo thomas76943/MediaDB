@@ -62,3 +62,10 @@ class filmRatingForm(forms.Form):
         widgets = {
             'rating':forms.FloatField()
         }
+
+
+class FilmListForm(forms.ModelForm):
+    class Meta:
+        model = UserListFilmMapping
+        fields = ['user','film']
+

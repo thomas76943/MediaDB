@@ -1,0 +1,56 @@
+{% extends "media/base.html" %}
+{% block title %}My List{% endblock title %}
+{% load crispy_forms_filters %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ user.username }}</h5><br>
+        <h6>My List</h6>
+        <br><br>
+
+        <ul class="auto-grid">
+            {% for f in films %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/films/{{ f.film.slug }}">
+                        {% if f.film in ratedFilms %}
+                            <img class="item posterSmall seen" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        Seen
+                        {% else %}
+                            <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+            {% for t in tv %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/tv/{{ t.television.slug }}">
+                        <img class="item posterSmall" src="{{t.television.poster.url}}" alt="{{t.television.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for vg in videoGames %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/video-games/{{ vg.videoGame.slug }}">
+                        <img class="item posterSmall" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for b in books %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/books/{{ b.book.slug }}">
+                        <img class="item posterSmall" src="{{b.book.image.url}}" alt="{{b.book.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            {% for ws in webSeries %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/web-series/{{ ws.webSeries.slug }}">
+                        <img class="item posterSmall" src="{{ws.webSeries.poster.url}}" alt="{{ws.webSeries.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+{% endblock %}

@@ -52,6 +52,58 @@ def userProfile(request):
     }
     return render(request, 'users/userProfile.html', context)
 
+
+
+class userList(generic.DetailView):
+    model = User
+    slug_field = "username"
+    slug_url_kwarg = "username"
+    template_name = 'users/userList.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['films'] = UserListFilmMapping.objects.filter(user=self.object.id)
+        context['television'] = UserListTelevisionMapping.objects.filter(user=self.object.id)
+        context['videoGames'] = UserListVideoGameMapping.objects.filter(user=self.object.id)
+        context['books'] = UserListBookMapping.objects.filter(user=self.object.id)
+        context['webSeries'] = UserListWebSeriesMapping.objects.filter(user=self.object.id)
+
+        userFRatings = FilmRating.objects.filter(user=self.object.id)
+        seen = []
+        for ur in userFRatings:
+            seen.append(ur.film)
+        context['ratedFilms'] = seen
+
+        userTRatings = TelevisionRating.objects.filter(user=self.object.id)
+        seen = []
+        for ur in userTRatings:
+            seen.append(ur.television)
+        context['ratedTV'] = seen
+
+        userVGRatings = VideoGameRating.objects.filter(user=self.object.id)
+        seen = []
+        for ur in userVGRatings:
+            seen.append(ur.videoGame)
+        context['ratedVideoGames'] = seen
+
+        userBRatings = BookRating.objects.filter(user=self.object.id)
+        seen = []
+        for ur in userBRatings:
+            seen.append(ur.book)
+        context['ratedBooks'] = seen
+
+        userWSRatings = WebSeriesRating.objects.filter(user=self.object.id)
+        seen = []
+        for ur in userWSRatings:
+            seen.append(ur.webSeries)
+        context['ratedWebSeries'] = seen
+
+        return context
+
+
 class memberProfile(generic.DetailView):
     model = User
     slug_field = "username"

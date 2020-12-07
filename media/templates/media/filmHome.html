@@ -5,6 +5,80 @@
         <h1 class="font-weight-bold text-uppercase">Films - Home</h1>
     </div>
 
+        <!--Carousel-->
+    <div id="c1" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#c1" data-slide-to="0" class="active"></li>
+          <li data-target="#c1" data-slide-to="1"></li>
+          <li data-target="#c1" data-slide-to="2"></li>
+          <li data-target="#c1" data-slide-to="3"></li>
+          <li data-target="#c1" data-slide-to="4"></li>
+        </ul>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <a href="/films/spirited-away-2003-09-12">
+                <img class="carousel"
+                style="content: url(../../../resources/carouselImages/castle-in-the-sky-cover.jpg)">
+            </a>
+            <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Studio Ghibli</span></h2>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/films/star-wars-episode-iv-a-new-hope-1977-05-25">
+                <img class="carousel"
+                style="content: url(../../../resources/carouselImages/sw-esb-cover.png)">
+            </a>
+            <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Star Wars</span></h2>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+              <a href="/films/singin-in-the-rain-1952-04-11">
+                  <img class="carousel"
+                  style="content: url(../../../resources/carouselImages/SinginInTheRainBanner-New.jpg)">
+              </a>
+              <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Classics</span></h2>
+              </div>
+          </div>
+
+          <div class="carousel-item">
+              <a href="/franchises/marvel-comics">
+                  <img class="carousel" width="1400" height="300"
+                  style="content: url(../../../resources/carouselImages/mcuCarousel.png)">
+              </a>
+              <div class="carousel-caption">
+                <h2 class="font-weight-bold text-uppercase"><span>Marvel Cinematic Universe</span></h2>
+              </div>
+          </div>
+
+
+        </div>
+
+        <!-- LR controls -->
+        <a class="carousel-control-prev" href="#c1" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#c1" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+    </div>
+
+    <script>
+    $('#c1').carousel({
+      interval: 30000,
+      cycle: true
+    });
+    </script>
+    <br>
+
     <div class="container infoSection">
         <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY FRANCHISE
             <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>

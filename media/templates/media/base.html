@@ -14,18 +14,25 @@
     <!--Font Awesome-->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <!--Bootstrap    -->
+    <!--Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+
+
     <!-- Bootstrap Material Design -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
+
+
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <!--Colorful Tag jQuery Plugin -->
     <link rel="stylesheet" href="{% static 'media/prettytag.css' %}" type="text/css">
@@ -241,53 +248,21 @@
                         <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
                           <div class="container noBoxShadow">
                             <div class="row bg-dark rounded-0 m-0 shadow-sm">
-                              <div class="col-lg-7 col-xl-8" style="background-color: rgba(30,30,30,0.88)">
-                                <div class="p-4">
+                              <div class="col" style="padding:20px; background-color: rgba(30,30,30,0.88)">
                                   <hr>
-                                  <div class="row">
-                                    <div class="col-lg-6 mb-4">
-                                      <h5>
-                                          <a href="/user/{{ user.username }}" class="nav-link font-weight-bold text-uppercase">
-                                              <img class="mediaIcon User">
-                                              View Profile
-                                          </a>
-                                      </h5>
-                                      <ul class="list-unstyled">
-                                        <li class="nav-item"><a href="{% url 'userProfile' %}" class="nav-link text-small pb-0 ">Edit Profile</a></li>
-                                        <li class="nav-item"><a href="/user/{{ user.username }}/activity" class="nav-link text-small pb-0 ">Ratings + Reviews</a></li>
-                                        <li class="nav-item"><a href="{% url 'contribute-company' %}" class="nav-link text-small pb-0 ">Lists</a></li>
-                                        <li class="nav-item"><a href="{% url 'contribute-role' %}" class="nav-link text-small pb-0 ">Edits</a></li>
-                                      </ul>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                      <h5>
-                                          <a href="{% url 'csv-upload' %}" class="nav-link font-weight-bold text-uppercase">
-                                              <img class="mediaIcon Upload">
-                                              Upload CSV
-                                          </a>
-                                      </h5>
-                                      <ul class="list-unstyled">
-                                        <li class="nav-item"><a href="{% url 'csv-upload' %}" class="nav-link text-small pb-0 ">CSV Data Upload</a></li>
-                                      </ul>
-                                    </div>
-                                    <div class="col-lg-6 mb-4">
-                                      <h5>
-                                          <a href="{% url 'csv-upload' %}" class="nav-link font-weight-bold text-uppercase">
-                                              <img class="mediaIcon Upload">
-                                              Upload CSV
-                                          </a>
-                                      </h5>
-                                      <ul class="list-unstyled">
-                                        <li class="nav-item"><a href="{% url 'csv-upload' %}" class="nav-link text-small pb-0 ">CSV Data Upload</a></li>
-                                      </ul>
-                                    </div>
-                                  </div>
+                                  <h5>
+                                      <a href="/user/{{ user.username }}" class="nav-link font-weight-bold text-uppercase">
+                                          <img class="mediaIcon User">
+                                          View Profile
+                                      </a>
+                                  </h5>
+                                  <ul class="list-unstyled">
+                                    <li class="nav-item"><a href="{% url 'userProfile' %}" class="nav-link text-small pb-0 ">Edit Profile</a></li>
+                                    <li class="nav-item"><a href="/user/{{ user.username }}/activity" class="nav-link text-small pb-0 ">My Ratings/Reviews</a></li>
+                                    <li class="nav-item"><a href="{% url 'user-List' %}" class="nav-link text-small pb-0 ">My List</a></li>
+                                    <li class="nav-item"><a href="{% url 'contribute-role' %}" class="nav-link text-small pb-0 ">My Edits</a></li>
+                                  </ul>
                                   <hr>
-                                </div>
-                              </div>
-
-                              <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
-                                   style="background: center center url(/resources/extraImages/bp3.jpg) no-repeat; background-size: cover;">
                               </div>
                             </div>
                           </div>
@@ -297,6 +272,8 @@
                     <li class="nav-item"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'login' %}">Login</a></li>
                     <li class="nav-item"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'register' %}">Register</a></li>
                 {% endif %}
+
+
             </ul>
 
             <!-- Right-Hand Nav Bar -->

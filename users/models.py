@@ -11,7 +11,6 @@ class Profile(models.Model):
     bio = models.CharField(max_length=500, default="", blank=True)
     country = models.CharField(max_length=25, default="", blank=True)
 
-
     def __str__(self):
         return self.user.username + " Profile"
 
@@ -22,7 +21,6 @@ class Profile(models.Model):
             output_size = (300,300)
             img.thumbnail(output_size)
             img.save(self.image.path)
-
 
 class ProfileSection(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -164,3 +162,63 @@ class WebSeriesRating(models.Model):
     class Meta:
         verbose_name = "Web Series - Rating"
         verbose_name_plural = "Web Series - Ratings"
+
+
+class UserListFilmMapping(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    film = models.ForeignKey(Film, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.username + " - " + self.film.title
+
+    class Meta:
+        verbose_name = "User List - Film Mapping"
+        verbose_name_plural = "User List - Film Mappings"
+
+
+class UserListTelevisionMapping(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    television = models.ForeignKey(Television, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.username + " - " + self.television.title
+
+    class Meta:
+        verbose_name = "User List - Television Mapping"
+        verbose_name_plural = "User List - Television Mappings"
+
+
+class UserListVideoGameMapping(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.username + " - " + self.videoGame.title
+
+    class Meta:
+        verbose_name = "User List - Video Game Mapping"
+        verbose_name_plural = "User List - Video Game Mappings"
+
+
+class UserListBookMapping(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.username + " - " + self.book.title
+
+    class Meta:
+        verbose_name = "User List - Book Mapping"
+        verbose_name_plural = "User List - Book Mappings"
+
+
+class UserListWebSeriesMapping(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.username + " - " + self.webSeries.title
+
+    class Meta:
+        verbose_name = "User List - Web Series Mapping"
+        verbose_name_plural = "User List - Web Series Mappings"
