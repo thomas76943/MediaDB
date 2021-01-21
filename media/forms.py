@@ -23,7 +23,7 @@ class ContributeFilmForm(forms.ModelForm):
     class Meta:
         model = Film
         fields = ['title', 'release', 'rating', 'synopsis', 'length', 'budget',
-                  'boxOffice', 'posterFilePath', 'trailerVideoPath']
+                  'boxOffice', 'trailerVideoPath']
 
         widgets = {
             'title':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
@@ -33,7 +33,6 @@ class ContributeFilmForm(forms.ModelForm):
             'length': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Length (mins)'}),
             'budget': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Budget'}),
             'boxOffice': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Box Offce'}),
-            'posterFilePath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Poster File Path'}),
             'trailerVideoPath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
         }
 
@@ -41,7 +40,7 @@ class ContributeTelevisionForm(forms.ModelForm):
     class Meta:
         model = Television
         fields = ['title', 'ongoing', 'release', 'end', 'synopsis', 'seasons',
-                  'episodes', 'posterFilePath', 'trailerVideoPath']
+                  'episodes', 'trailerVideoPath']
 
         widgets = {
             'title':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
@@ -50,7 +49,6 @@ class ContributeTelevisionForm(forms.ModelForm):
             'synopsis': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Synopsis'}),
             'seasons': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Seasons'}),
             'episodes': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Episodes'}),
-            'posterFilePath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Poster File Path'}),
             'trailerVideoPath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
         }
 

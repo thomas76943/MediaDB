@@ -2,8 +2,27 @@
 {% block title %}{{book.title}}{% endblock title %}
 {% block content %}
 
-    <h2>{{book.title}} | {{ book.getYear }}</h2>
-    <h5>{{ film.release }}</h5>
+    {% if book.cover %}
+        <style type="text/css">
+        .blur {
+            background-image: url("{{ book.cover.url }}");
+        }
+        </style>
+        <div class="blur"></div>
+    {% endif %}
+
+    <div class="container titleSection">
+
+        <form id="listForm">
+            {% csrf_token %}
+            <div style="float:right" class="plus-toggle">
+              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+              <label for="plus-toggle"></label>
+            </div>
+        </form>
+
+        <h2>{{book.title}} | {{ book.getYear }}</h2>
+        <h5>{{ film.release }}</h5>
 
     {% if genres %}
         {% for genre in genres %}
@@ -11,51 +30,67 @@
         {% endfor %}
     {% endif %}
 
+    </div>
 
-    <br><br>
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if book.image != 'MissingIcon.png' or averageRating %}
+        <div class="container posterTrailerContainer">
+            <div class="row" style="padding: 10px">
+                <img class="item detailPoster" style="float:left" src="{{book.image.url}}" alt="{{book.title}}">
 
-    <img class="item detailPoster" src="{{book.image.url}}" alt="{{book.title}}">
+                    <div class="col">
+                        {% if averageRating %}
+                            <div class="container ratingBox">
+                                <h5>Average Rating: </h5>
+                                <h4>{{ averageRatingText }}</h4>
+                                <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                            </div>
+                        {% endif %}
 
-    <hr>
+                        {% if user.is_authenticated %}
+                            <div class="container ratingBox">
+                                <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
+    {% endif %}
+
 
      {% if authors %}
-        <h5 style="padding-top:10px"> Written by:</h5>
-        {% for author in authors %}
-            <a style="padding-right:10px" href="/person/{{ author.person.id }}"> {{ author.getPerson }}</a>
-        {% endfor %}
-    {% endif %}
-
-    <hr>
-
-    <h5>Synopsis:</h5>
-    <h6>{{ book.synopsis }}</h6>
-
-    {% if franchises %}
-        <hr>
-        <h5>Part of the Following Franchises:</h5>
-        {% for franchise in franchises %}
-            <a href="/franchises/{{ franchise.franchise.slug }}"> {{ franchise.franchise.title }} </a><br>
-        {% endfor %}
-    {% endif %}
-
-    <hr>
-
-    {% if publishers %}
-        <h6 style="padding-top:10px"> Published by:</h6>
-        {% for company in publishers %}
-            <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-        {% endfor %}
-    {% endif %}
-
-    <hr>
-
-    {% if franchises %}
         <div class="container infoSection">
-            <h5>Franchise:</h5>
-            {% for franchise in franchises %}
-                <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+            <h5 style="padding-top:10px"> Written by:</h5>
+            {% for author in authors %}
+                <a style="padding-right:10px" href="/person/{{ author.person.slug }}"> {{ author.getPerson }}</a>
             {% endfor %}
         </div>
     {% endif %}
+
+    {% if book.synopsis %}
+        <div class="container infoSection">
+            <h5>Synopsis:</h5>
+            <h6>{{ book.synopsis }}</h6>
+        </div>
+    {% endif %}
+
+    {% if publishers %}
+        <div class="container infoSection">
+            <h6 style="padding-top:10px"> Published by:</h6>
+            {% for company in publishers %}
+                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5>Part of the Following Franchises:</h5>
+            {% for franchise in franchises %}
+                <a href="/franchises/{{ franchise.franchise.slug }}"> {{ franchise.franchise.title }} </a><br>
+            {% endfor %}
+            </div>
+    {% endif %}
+
 
 {% endblock %}

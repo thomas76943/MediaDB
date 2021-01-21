@@ -30,7 +30,7 @@
             {% for credit in filmCredits %}
                 {% if credit.FilmAwardMapping == fn %}
                     {% if credit.Person %}
-                        | <a href="/person/{{ credit.Person.id }}"> {{ credit.Person.getFullName }}</a>
+                        | <a href="/person/{{ credit.Person.slug }}"> {{ credit.Person.getFullName }}</a>
                     {% endif %}
                     {% if credit.Company %}
                         | <a href="/company/{{ credit.Company.slug }}"> {{ credit.Company.name }}</a>
@@ -61,7 +61,7 @@
                                 {% if category.personCompanyPriority %}
                                         {% for credit in filmCredits %}
                                             {% if credit.FilmAwardMapping == fn %}
-                                                <a href="/person/{{ credit.Person.id }}">
+                                                <a href="/person/{{ credit.Person.slug }}">
                                                 {% if fn.win %}
                                                     <img class="item additionalImage winner" src="{{credit.Person.image.url}}" alt="{{credit.Person.getFullName}}">
                                                 {% else %}

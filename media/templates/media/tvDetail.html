@@ -19,6 +19,15 @@
     <br>
 
     <div class="container titleSection">
+
+        <form id="listForm">
+            {% csrf_token %}
+            <div style="float:right" class="plus-toggle">
+              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+              <label for="plus-toggle"></label>
+            </div>
+        </form>
+
         <h2>
         {{television.title}} | {{ television.getYear }}
         {% if television.ongoing == False %}
@@ -41,72 +50,75 @@
 
     <br>
 
-    <div class="container posterTrailerContainer">
-        <div class="row" style="padding: 10px">
-            <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
+    {% if television.poster != 'MissingIcon.png' or television.trailerVideoPath or averageRating %}
+        <div class="container posterTrailerContainer">
+            <div class="row" style="padding: 10px">
+                <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
                 {% if television.trailerVideoPath %}
                     <iframe class="trailer" width="711" height="400" src={{television.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
-                {% if averageRating %}
-                    <div class="col">
+
+                <div class="col">
+
+                    {% if averageRating %}
                         <div class="container ratingBox">
                             <h5>Average Rating: </h5>
                             <h4>{{ averageRating }}</h4>
                             <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
                         </div>
-                        {% if user.is_authenticated %}
-                            {% if userRating  %}
-                                <div class="container ratingBox">
-                                    <h4>My Rating:</h4>
-                                    <h4>{{ userRating }}</h4>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                {% endif %}
+                    {% endif %}
 
+                    {% if user.is_authenticated %}
+                        <div class="container ratingBox">
+                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
+                        </div>
+                    {% endif %}
 
+                </div>
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {% if showrunners or writers or producers %}
         <div class="container infoSection">
             {% if showrunners %}
-                    <h5>Created by:</h5>
+                    <h5 style="padding-top:5px">Created by:</h5>
                     {% for showrunner in showrunners %}
-                        <a style="padding-right:10px" href="/person/{{ showrunner.person.id }}"> {{ showrunner.getPerson }}</a>
+                        <a style="padding-right:10px" href="/person/{{ showrunner.person.slug }}"> {{ showrunner.getPerson }}</a>
                     {% endfor %}
             {% endif %}
 
             {% if writers %}
-                <h5 style="padding-top:10px"> Written by:</h5>
+                <h5 style="padding-top:10px">Written by:</h5>
                 {% for writer in writers %}
-                    <a style="padding-right:10px" href="/person/{{ writer.person.id }}"> {{ writer.getPerson }} </a>
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} </a>
                 {% endfor %}
             {% endif %}
 
             {% if producers %}
-                <h5> Produced by:</h5>
+                <h5 style="padding-top:10px">Produced by:</h5>
                 {% for producer in producers %}
-                    <a style="padding-right:10px" href="/person/{{ producer.person.id }}"> {{ producer.getPerson }} </a>
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
                 {% endfor %}
             {% endif %}
         </div>
     {% endif %}
 
-    <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
-        <h6>{{ television.synopsis }}</h6>
-    </div>
+    {% if television.synopsis %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+            <h6>{{ television.synopsis }}</h6>
+        </div>
+    {% endif %}
 
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
                         <div class="bottomOverlay">
-                            <a class="item" href="/person/{{ actor.person.id }}">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
                                 <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
                             </a>
                             <div class="content">
@@ -121,7 +133,7 @@
 
     {% if franchises %}
         <div class="container infoSection">
-            <h5>Franchise:</h5>
+            <h5 style="padding-top:5px">Franchise:</h5>
             {% for franchise in franchises %}
                 <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
             {% endfor %}
@@ -129,7 +141,7 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6>First Episode Air  Date: {{ television.release }}</h6>
+        <h6 style="padding-top:5px">First Episode Air  Date: {{ television.release }}</h6>
         {% if television.ongoing == False %}
             <h6>Final Episode Air Date: {{ television.end }}</h6>
         {% endif %}

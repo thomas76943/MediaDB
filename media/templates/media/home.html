@@ -115,12 +115,34 @@
             <ul class="hs full">
                 {% for film, rating in highestRatedFilms.items %}
                     <div class="bottomOverlay">
+
                         <a href="/films/{{ film.slug }}">
                             <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                             <div class="content">
+
                                 <h6 class = "font-weight-bold text-uppercase" >
-                                    {{ rating }}
+
+
+                                    <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
+                                    <div style="display: inline-block">{{ rating }}</div>
+
+                                    <script>
+                                        $('#{{film.slug}}').rateYo({
+                                            rating:'{% widthratio rating 1 2 %}',
+                                            starWidth:'15px',
+                                            numStars:5,
+                                            minValue:0,
+                                            maxValue:10,
+                                            normalFill:'gray',
+                                            ratedFill:'orange',
+                                            halfStar:true,
+                                            readOnly:true,
+                                        })
+                                    </script>
+                                    <!--
                                     <div class="ratingStars small" style="--rating: {{ rating }};"></div>
+                                    -->
+
                                 </h6>
                             </div>
                         </a>
@@ -153,11 +175,11 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">OLDEST PEOPLE</h5>
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Actors</h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for person in people %}
-                    <a href="/person/{{ person.id }}">
+                    <a href="/person/{{ person.slug }}">
                         <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
                     </a>
                 {% endfor %}
@@ -172,7 +194,7 @@
             <div class="scroller" >
                 <ul class="hs full">
                     {% for person in bornToday %}
-                        <a href="/person/{{ person.id }}">
+                        <a href="/person/{{ person.slug }}">
                             <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
                         </a>
                     {% endfor %}

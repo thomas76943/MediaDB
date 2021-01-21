@@ -49,7 +49,7 @@
             {% endfor %}
             {% for p in people %}
                 <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/person/{{ p.id }}">
+                    <a href="/person/{{ p.slug }}">
                         <img class="item personSmall" src="{{p.image.url}}" alt="{{p.getFullName}}">
                     </a>
                 </li>

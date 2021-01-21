@@ -15,6 +15,7 @@ class Person(models.Model):
     imageFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png')
     bio = models.CharField(max_length=1000, default='', blank=True)
     image = models.ImageField(default='MissingIcon.png', upload_to='people', blank=True)
+    slug = models.SlugField(max_length=150, blank=True, editable=True)
 
     def __str__(self):
         return (self.firstName + " " + self.surname)
@@ -29,10 +30,14 @@ class Person(models.Model):
             output_size = (600,600)
             img.thumbnail(output_size)
             img.save(self.image.path)
+        if not self.slug:
+            self.slug = slugify(self.getFullName() + "-" + str(self.DoB))
+        super(Person, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Person"
         verbose_name_plural = "People"
+
 
 class PersonRole(models.Model):
     role = models.CharField(max_length=500, default='NoRoleNameSpecified')
@@ -90,9 +95,7 @@ class Film(models.Model):
     length = models.IntegerField(null=True, blank=True)
     budget = models.IntegerField(null=True, blank=True)
     boxOffice = models.IntegerField(null=True, blank=True)
-    posterFilePath = models.CharField(max_length=500, default='', blank=True)
     trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
     poster = models.ImageField(default='MissingIcon.png', upload_to='posters', blank=True)
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -114,6 +117,9 @@ class Film(models.Model):
 
     def getYear(self):
         return self.release.year
+
+    def get_absolute_url(self):
+        return ''
 
     class Meta:
         verbose_name = "Film"

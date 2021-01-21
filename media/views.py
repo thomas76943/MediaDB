@@ -17,8 +17,9 @@ from django.db.models import Q
 from .models import *
 from users.models import *
 from .forms import *
+from django.db.models import Count
 
-def calculateRatings(quantity, reverse):
+def calculateHighestRated(quantity, reverse):
     films = Film.objects.all()
     filmRatingsDict = {}
 
@@ -28,7 +29,7 @@ def calculateRatings(quantity, reverse):
         if fRatingsCount > 0:
             fRatingSum = 0
             for rating in fRatings:
-                fRatingSum += rating.rating
+                fRatingSum += float(rating.rating / 2)
             fRatingAverage = (fRatingSum / fRatingsCount)
             average2DP = "{:.1f}".format(fRatingAverage)
             filmRatingsDict[f] = average2DP
@@ -37,6 +38,7 @@ def calculateRatings(quantity, reverse):
     sortedRatings = dict(sorted(filmRatingsDict.items(), key=lambda x: float(x[1]), reverse=reverse))
     highestRated = dict(itertools.islice(sortedRatings.items(), quantity))
     return highestRated
+
 
 def calculateTopGrossing(quantity):
     topGrossing = Film.objects.all().order_by('-boxOffice')[:quantity]
@@ -52,6 +54,85 @@ def calculateTopGrossing(quantity):
         filmGrossingDict[f] = '$' + '{}{}'.format('{:.3f}'.format(gross).rstrip('0'), symbols[magnitude])
 
     return filmGrossingDict
+
+def findDulplicateTitles():
+
+    #repeated_names = Application.objects.values('school_name', 'category').annotate(Count('id')).order_by().filter(
+    #    id__count__gt=0)  # <--- gt 0 will get all the objects having occurred in DB i.e is greater than 0
+
+
+    repeatedtitles = Film.objects.values('title').annotate(Count('id')).order_by().filter(id__count__gt=1)
+
+    return repeatedTitles
+
+def postRequest(self, request, *args, **kwargs):
+    object = self.get_object()
+    print(type(object))
+
+    if self.request.user.is_authenticated:
+
+        # POST Request: Adding/Removing from List
+        if request.POST['type'] == "listToggle":
+            toggle = request.POST['toggle']
+            #Adding Media to List
+            if toggle == "add":
+                if isinstance(object, Film):
+                    l = UserListFilmMapping(user=self.request.user, film=object)
+                elif isinstance(object, Television):
+                    l = UserListTelevisionMapping(user=self.request.user, television=object)
+                elif isinstance(object, VideoGame):
+                    l = UserListVideoGameMapping(user=self.request.user, videoGame=object)
+                elif isinstance(object, Book):
+                    l = UserListBookMapping(user=self.request.user, book=object)
+                elif isinstance(object, WebSeries):
+                    l = UserListWebSeriesMapping(user=self.request.user, webSeries=object)
+                l.save()
+            else:
+                #Removing Media from List
+                if isinstance(object, Film):
+                    UserListFilmMapping.objects.filter(user=self.request.user, film=object.id).delete()
+                elif isinstance(object, Television):
+                    UserListTelevisionMapping.objects.filter(user=self.request.user, television=object.id).delete()
+                elif isinstance(object, VideoGame):
+                    UserListVideoGameMapping.objects.filter(user=self.request.user, videoGame=object.id).delete()
+                elif isinstance(object, Book):
+                    UserListBookMapping.objects.filter(user=self.request.user, book=object.id).delete()
+                elif isinstance(object, WebSeries):
+                    UserListWebSeriesMapping.objects.filter(user=self.request.user, webSeries=object.id).delete()
+
+        #POST Request: Adding/Changing a Rating
+        else:
+            newRating = float(request.POST['nr']) * 2
+            if isinstance(object, Film):
+                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
+            elif isinstance(object, Television):
+                r = TelevisionRating.objects.filter(user=self.request.user, television=object.id).first()
+            elif isinstance(object, VideoGame):
+                r = VideoGameRating.objects.filter(user=self.request.user, videoGame=object.id).first()
+            elif isinstance(object, Book):
+                r = BookRating.objects.filter(user=self.request.user, book=object.id).first()
+            elif isinstance(object, WebSeries):
+                r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=object.id).first()
+
+            # If Updating a Rating
+            if r is not None:
+                r.rating = newRating
+                r.save()
+            # If Creating a New Rating
+            else:
+                if isinstance(object, Film):
+                    rating = FilmRating(user=self.request.user, film=object, rating=newRating)
+                elif isinstance(object, Television):
+                    rating = TelevisionRating(user=self.request.user, television=object, rating=newRating)
+                elif isinstance(object, VideoGame):
+                    rating = VideoGameRating(user=self.request.user, videoGame=object, rating=newRating)
+                elif isinstance(object, Book):
+                    rating = BookRating(user=self.request.user, book=object, rating=newRating)
+                elif isinstance(object, WebSeries):
+                    rating = WebSeries(user=self.request.user, webSeries=object, rating=newRating)
+                rating.save()
+
+    return super(FilmDetailView, self).post(request, *args, **kwargs)
 
 def dataSources(request):
     fImages = FilmImages.objects.all()
@@ -109,11 +190,20 @@ def home(request):
         'webseries':WebSeries.objects.all()[:30],
         'people':Person.objects.all().order_by('DoB')[:30],
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
-        'highestRatedFilms':calculateRatings(20, True),
+        'highestRatedFilms':calculateHighestRated(20, True),
         'topGrossing':calculateTopGrossing(30),
     }
 
+
     return render(request, 'media/home.html', context)
+
+def testing(request):
+
+    context = {
+        'counts':findDulplicateTitles()
+    }
+    return render (request, 'media/testingPage.html', context)
+
 
 def searchResults(request):
     title_contains = request.GET.get('q')
@@ -309,7 +399,7 @@ def topGrossing(request):
 
 def topRated(request):
     context = {
-        'topRated':calculateRatings(100, True),
+        'topRated':calculateHighestRated(100, True),
     }
     return render(request, 'media/topRated.html', context)
 
@@ -367,6 +457,8 @@ class AwardsCategoryDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['films'] = FilmAwardCreditMapping.objects.filter(FilmAwardMapping__category=self.object.id).filter(FilmAwardMapping__win=True)
+        a = FilmAwardCreditMapping.objects.filter(FilmAwardMapping__category=self.object.id)
+        print(a)
         context['television'] = TelevisionAwardCreditMapping.objects.filter(TelevisionAwardMapping__category=self.object.id).filter(TelevisionAwardMapping__win=True)
         context['videogames'] = VideoGameAwardCreditMapping.objects.filter(VideoGameAwardMapping__category=self.object.id).filter(VideoGameAwardMapping__win=True)
         context['books'] = BookAwardCreditMapping.objects.filter(BookAwardMapping__category=self.object.id).filter(BookAwardMapping__win=True)
@@ -375,6 +467,7 @@ class AwardsCategoryDetail(generic.DetailView):
 
 class PersonDetailView(generic.DetailView):
     model = Person
+    slug_field, slug_url_kwarg = "slug", "slug"
     template_name = 'media/personDetail.html'
 
     def get_context_data(self, **kwargs):
@@ -438,6 +531,38 @@ class FranchiseDetailView(generic.DetailView):
                 #Dynamic context name for the subcategory in the template
                 context[subcategories[x].title] = completeSubCat
 
+        franchiseFilms = FilmFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
+        franchiseTelevision = TelevisionFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
+        franchiseVideoGames = VideoGameFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
+        franchiseBooks = BookFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
+        franchiseWebSeries = WebSeriesFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
+
+        completeFranchise = list(chain(franchiseFilms, franchiseTelevision, franchiseVideoGames, franchiseBooks, franchiseWebSeries))
+
+        franchisePeople = {}
+        for media in completeFranchise:
+            if hasattr(media,'film'):
+                crew = FilmPersonMapping.objects.filter(film=media.film)
+            if hasattr(media,'television'):
+                crew = TelevisionPersonMapping.objects.filter(television=media.television)
+            if hasattr(media,'videogame'):
+                crew = VideoGamePersonMapping.objects.filter(videoGame=media.videoGame)
+            if hasattr(media,'book'):
+                crew = BookPersonMapping.objects.filter(book=media.book)
+            if hasattr(media,'webseries'):
+                crew = WebSeriesPersonMapping.objects.filter(webSeries=media.webSeries)
+
+            cast = crew.filter(role=1)
+            for mapping in cast:
+                if mapping.person not in franchisePeople:
+                    franchisePeople[mapping.person] = 1
+                else:
+                    franchisePeople[mapping.person] += 1
+
+        tuples = sorted(franchisePeople.items(), key=operator.itemgetter(1), reverse=True)
+        sortedPeople = {k: v for k,v in tuples}
+        context['franchisePeople'] = sortedPeople
+
         return context
 
 class VideoGameFranchiseDetailView(generic.DetailView):
@@ -463,10 +588,53 @@ class VideoGameFranchiseDetailView(generic.DetailView):
 
         return context
 
-class FilmDetailView(generic.DetailView):
+
+class FilmDetailView(generic.UpdateView):
     model = Film
     template_name = 'media/filmDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+    """
+    def post(self, request, *args, **kwargs):
+        object = self.get_object()
+
+        if self.request.user.is_authenticated:
+
+            #List Toggle Request
+            if request.POST['type'] == "listToggle":
+
+                toggle = request.POST['toggle']
+                if toggle == "add":
+                    l = UserListFilmMapping(user=self.request.user, film=object)
+                    l.save()
+                else:
+                    UserListFilmMapping.objects.filter(user=self.request.user, film=object.id).delete()
+
+            #Rating Post Request
+            else:
+
+                newRating = float(request.POST['nr'])*2
+
+                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
+                #If Updating a Rating
+                if r is not None:
+                    r.rating = newRating
+                    r.save()
+                #If Creating a New Rating
+                else:
+                    rating = FilmRating(user=self.request.user, film=object, rating=newRating)
+                    rating.save()
+
+                print("New Rating (DB):")
+                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
+                print(r.rating)
+    
+        return super(FilmDetailView, self).post(request, *args, **kwargs)
+    """
+
+    def post(self, request, *args, **kwargs):
+        postRequest(self,request,*args,**kwargs)
+        return super(FilmDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -485,7 +653,6 @@ class FilmDetailView(generic.DetailView):
         franchises = []
         for x in FilmFranchiseSubcategoryMapping.objects.filter(film=self.object.id):
             if x.film.id == self.object.id:
-                print("hello")
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
@@ -505,11 +672,13 @@ class FilmDetailView(generic.DetailView):
             average = ratingSum/ratingCount
             averageRating = "{:.1f}".format(average)
             context['averageRating'] = averageRating
+            context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
 
             if self.request.user.is_authenticated:
                 r = FilmRating.objects.filter(user=self.request.user, film=self.object.id).first()
                 if r is not None:
                     context['userRating'] = r.rating
+                    context['userRatingText'] = r.rating / 2
 
         if self.request.user.is_authenticated:
             context['inList'] = False
@@ -517,10 +686,6 @@ class FilmDetailView(generic.DetailView):
                 if listFilm.film.id == self.object.id:
                     context['inList'] = True
                     break
-
-        listForm = FilmListForm()
-
-        context['ratingForm'] = filmRatingForm()
 
         return context
 
@@ -543,10 +708,15 @@ class FilmCrewDetailView(generic.DetailView):
         return context
 
 
-class TVDetailView(generic.DetailView):
+class TVDetailView(generic.UpdateView):
     model = Television
     template_name = 'media/tvDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        postRequest(self,request,*args,**kwargs)
+        return super(TVDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -562,7 +732,6 @@ class TVDetailView(generic.DetailView):
         franchises = []
         for x in TelevisionFranchiseSubcategoryMapping.objects.filter(television=self.object.id):
             if x.television.id == self.object.id:
-                print("hello")
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
@@ -580,13 +749,44 @@ class TVDetailView(generic.DetailView):
                 r = TelevisionRating.objects.filter(user=self.request.user, television=self.object.id).first()
                 if r is not None:
                     context['userRating'] = r.rating
+                    context['userRatingText'] = r.rating / 2
+
+        if self.request.user.is_authenticated:
+            context['inList'] = False
+            for listtv in UserListTelevisionMapping.objects.filter(user=self.request.user):
+                if listtv.television.id == self.object.id:
+                    context['inList'] = True
+                    break
 
         return context
 
-class VideoGameDetailView(generic.DetailView):
+
+class TVCrewDetailView(generic.DetailView):
+    model = Television
+    template_name = 'media/tvCrewDetail.html'
+    slug_field, slug_url_kwarg = "slug", "slug"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['genres'] = TelevisionGenreMapping.objects.filter(television=self.object.id).order_by('genre__title')
+        context['cast'] = TelevisionPersonMapping.objects.filter(role=1, television=self.object.id).order_by('billing')
+        context['showrunners'] = TelevisionPersonMapping.objects.filter(role=4, television=self.object.id)
+        context['writers'] = TelevisionPersonMapping.objects.filter(role=3, television=self.object.id)
+        context['producers'] = TelevisionPersonMapping.objects.filter(role=6, television=self.object.id).order_by('billing')
+        context['networks'] = TelevisionCompanyMapping.objects.filter(role=3, television=self.object.id)
+        context['productionCompanies'] = TelevisionCompanyMapping.objects.filter(role=2, television=self.object.id)
+        return context
+
+
+class VideoGameDetailView(generic.UpdateView):
     model = VideoGame
     template_name = 'media/gameDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        postRequest(self,request,*args,**kwargs)
+        return super(VideoGameDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -603,12 +803,43 @@ class VideoGameDetailView(generic.DetailView):
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
+        ratings = VideoGameRating.objects.filter(videoGame=self.object.id)
+        ratingCount = ratings.count()
+        context['ratingCount'] = ratingCount
+        if ratingCount > 0:
+            ratingSum = 0
+            for rating in ratings:
+                ratingSum += rating.rating
+            average = ratingSum/ratingCount
+            averageRating = "{:.1f}".format(average)
+            context['averageRating'] = averageRating
+            context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
+
+            if self.request.user.is_authenticated:
+                r = VideoGameRating.objects.filter(user=self.request.user, videoGame=self.object.id).first()
+                if r is not None:
+                    context['userRating'] = r.rating
+                    context['userRatingText'] = r.rating / 2
+
+        if self.request.user.is_authenticated:
+            context['inList'] = False
+            for listvg in UserListVideoGameMapping.objects.filter(user=self.request.user):
+                if listvg.videoGame.id == self.object.id:
+                    context['inList'] = True
+                    break
+
         return context
 
-class BookDetailView(generic.DetailView):
+
+class BookDetailView(generic.UpdateView):
     model = Book
     template_name = 'media/bookDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        postRequest(self,request,*args,**kwargs)
+        return super(BookDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -623,12 +854,43 @@ class BookDetailView(generic.DetailView):
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
+        ratings = BookRating.objects.filter(book=self.object.id)
+        ratingCount = ratings.count()
+        context['ratingCount'] = ratingCount
+        if ratingCount > 0:
+            ratingSum = 0
+            for rating in ratings:
+                ratingSum += rating.rating
+            average = ratingSum/ratingCount
+            averageRating = "{:.1f}".format(average)
+            context['averageRating'] = averageRating
+            context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
+
+            if self.request.user.is_authenticated:
+                r = BookRating.objects.filter(user=self.request.user, book=self.object.id).first()
+                if r is not None:
+                    context['userRating'] = r.rating
+                    context['userRatingText'] = r.rating / 2
+
+        if self.request.user.is_authenticated:
+            context['inList'] = False
+            for listb in UserListBookMapping.objects.filter(user=self.request.user):
+                if listb.book.id == self.object.id:
+                    context['inList'] = True
+                    break
+
         return context
 
-class WebSeriesDetailView(generic.DetailView):
+
+class WebSeriesDetailView(generic.UpdateView):
     model = WebSeries
     template_name = 'media/webDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        postRequest(self,request,*args,**kwargs)
+        return super(WebSeriesDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -648,7 +910,34 @@ class WebSeriesDetailView(generic.DetailView):
         context['franchises'] = franchises
 
         context['images'] = WebSeriesImages.objects.filter(webSeries=self.object.id)
+
+        ratings = WebSeriesRating.objects.filter(webSeries=self.object.id)
+        ratingCount = ratings.count()
+        context['ratingCount'] = ratingCount
+        if ratingCount > 0:
+            ratingSum = 0
+            for rating in ratings:
+                ratingSum += rating.rating
+            average = ratingSum/ratingCount
+            averageRating = "{:.1f}".format(average)
+            context['averageRating'] = averageRating
+            context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
+
+            if self.request.user.is_authenticated:
+                r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=self.object.id).first()
+                if r is not None:
+                    context['userRating'] = r.rating
+                    context['userRatingText'] = r.rating / 2
+
+        if self.request.user.is_authenticated:
+            context['inList'] = False
+            for listws in UserListWebSeriesMapping.objects.filter(user=self.request.user):
+                if listws.webSeries.id == self.object.id:
+                    context['inList'] = True
+                    break
+
         return context
+
 
 class GenreDetailView(generic.DetailView):
     model = Genre

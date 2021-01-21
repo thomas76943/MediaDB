@@ -16,15 +16,13 @@
                         <h5 class="font-weight-bold border-bottom mb-0">
                             {{ film.title }} ({{ film.getYear }})
                             <div style="float:right">
-                                <div class="ratingStars medium" style="--rating: {{ rating }};"></div>
+                                <div class="ratingStars medium" style="--rating: 5;"></div>
                                 {{ rating }}
                             </div>
                         </h5>
                     </a>
                     {% if film.synopsis %}
                         {{ film.synopsis }}
-                    {% else %}
-                        <p>Add a Review</p>
                     {% endif %}
                 </div>
             </div>

@@ -9,7 +9,13 @@
             <div class="media-body" style="padding-left:15px">
                 <h2 class="account-heading">{{memberProfile.username}}</h2>
                 <p class="text-secondary">{{ memberProfile.email }}</p>
-                <p>{{ memberProfile.profile.bio }}</p>
+                Ratings:<br>
+                Films - {{ filmCount }}<br>
+                Television - {{ tvCount }}<br>
+                Video Games - {{ vgCount }}<br>
+                Books - {{ bookCount }}<br>
+                Web Series - {{ wsCount }}<br>
+
             </div>
         </div>
     </div>
@@ -49,8 +55,21 @@
                             {% endif %}
                             <div class="content">
                                 <h6 class = "font-weight-bold text-uppercase" >
-                                    {{ rating.rating }}
-                                    <div class="ratingStars small" style="--rating: {{ rating.rating }};"></div>
+                                    <div class="below" style="display: inline-block" id="{{ rating.film.slug }}"></div>
+                                    <div style="display: inline-block">{% widthratio rating.rating 2 1 %}</div>
+                                    <script>
+                                        $('#{{rating.film.slug}}').rateYo({
+                                            rating:'{{ rating.rating }}',
+                                            starWidth:'15px',
+                                            numStars:5,
+                                            minValue:0,
+                                            maxValue:10,
+                                            normalFill:'gray',
+                                            ratedFill:'orange',
+                                            halfStar:true,
+                                            readOnly:true,
+                                        })
+                                    </script>
                                 </h6>
                             </div>
                         </div>

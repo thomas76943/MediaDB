@@ -12,7 +12,7 @@
             <a href="/awards/show/{{ film.FilmAwardMapping.awardsShow.id }}">{{ film.FilmAwardMapping.awardsShow.date.year }}</a> -
             <a href="/films/{{ film.FilmAwardMapping.film.slug }}">{{ film.FilmAwardMapping.film.title }}</a>
             {% if film.Person %}
-                | <a href="/person/{{ film.Person.id }}">{{ film.Person.getFullName }}</a>
+                | <a href="/person/{{ film.Person.slug }}">{{ film.Person.getFullName }}</a>
             {% endif %}
             {% if film.Company %}
                 | <a href="/company/{{ film.Company.slug }}">{{ film.Company.name }}</a>

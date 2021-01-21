@@ -12,6 +12,15 @@
     {% endif %}
 
     <div class="container titleSection">
+
+        <form id="listForm">
+            {% csrf_token %}
+            <div style="float:right" class="plus-toggle">
+              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+              <label for="plus-toggle"></label>
+            </div>
+        </form>
+
         <h2>{{videogame.title}} | {{ videogame.getYear }}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
@@ -25,12 +34,27 @@
     {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                {% if webseries.poster != 'MissingIcon.png' %}
-                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
-                {% endif %}
+                <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
                 {% if videogame.trailerVideoPath %}
                     <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
+
+                <div class="col">
+                    {% if averageRating %}
+                        <div class="container ratingBox">
+                            <h5>Average Rating: </h5>
+                            <h4>{{ averageRatingText }}</h4>
+                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                        </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <div class="container ratingBox">
+                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
+                        </div>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     {% endif %}

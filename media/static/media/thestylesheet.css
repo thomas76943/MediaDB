@@ -511,10 +511,9 @@ h3 {
 }
 
 
-/*Poster and Trailer Containers
+/*Poster and Trailer Containers*/
 
 .trailer {
-    margin-top: 10px;
   border: solid white;
   border-width: 1px 1px;
   max-height: 400px;
@@ -532,7 +531,7 @@ h3 {
   min-height: 400px;
 
 }
-*/
+
 
 .detailInfo {
     width: 100%;
@@ -642,7 +641,9 @@ h2 span {
 }
 
 .ratingStars::before {
-    content: '★★★★★';
+    /*content: '★★★★★';*/
+    content: '★';
+    font-size: 25px;
     letter-spacing: 3px;
     background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
     -webkit-background-clip: text;
@@ -802,6 +803,11 @@ h2 span {
         display: none;
     }
 
+    .responsive-iframe {
+        width: 270px;
+        height: auto;
+    }
+
     .trailer {
         width: 270px;
         height: auto;
@@ -886,4 +892,9 @@ label:focus,
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none !important;
+}
+
+
+.below {
+    z-index: 0;
 }

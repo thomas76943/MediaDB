@@ -114,10 +114,15 @@ class memberProfile(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         filmRatings = FilmRating.objects.filter(user=self.object.id)
+        context['filmCount'] = filmRatings.count()
         televisionRatings = TelevisionRating.objects.filter(user=self.object.id)
+        context['tvCount'] = televisionRatings.count()
         videoGameRatings = VideoGameRating.objects.filter(user=self.object.id)
+        context['vgCount'] = videoGameRatings.count()
         bookRatings = BookRating.objects.filter(user=self.object.id)
+        context['bookCount'] = bookRatings.count()
         webSeriesRatings = WebSeriesRating.objects.filter(user=self.object.id)
+        context['wsCount'] = webSeriesRatings.count()
         ratings = sorted(list(chain(filmRatings, televisionRatings, videoGameRatings, bookRatings, webSeriesRatings)), key=attrgetter('dateTime'), reverse=True)
         context['ratings'] = ratings[:8]
 

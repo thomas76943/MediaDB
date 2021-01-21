@@ -9,7 +9,7 @@
         <div class="container infoSection">
             <h5>People:</h5>
             {% for person in people %}
-                <a href="/person/{{ person.id }}"> {{ person.firstName }} {{ person.surname }}</a><br>
+                <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }}</a><br>
             {% endfor %}
         </div>
     {% endif %}

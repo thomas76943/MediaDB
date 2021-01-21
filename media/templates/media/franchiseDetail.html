@@ -14,6 +14,26 @@
         </div>
     {% endif %}
 
+    {% if franchisePeople %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Actors</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for key, val in franchisePeople.items %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ key.slug }}">
+                                <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ val }} - {{ key.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
     {% if subcategories %}
         {% for subcategory in subcategories %}
             <div class="container infoSection">

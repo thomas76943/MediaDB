@@ -4,48 +4,61 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ user.username }}</h5><br>
-        <h6>My List</h6>
-        <br><br>
+        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ user.username }} - My List</h5><br>
 
         <ul class="auto-grid">
             {% for f in films %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/films/{{ f.film.slug }}">
                         {% if f.film in ratedFilms %}
-                            <img class="item posterSmall seen" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
-                        Seen
+                            <img class="item posterSmall seen" src="{{f.film.poster.url}}" alt="{{f.film.title}}"> Watched
                         {% else %}
                             <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
                         {% endif %}
                     </a>
                 </li>
             {% endfor %}
-            {% for t in tv %}
+            {% for t in television %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/tv/{{ t.television.slug }}">
-                        <img class="item posterSmall" src="{{t.television.poster.url}}" alt="{{t.television.title}}">
+                        {% if t.television in ratedTV %}
+                            <img class="item posterSmall seen" src="{{t.television.poster.url}}" alt="{{t.television.title}}"> Watched
+                        {% else %}
+                            <img class="item posterSmall" src="{{t.television.poster.url}}" alt="{{t.television.title}}">
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}
             {% for vg in videoGames %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/video-games/{{ vg.videoGame.slug }}">
-                        <img class="item posterSmall" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}">
+                        {% if vg.videoGame in ratedVideoGames %}
+                            <img class="item posterSmall seen" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}"> Played
+                        {% else %}
+                            <img class="item posterSmall" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}">
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}
             {% for b in books %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/books/{{ b.book.slug }}">
-                        <img class="item posterSmall" src="{{b.book.image.url}}" alt="{{b.book.title}}">
+                        {% if b.book in ratedBooks %}
+                            <img class="item posterSmall seen" src="{{b.book.image.url}}" alt="{{b.book.title}}"> Read
+                        {% else %}
+                            <img class="item posterSmall" src="{{b.book.image.url}}" alt="{{b.book.title}}">
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}
             {% for ws in webSeries %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/web-series/{{ ws.webSeries.slug }}">
-                        <img class="item posterSmall" src="{{ws.webSeries.poster.url}}" alt="{{ws.webSeries.title}}">
+                        {% if ws.webSeries in ratedWebSeries %}
+                            <img class="item posterSmall seen" src="{{ws.webSeries.poster.url}}" alt="{{ws.webSeries.title}}"> Watched
+                        {% else %}
+                            <img class="item posterSmall" src="{{ws.webSeries.poster.url}}" alt="{{ws.webSeries.title}}">
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}

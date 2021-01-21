@@ -24,7 +24,7 @@ SECRET_KEY = 'pwsjl=-e%$lp3s^+ja7r$ik3ynf@2551v(m0bmjm0u1fy(9d)r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+"""
 ALLOWED_HOSTS = ['192.168.1.156',
                  '192.168.1.73',
                  'localhost',
@@ -38,8 +38,8 @@ ALLOWED_HOSTS = ['192.168.1.156',
                  '86.169.214.56',
                  '192.168.1.142',
                  ]
-
-#ALLOWED_HOSTS = ['*']
+"""
+ALLOWED_HOSTS = ['*']
 
 
 
