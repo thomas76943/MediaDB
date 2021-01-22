@@ -142,7 +142,6 @@ USE_TZ = True
 #Old Static and Media Settings
 
 #STATIC_URL = '/static/'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
 MEDIA_URL = '/resources/'
 
@@ -187,5 +186,6 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
+STATIC_ROOT = [os.path.join(BASE_DIR, 'media/staticfiles')]
 
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
