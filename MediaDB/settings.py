@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'import_export',
-    'rest_framework'
+    'rest_framework',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -138,10 +139,14 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATIC_URL = '/static/'
+#Old Static and Media Settings
+
+#STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
 MEDIA_URL = '/resources/'
+
+#-----------------------------------------------------------------------------------------------------#
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -152,5 +157,35 @@ LOGIN_URL = 'login'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES' :('rest_framework.permissions.IsAuthenticatedOrReadOnly',)
     #'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdmin',)
-
 }
+
+#-----------------------------------------------------------------------------------------------------#
+
+#AWS S3 Bucket Settings from Environmental Variables
+
+#AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+#AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+#AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+#AWS_DEFAULT_REGION = os.environ.get('AWS_DEFAULT_REGION')
+
+AWS_ACCESS_KEY_ID = "AKIA3PZJAERXYJ7FQSV4"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
+AWS_DEFAULT_REGION = "us-west-2"
+AWS_REGION_NAME = "us-west-2"
+
+#Temp Fix
+AWS_QUERYSTRING_AUTH = False
+
+AWS_S3_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+#AWS Bucket Settings for Static Files
+STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
