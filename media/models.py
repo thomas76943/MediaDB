@@ -8,11 +8,10 @@ from django.utils.text import slugify
 
 class Person(models.Model):
     firstName = models.CharField(max_length=500, default='NoFirstNameSpecified')
-    surname = models.CharField(max_length=500, blank=True, default='NoSurnameSpecified')
-    DoB = models.DateField(default=timezone.now)
+    surname = models.CharField(max_length=500, blank=True)
+    DoB = models.DateField(blank=True, null=True)
     alive = models.BooleanField(default=True)
     DoD = models.DateField(blank=True, null=True)
-    imageFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png')
     bio = models.CharField(max_length=1000, default='', blank=True)
     image = models.ImageField(default='MissingIcon.png', upload_to='people', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -25,13 +24,16 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.image.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        #img = Image.open(self.image.name)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.image.name)
         if not self.slug:
-            self.slug = slugify(self.getFullName() + "-" + str(self.DoB))
+            if self.DoB:
+                self.slug = slugify(self.getFullName() + "-" + str(self.DoB.year))
+            else:
+                self.slug = slugify(self.getFullName())
         super(Person, self).save(*args, **kwargs)
 
     class Meta:
@@ -102,12 +104,12 @@ class Film(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        if self.poster:
-            img = Image.open(self.poster.path)
-            if img.height > 600 or img.width > 600:
-                output_size = (600,600)
-                img.thumbnail(output_size)
-                img.save(self.poster.path)
+        #if self.poster:
+        #    img = Image.open(self.poster.path)
+        #    if img.height > 600 or img.width > 600:
+        #        output_size = (600,600)
+        #        img.thumbnail(output_size)
+        #        img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(Film, self).save(*args, **kwargs)

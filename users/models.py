@@ -7,7 +7,7 @@ from media.models import Film, Television, VideoGame, Book, WebSeries
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='MissingIcon.png', upload_to='profile_pics')
+    image = models.ImageField(upload_to='profile_pics', null=True)
     bio = models.CharField(max_length=500, default="", blank=True)
     country = models.CharField(max_length=25, default="", blank=True)
 
@@ -16,11 +16,12 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.image.path)
-        if img.height > 300 or img.width > 300:
-            output_size = (300,300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        if self.image != None:
+            img = Image.open(self.image.name)
+            if img.height > 300 or img.width > 300:
+                output_size = (300,300)
+                img.thumbnail(output_size)
+                img.save(self.image.name)
 
 class ProfileSection(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

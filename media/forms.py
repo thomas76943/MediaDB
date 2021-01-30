@@ -8,15 +8,13 @@ class DateInput(forms.DateInput):
 class ContributePersonForm(forms.ModelForm):
     class Meta:
         model = Person
-        fields = ['firstName', 'surname', 'DoB', 'alive', 'DoD', 'imageFilePath', 'bio']
+        fields = ['firstName', 'surname', 'DoB', 'alive', 'DoD', 'bio']
         widgets = {
             'firstName':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
             'surname':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Surname'}),
             'DoB':DateInput(),
             'DoD': DateInput(),
             'bio':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bio'}),
-            'imageFilePath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Image File Path'}),
-
         }
 
 class ContributeFilmForm(forms.ModelForm):

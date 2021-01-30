@@ -4,22 +4,29 @@
 
     <div class="container infoSection">
         <h2>{{person.firstName}} {{ person.surname }}</h2>
-        <h5>Born: {{ person.DoB }}</h5>
+        (ID: {{ person.id }})
+        {% if person.DoB %}
+            <h5>Born: {{ person.DoB }}</h5>
+        {% endif %}
         {% if person.alive is False %}
         <h5>Died: {{ person.DoD }}</h5>
         {% endif %}
     </div>
 
-    <div class="container infoSection">
-        <div class="media">
-            <img class="item personDetail" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
-            {% if person.bio %}
-                <div class="media-body" style="padding-left:15px">
-                    {{ person.bio }}
-                </div>
-            {% endif %}
+    {% if person.image or person.bio %}
+        <div class="container infoSection">
+            <div class="media">
+                {% if person.image %}
+                    <img class="item personDetail" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                {% endif %}
+                {% if person.bio %}
+                    <div class="media-body" style="padding-left:15px">
+                        {{ person.bio }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {% if nominationCount != 0 or winCount != 0 %}
         <div class="container infoSection">

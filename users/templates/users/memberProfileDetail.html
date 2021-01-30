@@ -5,7 +5,13 @@
 
     <div class="container profileSection">
         <div class="media">
-            <img class="item additionalImage" alt="profilePicture" src={{ memberProfile.profile.image.url }}>
+            <img class="item additionalImage" alt="profilePicture" src=
+            {% if memberProfile.profile.image %}
+                {{ memberProfile.profile.image.url }}
+             {% else %}
+                https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png
+            {% endif %}
+                >
             <div class="media-body" style="padding-left:15px">
                 <h2 class="account-heading">{{memberProfile.username}}</h2>
                 <p class="text-secondary">{{ memberProfile.email }}</p>

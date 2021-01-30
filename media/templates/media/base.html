@@ -40,7 +40,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
 
     <!--Custom CSS-->
-    <link rel="stylesheet" href="{% static 'media/thestylesheet.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'media/customStylesheet.css' %}" type="text/css">
     <link rel="shortcut icon" type="image/png" href="{% static 'media/favicon.png' %}"/>
 
 </head>
@@ -122,6 +122,7 @@
                                     <li class="nav-item"><a href="{% url 'game-home' %}" class="nav-link text-small pb-0 ">Consoles</a></li>
                                   </ul>
                                 </div>
+
                                 <div class="col-lg-6 mb-4">
                                   <h5>
                                       <a href="{% url 'book-home' %}" class="nav-link font-weight-bold text-uppercase">
@@ -166,7 +167,7 @@
                             </div>
                           </div>
                           <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
-                               style="background: center center url(/resources/extraImages/aliens1.jpg) no-repeat; background-size: cover;">
+                               style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/aliens1.jpg) no-repeat; background-size: cover;">
                           </div>
                         </div>
                       </div>
@@ -227,7 +228,7 @@
                             </div>
                           </div>
                           <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
-                               style="background: center center url(/resources/posters/exorcist1.png) no-repeat; background-size: cover;">
+                               style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/posters/exorcist1.png) no-repeat; background-size: cover;">
                           </div>
                         </div>
                       </div>

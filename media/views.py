@@ -4,7 +4,6 @@ import operator
 from itertools import chain
 from operator import attrgetter
 import locale
-
 import collections
 
 from django import http
@@ -18,6 +17,217 @@ from .models import *
 from users.models import *
 from .forms import *
 from django.db.models import Count
+
+import requests, json, datetime, re
+from django.core.files import File
+
+def addUsers():
+    with open("D:/MediaDB Datasets/movielensSmall/users.csv", 'r') as users:
+        userData = csv.reader(users)
+
+        for row in userData:
+            print("Creating - ", row[1])
+            user = User.objects.create_user(username=row[1], email=row[3], password=row[2])
+            print("Created - ", row[1])
+
+def addRatings():
+    ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratingsTest.csv", "rt")
+    ratingsData = csv.reader(ratingsFile)
+
+    people = Person.objects.all()
+    genres = Genre.objects.all()
+    films = Film.objects.all()
+
+    filmTitles = []
+    for film in films:
+        filmTitles.append(film.title)
+
+    genreTitles = []
+    for g in genres:
+        genreTitles.append(g.title)
+
+    peopleNames = []
+    for p in people:
+        peopleNames.append(p.getFullName())
+
+    knownIDs = {}
+
+    for row in ratingsData:
+        row=row[0].split('\t')
+
+        userID = row[0]
+        imdbID = str(row[2])
+        ratingScore = row[3]
+
+        #Add 0s to make all IDs same length
+        while len(imdbID) < 8:
+            imdbID = "0" + imdbID
+
+        #Don't make new request if possible
+        if imdbID in knownIDs:
+            title = knownIDs[imdbID]
+
+        #Making new request
+        else:
+            resp = requests.get("http://www.omdbapi.com/?i=tt" + imdbID + "&apikey=5cd5955c")
+            data = json.loads(resp.text)
+            title = data['Title']
+            knownIDs[imdbID] = title #Adding to knownIDs
+
+            #If not in database already, add new film
+            if title not in filmTitles:
+                filmTitles.append(title)
+                print("Adding new film:", title)
+
+                f = Film(
+                    title=data['Title'],
+                    release=datetime.datetime.strptime(data['Released'], '%d %b %Y').strftime('%Y-%m-%d'),
+                    length=data['Runtime'][:-4],
+                    synopsis=data['Plot'],
+                    rating=data['Rated'],
+                )
+
+                #Getting poster data from API request, saving to local temp file and storing in Film Model Object
+                img_data = requests.get(data['Poster']).content
+                img_name = data['Title'] + "-" + str(data['Year']) + ".jpg"
+                with open("D:/MediaDB Datasets/postersTemp/"+img_name, 'wb') as handler:
+                    handler.write(img_data)
+
+                f.poster.save(img_name, File(open("D:/MediaDB Datasets/postersTemp/"+img_name, "rb")))
+                f.save()
+
+                #Adding Genres
+                genres = data['Genre'].split(', ')
+                for genre in genres:
+                    if genre not in genreTitles:
+                        newGenre = Genre(title=genre)
+                        newGenre.save()
+                        genreTitles.append(newGenre)
+
+                    getGenre = Genre.objects.filter(title=genre)[0]
+                    fgm = FilmGenreMapping(film=f, genre=getGenre)
+                    fgm.save()
+
+                #Adding Directors
+                directors = data['Director'].split(', ')
+                for director in directors:
+
+                    #Removing parantheses or credits from names
+                    firstLastNames = re.sub(r" ?\([^)]+\)", "", director)
+
+                    if firstLastNames not in peopleNames:
+                        print("Adding new person:", firstLastNames)
+                        peopleNames.append(firstLastNames)
+                        newPerson = Person()
+                        firstLastNames = firstLastNames.split()
+                        newPerson.firstName = firstLastNames[0]
+                        if len(firstLastNames) > 1:
+                            combinedSurname = ""
+                            for name in firstLastNames[1:]:
+                                combinedSurname += name + " "
+                            newPerson.surname = combinedSurname[:-1]
+                        newPerson.save()
+                        thisDirector = newPerson
+                    else:
+                        print("Getting Existing Director: ", firstLastNames)
+                        firstLastNames = firstLastNames.split(" ", 1) #Only Separating First Name Out
+                        thisDirector = Person.objects.filter(firstName=firstLastNames[0], surname=firstLastNames[1])[0]
+
+                    thisFilm = Film.objects.filter(title=title)[0]
+                    directorRole = PersonRole.objects.filter(id=2)[0]
+                    print("trying to add. thisDirector variable = ", thisDirector)
+
+                    #If mapping doesn't already exist
+                    query = FilmPersonMapping.objects.filter(person=thisDirector, film=thisFilm, role=directorRole)
+                    if not query:
+                        fpm = FilmPersonMapping(person=thisDirector, film=thisFilm, role=directorRole)
+                        fpm.save()
+                    else:
+                        print(thisDirector.getFullName(), "is already tied to", thisFilm, "in this role")
+
+                # Adding Writers
+                writers = data['Writer'].split(', ')
+                for writer in writers:
+
+                    # Removing parantheses or credits from names
+                    firstLastNames = re.sub(r" ?\([^)]+\)", "", writer)
+                    print("got writer: ", firstLastNames)
+
+                    if firstLastNames not in peopleNames:
+                        print("Adding new person:", firstLastNames)
+                        peopleNames.append(firstLastNames)
+                        newPerson = Person()
+                        firstLastNames = firstLastNames.split()
+                        newPerson.firstName = firstLastNames[0]
+                        if len(firstLastNames) > 1:
+                            combinedSurname = ""
+                            for name in firstLastNames[1:]:
+                                combinedSurname += name + " "
+                            newPerson.surname = combinedSurname[:-1]
+                        newPerson.save()
+                        thisWriter = newPerson
+                    else:
+                        print("Getting Existing Writer: ", firstLastNames)
+                        firstLastNames = firstLastNames.split(" ", 1) #Only Separating First Name Out
+                        thisWriter = Person.objects.filter(firstName=firstLastNames[0], surname=firstLastNames[1])[0]
+
+                    thisFilm = Film.objects.filter(title=title)[0]
+                    writerRole = PersonRole.objects.filter(id=3)[0]
+                    print("trying to add. thisWriter variable = ", thisWriter)
+
+                    #If mapping doesn't already exist
+                    query = FilmPersonMapping.objects.filter(person=thisWriter, film=thisFilm, role=writerRole)
+                    if not query:
+                        fpm = FilmPersonMapping(person=thisWriter, film=thisFilm, role=writerRole)
+                        fpm.save()
+                    else:
+                        print(thisWriter.getFullName(), "is already tied to", thisFilm, "in this role")
+
+                # Adding Actors
+                actors = data['Actors'].split(', ')
+                for actor in actors:
+
+                    #Removing parantheses or credits from names
+                    firstLastNames = re.sub(r" ?\([^)]+\)", "", actor)
+                    print("got actor:", firstLastNames)
+
+                    if firstLastNames not in peopleNames:
+                        print("Adding new person:", firstLastNames)
+                        peopleNames.append(firstLastNames)
+                        newPerson = Person()
+                        firstLastNames = firstLastNames.split()
+                        newPerson.firstName = firstLastNames[0]
+                        if len(firstLastNames) > 1:
+                            combinedSurname = ""
+                            for name in firstLastNames[1:]:
+                                combinedSurname += name + " "
+                            newPerson.surname = combinedSurname[:-1]
+                        newPerson.save()
+                        thisActor = newPerson
+                    else:
+                        print("Getting Existing Actor: ", firstLastNames)
+                        firstLastNames = firstLastNames.split(" ", 1)  # Only Separating First Name Out
+                        thisActor = Person.objects.filter(firstName=firstLastNames[0], surname=firstLastNames[1])[0]
+                        print(thisActor)
+
+                    thisFilm = Film.objects.filter(title=title)[0]
+                    actorRole = PersonRole.objects.filter(id=1)[0]
+                    print("trying to add. thisActor variable = ", thisActor)
+
+                    # If mapping doesn't already exist
+                    query = FilmPersonMapping.objects.filter(person=thisActor, film=thisFilm, role=actorRole)
+                    if not query:
+                        fpm = FilmPersonMapping(person=thisActor, film=thisFilm, role=actorRole)
+                        fpm.save()
+                    else:
+                        print(thisActor.getFullName(), "is already tied to", thisFilm, "in this role")
+
+
+        #Add Rating
+        thisFilm = Film.objects.filter(title=title)[0]
+        currentUser = User.objects.filter(id=userID)[0]
+        r = FilmRating(film=thisFilm, user=currentUser, rating=ratingScore)
+        r.save()
 
 def calculateHighestRated(quantity, reverse):
     films = Film.objects.all()
@@ -39,7 +249,6 @@ def calculateHighestRated(quantity, reverse):
     highestRated = dict(itertools.islice(sortedRatings.items(), quantity))
     return highestRated
 
-
 def calculateTopGrossing(quantity):
     topGrossing = Film.objects.all().order_by('-boxOffice')[:quantity]
     filmGrossingDict = {}
@@ -60,8 +269,7 @@ def findDulplicateTitles():
     #repeated_names = Application.objects.values('school_name', 'category').annotate(Count('id')).order_by().filter(
     #    id__count__gt=0)  # <--- gt 0 will get all the objects having occurred in DB i.e is greater than 0
 
-
-    repeatedtitles = Film.objects.values('title').annotate(Count('id')).order_by().filter(id__count__gt=1)
+    repeatedTitles = Film.objects.values('title').annotate(Count('id')).order_by().filter(id__count__gt=1)
 
     return repeatedTitles
 
@@ -178,8 +386,16 @@ def csvUpload(request):
 
     return render(request, 'media/csvUpload.html', context)
 
-
 def home(request):
+
+    oldest = []
+
+    for p in Person.objects.all().order_by('DoB'):
+        if p.DoB != None:
+            oldest.append(p)
+        if len(oldest) == 30:
+            break
+
     context = {
         'films':Film.objects.all().order_by('-id')[:30],
         'newestFilms':Film.objects.all().order_by('release')[:30],
@@ -188,12 +404,13 @@ def home(request):
         'games':VideoGame.objects.all()[:30],
         'books':Book.objects.all()[:30],
         'webseries':WebSeries.objects.all()[:30],
-        'people':Person.objects.all().order_by('DoB')[:30],
+        'people':oldest,
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
         'highestRatedFilms':calculateHighestRated(20, True),
         'topGrossing':calculateTopGrossing(30),
     }
 
+    #addRatings()
 
     return render(request, 'media/home.html', context)
 
@@ -259,9 +476,9 @@ def filmHome(request):
         'films': Film.objects.all(),
         'franchises':Franchise.objects.all(),
         'genres':Genre.objects.all(),
-        'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"]),
-        'eighties': Film.objects.all().filter(release__range=["1980-01-01", "1989-12-25"]),
-        'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"]),
+        'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"])[:30],
+        'eighties': Film.objects.all().filter(release__range=["1980-01-01", "1989-12-25"])[:30],
+        'nineties':Film.objects.all().filter(release__range=["1990-01-01", "1999-12-25"])[:30],
     }
     return render(request, 'media/filmHome.html', context)
 
@@ -945,17 +1162,17 @@ class GenreDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['franchises'] = FranchiseGenreMapping.objects.filter(genre=self.object.id)
-        context['naughtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["2000-01-01", "2009-12-25"])
-        context['ninetiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1990-01-01", "1999-12-25"])
-        context['eightiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1980-01-01", "1989-12-25"])
-        context['seventiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1970-01-01", "1979-12-25"])
-        context['sixtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1960-01-01", "1969-12-25"])
-        context['fiftiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1950-01-01", "1959-12-25"])
-        context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('television__release')
-        context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')
-        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')
-        context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('webSeries__release')
+        context['franchises'] = FranchiseGenreMapping.objects.filter(genre=self.object.id)[:30]
+        context['naughtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["2000-01-01", "2009-12-25"])[:30]
+        context['ninetiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1990-01-01", "1999-12-25"])[:30]
+        context['eightiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1980-01-01", "1989-12-25"])[:30]
+        context['seventiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1970-01-01", "1979-12-25"])[:30]
+        context['sixtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1960-01-01", "1969-12-25"])[:30]
+        context['fiftiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1950-01-01", "1959-12-25"])[:30]
+        context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('television__release')[:30]
+        context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:30]
+        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')[:30]
+        context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('webSeries__release')[:30]
         return context
 
 
