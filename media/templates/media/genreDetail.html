@@ -97,10 +97,25 @@
 
     {% if fiftiesFilms %}
         <div class="container infoSection">
-            <h5>50's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">50's {{ genre.title }} Films:</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in fiftiesFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if fortiesFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">40's {{ genre.title }} Films:</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in fortiesFilms %}
                         <a href="/films/{{ f.film.slug }}">
                         <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
                         </a>

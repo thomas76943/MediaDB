@@ -31,7 +31,7 @@ def addUsers():
             print("Created - ", row[1])
 
 def addRatings():
-    ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratingsTest.csv", "rt")
+    ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratingsCopy.csv", "rt")
     ratingsData = csv.reader(ratingsFile)
 
     people = Person.objects.all()
@@ -53,6 +53,7 @@ def addRatings():
     knownIDs = {}
 
     for row in ratingsData:
+        #print(row)
         row=row[0].split('\t')
 
         userID = row[0]
@@ -236,7 +237,7 @@ def calculateHighestRated(quantity, reverse):
     for f in films:
         fRatings = FilmRating.objects.filter(film=f)
         fRatingsCount = fRatings.count()
-        if fRatingsCount > 0:
+        if fRatingsCount > 30:
             fRatingSum = 0
             for rating in fRatings:
                 fRatingSum += float(rating.rating / 2)
@@ -389,7 +390,6 @@ def csvUpload(request):
 def home(request):
 
     oldest = []
-
     for p in Person.objects.all().order_by('DoB'):
         if p.DoB != None:
             oldest.append(p)
@@ -414,10 +414,28 @@ def home(request):
 
     return render(request, 'media/home.html', context)
 
+import collections
+
 def testing(request):
+    monthList = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    months = {}
+    for p in Person.objects.all().order_by('DoB__month'):
+        if p.DoB != None:
+            date = str(monthList[p.DoB.month - 1])
+            if date in months:
+                months[date].append(p)
+            else:
+                months[date] = []
+                months[date].append(p)
+
+    for month in months:
+        print(months[month])
+        monthSort = sorted(months[month], key=attrgetter('DoB.day'))
+        months[month] = monthSort
 
     context = {
-        'counts':findDulplicateTitles()
+        'counts':findDulplicateTitles(),
+        'people':months
     }
     return render (request, 'media/testingPage.html', context)
 
@@ -1169,6 +1187,7 @@ class GenreDetailView(generic.DetailView):
         context['seventiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1970-01-01", "1979-12-25"])[:30]
         context['sixtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1960-01-01", "1969-12-25"])[:30]
         context['fiftiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1950-01-01", "1959-12-25"])[:30]
+        context['fortiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1940-01-01", "1949-12-25"])[:30]
         context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('television__release')[:30]
         context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:30]
         context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')[:30]

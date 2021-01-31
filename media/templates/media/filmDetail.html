@@ -24,7 +24,7 @@
             </form>
 
             <h2>{{film.title}}</h2>
-            <h5>{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
+            <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
             {% if genres %}
                 {% for genre in genres %}
                     <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>

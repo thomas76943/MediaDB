@@ -2,18 +2,38 @@
 {% block content %}
 
     <div class="container infoSection">
-        <p>Testing</p>
-
-        {% for film, count in counts.items %}
-            {% if count > 1 %}
-                {{ film }} - {{ count }}<br>
-            {% endif %}
-        {% endfor %}
-
+        <h5 class="font-weight-bold text-uppercase">Duplicate Titles</h5>
 
         {% for f in counts %}
-        {{ f.title }} <br>
+        {{ f.title }}<br>
         {% endfor %}
     </div>
+
+
+
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold text-uppercase" style="padding-top: 5px">Calendar</h5>
+
+        {% for month, persons in people.items %}
+            <hr>
+            <h5 class="font-weight-bold text-uppercase">{{ month }}</h5>
+                <ul class="auto-grid">
+                    {% for person in persons %}
+                        <li class="module" style="list-style-type: none; white-space: normal">
+                            <h5 class="font-weight-bold text-uppercase">{{ person.DoB.day }}</h5>
+                            {{ person }}
+                        </li>
+                    {% endfor %}
+                </ul>
+        {% endfor %}
+    </div>
+
+
+
+
+
+
+
 
 {% endblock %}
