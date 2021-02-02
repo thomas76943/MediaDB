@@ -131,7 +131,7 @@ class Television(models.Model):
     title = models.CharField(max_length=500, default='NoTelevisionTitleSpecified')
     ongoing = models.BooleanField(default=False)
     release = models.DateField(default=timezone.now)
-    end = models.DateField(default=timezone.now, blank=True)
+    end = models.DateField(default=timezone.now, blank=True, null=True)
     synopsis = models.CharField(max_length=500, default='', blank=True)
     seasons = models.IntegerField(default=1)
     episodes = models.IntegerField(default=1)
@@ -144,11 +144,11 @@ class Television(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.poster.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.poster.path)
+        #img = Image.open(self.poster.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(Television, self).save(*args, **kwargs)
@@ -924,11 +924,11 @@ class PersonImages(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.image.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        #img = Image.open(self.image.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.image.path)
 
 class FilmImages(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)

@@ -434,7 +434,6 @@ def testing(request):
     }
     return render (request, 'media/testingPage.html', context)
 
-
 def searchResults(request):
     title_contains = request.GET.get('q')
 
@@ -462,7 +461,6 @@ def searchResults(request):
         }
     return render(request, 'media/searchResults.html', context)
 
-
 def browse(request):
     context = {
         'films': Film.objects.all(),
@@ -482,7 +480,6 @@ def browse(request):
         context['seenFilms'] = seenFilms
 
     return render(request, 'media/browse.html', context)
-
 
 def filmHome(request):
     context = {
