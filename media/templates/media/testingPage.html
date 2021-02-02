@@ -10,30 +10,26 @@
     </div>
 
 
-
-
     <div class="container infoSection">
         <h5 class="font-weight-bold text-uppercase" style="padding-top: 5px">Calendar</h5>
-
         {% for month, persons in people.items %}
             <hr>
             <h5 class="font-weight-bold text-uppercase">{{ month }}</h5>
-                <ul class="auto-grid">
-                    {% for person in persons %}
-                        <li class="module" style="list-style-type: none; white-space: normal">
-                            <h5 class="font-weight-bold text-uppercase">{{ person.DoB.day }}</h5>
-                            {{ person }}
-                        </li>
-                    {% endfor %}
-                </ul>
+            <ul class="auto-grid">
+                {% for person in persons %}
+                    <li class="module" style="list-style-type: none; white-space: normal">
+                        <a href="/person/{{ person.slug }}">
+                            {% if person.image %}
+                                <img class="item personSmall" src="{{person.image.url}}" alt="{{person.getFullName}}">
+                            {% endif %}
+                        </a>
+                        <div class="content">
+                            <h6 class = "font-weight-bold text-uppercase" >{{ person.DoB.day }}</h6>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <br>
         {% endfor %}
     </div>
-
-
-
-
-
-
-
-
 {% endblock %}

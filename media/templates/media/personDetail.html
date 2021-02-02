@@ -3,7 +3,7 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2>{{person.firstName}} {{ person.surname }}</h2>
+        <h2>{{person.firstName}} {{ person.surname }}</h2> {{ person.id }}
         {% if person.DoB %}
             <h5>Born: {{ person.DoB }}</h5>
         {% endif %}

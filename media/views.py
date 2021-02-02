@@ -54,7 +54,7 @@ def addRatings():
 
     for row in ratingsData:
         #print(row)
-        row=row[0].split('\t')
+        #row=row[0].split('\t')
 
         userID = row[0]
         imdbID = str(row[2])
@@ -136,7 +136,6 @@ def addRatings():
 
                     thisFilm = Film.objects.filter(title=title)[0]
                     directorRole = PersonRole.objects.filter(id=2)[0]
-                    print("trying to add. thisDirector variable = ", thisDirector)
 
                     #If mapping doesn't already exist
                     query = FilmPersonMapping.objects.filter(person=thisDirector, film=thisFilm, role=directorRole)
@@ -152,7 +151,6 @@ def addRatings():
 
                     # Removing parantheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", writer)
-                    print("got writer: ", firstLastNames)
 
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
@@ -174,7 +172,6 @@ def addRatings():
 
                     thisFilm = Film.objects.filter(title=title)[0]
                     writerRole = PersonRole.objects.filter(id=3)[0]
-                    print("trying to add. thisWriter variable = ", thisWriter)
 
                     #If mapping doesn't already exist
                     query = FilmPersonMapping.objects.filter(person=thisWriter, film=thisFilm, role=writerRole)
@@ -190,7 +187,6 @@ def addRatings():
 
                     #Removing parantheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", actor)
-                    print("got actor:", firstLastNames)
 
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
@@ -213,7 +209,6 @@ def addRatings():
 
                     thisFilm = Film.objects.filter(title=title)[0]
                     actorRole = PersonRole.objects.filter(id=1)[0]
-                    print("trying to add. thisActor variable = ", thisActor)
 
                     # If mapping doesn't already exist
                     query = FilmPersonMapping.objects.filter(person=thisActor, film=thisFilm, role=actorRole)
