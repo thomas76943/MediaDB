@@ -496,6 +496,7 @@ class Franchise(models.Model):
     image = models.ImageField(blank=True, upload_to='franchises')
     description = models.CharField(max_length=1000, blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
+    showPeople = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

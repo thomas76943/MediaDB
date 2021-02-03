@@ -59,7 +59,7 @@
             <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Films</h5>
             {% for f in films %}
                 <br>
-                <a href="/films/{{ f.film.slug }}"> {{ f.film.title }} | {{ f.film.getYear }} ({{ f.role }})</a><br>
+                <a href="/films/{{ f.film.slug }}"> {{ f.film.title }} | {{ f.film.getYear }} ({{ f.role }})</a> {{ f.id }}<br>
                 {% if f.character %}
                     <a>{{ f.character }}</a><br>
                 {% endif %}

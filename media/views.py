@@ -116,6 +116,9 @@ def addRatings():
                     #Removing parantheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", director)
 
+                    if firstLastNames == "N/A":
+                        continue
+
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
                         peopleNames.append(firstLastNames)
@@ -152,6 +155,9 @@ def addRatings():
                     # Removing parantheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", writer)
 
+                    if firstLastNames == "N/A":
+                        continue
+
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
                         peopleNames.append(firstLastNames)
@@ -187,6 +193,9 @@ def addRatings():
 
                     #Removing parantheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", actor)
+
+                    if firstLastNames == "N/A":
+                        continue
 
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
@@ -765,6 +774,7 @@ class FranchiseDetailView(generic.DetailView):
         franchiseWebSeries = WebSeriesFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
 
         completeFranchise = list(chain(franchiseFilms, franchiseTelevision, franchiseVideoGames, franchiseBooks, franchiseWebSeries))
+
 
         franchisePeople = {}
         for media in completeFranchise:
