@@ -14,14 +14,14 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username + " Profile"
 
-    def save(self, *args, **kwargs):
-        super().save()
-        if self.image != None:
-            img = Image.open(self.image.name)
-            if img.height > 300 or img.width > 300:
-                output_size = (300,300)
-                img.thumbnail(output_size)
-                img.save(self.image.name)
+    #def save(self, *args, **kwargs):
+        #super().save()
+        #if self.image != None:
+        #    img = Image.open(self.image.name)
+        #    if img.height > 300 or img.width > 300:
+        #        output_size = (300,300)
+        #        img.thumbnail(output_size)
+        #        img.save(self.image.name)
 
 class ProfileSection(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

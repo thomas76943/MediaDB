@@ -414,7 +414,7 @@ def home(request):
         'topGrossing':calculateTopGrossing(30),
     }
 
-    #addRatings()
+    addRatings()
 
     return render(request, 'media/home.html', context)
 

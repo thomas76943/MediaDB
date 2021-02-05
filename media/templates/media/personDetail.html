@@ -83,29 +83,33 @@
     {% endif %}
 
     {% if books %}
-        <hr>
-        <h5>Books:</h5>
-        {% for b in books %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Books</h5>
+            {% for b in books %}
+                <br>
                 <a href="/books/{{ b.book.slug }}"> {{ b.book.title }} | {{ b.book.getYear }} ({{ b.role }})</a><br>
-        {% endfor %}
+            {% endfor %}
+        <br></div>
     {% endif %}
 
     {% if games %}
-        <hr>
-        <h5>Games:</h5>
-        {% for g in games %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Video Games</h5>
+            {% for g in games %}
+                <br>
                 <a href="/video-games/{{ g.videoGame.slug }}"> {{ g.videoGame.title }} | {{ g.videoGame.getYear }} ({{ g.role }})</a><br>
-        {% endfor %}
+            {% endfor %}
+        <br></div>
     {% endif %}
 
     {% if webseries %}
-        <hr>
-        <h5>Web Series:</h5>
-        {% for w in webseries %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Web Series</h5>
+            {% for w in webseries %}
+                <br>
                 <a href="/web-series/{{ w.webSeries.slug }}"> {{ w.webSeries.title }} | {{ w.webSeries.getYear }} ({{ w.role }})</a><br>
-        {% endfor %}
+            {% endfor %}
+        <br></div>
     {% endif %}
-
-
 
 {% endblock %}
