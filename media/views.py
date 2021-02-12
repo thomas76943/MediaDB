@@ -54,7 +54,7 @@ def addRatings():
 
     for row in ratingsData:
         #print(row)
-        #row=row[0].split('\t')
+        row=row[0].split('\t')
 
         userID = row[0]
         imdbID = str(row[2])
