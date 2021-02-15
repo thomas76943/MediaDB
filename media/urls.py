@@ -58,7 +58,7 @@ urlpatterns = [
 
     path('data/', views.dataSources, name="data-sources"),
 
-    path('testing/', views.testing, name="testing"),
+    path('calendar/', views.calendar, name="calendar"),
 
 ]
 

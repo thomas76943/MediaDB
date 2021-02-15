@@ -189,7 +189,7 @@
 
     {% if bornToday %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">BORN TODAY</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Born Today<a style="float:right" href={% url 'calendar' %}>See All</a></h5>
             <div class="scroller" >
                 <ul class="hs full">
                     {% for person in bornToday %}

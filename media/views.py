@@ -52,6 +52,9 @@ def addRatings():
 
     knownIDs = {}
 
+    badCharsTitles = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '@']
+    badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@']
+
     for row in ratingsData:
         #print(row)
         row=row[0].split('\t')
@@ -73,12 +76,23 @@ def addRatings():
             resp = requests.get("http://www.omdbapi.com/?i=tt" + imdbID + "&apikey=5cd5955c")
             data = json.loads(resp.text)
             title = data['Title']
+
+            if any(badChar in title for badChar in badCharsTitles):
+                print("--------------------------------------------------------------------------------------")
+                print("Skipped Film: ", title)
+                continue
+
             knownIDs[imdbID] = title #Adding to knownIDs
 
             #If not in database already, add new film
             if title not in filmTitles:
                 filmTitles.append(title)
                 print("Adding new film:", title)
+
+                try:
+                    datetime.datetime.strptime(data['Released'], '%d %b %Y').strftime('%Y-%m-%d')
+                except ValueError:
+                    continue
 
                 f = Film(
                     title=data['Title'],
@@ -117,6 +131,11 @@ def addRatings():
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", director)
 
                     if firstLastNames == "N/A":
+                        continue
+
+                    if any(badChar in firstLastNames for badChar in badCharsPeople):
+                        print("--------------------------------------------------------------------------------------")
+                        print("Skipped Person: ", firstLastNames)
                         continue
 
                     if firstLastNames not in peopleNames:
@@ -158,6 +177,11 @@ def addRatings():
                     if firstLastNames == "N/A":
                         continue
 
+                    if any(badChar in firstLastNames for badChar in badCharsPeople):
+                        print("--------------------------------------------------------------------------------------")
+                        print("Skipped Person: ", firstLastNames)
+                        continue
+
                     if firstLastNames not in peopleNames:
                         print("Adding new person:", firstLastNames)
                         peopleNames.append(firstLastNames)
@@ -195,6 +219,11 @@ def addRatings():
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", actor)
 
                     if firstLastNames == "N/A":
+                        continue
+
+                    if any(badChar in firstLastNames for badChar in badCharsPeople):
+                        print("--------------------------------------------------------------------------------------")
+                        print("Skipped Person: ", firstLastNames)
                         continue
 
                     if firstLastNames not in peopleNames:
@@ -420,11 +449,14 @@ def home(request):
 
 import collections
 
-def testing(request):
+def calendar(request):
     monthList = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     months = {}
+    num = 0
+
     for p in Person.objects.all().order_by('DoB__month'):
         if p.DoB != None:
+            num += 1
             date = str(monthList[p.DoB.month - 1])
             if date in months:
                 months[date].append(p)
@@ -438,10 +470,11 @@ def testing(request):
         months[month] = monthSort
 
     context = {
+        'num':num,
         'counts':findDulplicateTitles(),
         'people':months
     }
-    return render (request, 'media/testingPage.html', context)
+    return render (request, 'media/calendar.html', context)
 
 def searchResults(request):
     title_contains = request.GET.get('q')

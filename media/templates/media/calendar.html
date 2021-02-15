@@ -4,10 +4,14 @@
     <div class="container infoSection">
         <h5 class="font-weight-bold text-uppercase">Duplicate Titles</h5>
 
+        <p>{{ num }}</p>
+
         {% for f in counts %}
         {{ f.title }}<br>
         {% endfor %}
     </div>
+
+
 
 
     <div class="container infoSection">
