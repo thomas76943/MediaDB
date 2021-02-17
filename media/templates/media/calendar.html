@@ -1,6 +1,7 @@
 {% extends "media/base.html" %}
 {% block content %}
 
+    <!--
     <div class="container infoSection">
         <h5 class="font-weight-bold text-uppercase">Duplicate Titles</h5>
 
@@ -10,12 +11,13 @@
         {{ f.title }}<br>
         {% endfor %}
     </div>
-
-
-
+    -->
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase" style="padding-top: 5px">Calendar</h5>
+        <h2 style="padding-top: 7px">Calendar</h2>
+    </div>
+
+    <div class="container infoSection">
         {% for month, persons in people.items %}
             <hr>
             <h5 class="font-weight-bold text-uppercase">{{ month }}</h5>

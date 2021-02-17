@@ -109,7 +109,7 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Highest Rated <a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated <a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for film, rating in highestRatedFilms.items %}
@@ -154,7 +154,7 @@
     <br>
 
     <div class="container infoSection">
-    <h5 class="font-weight-bold text-uppercase border-bottom mb-0">HIGHEST GROSSING <a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
+    <h5 class="font-weight-bold border-bottom mb-0">Highest Grossing<a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for film, gross in topGrossing.items %}
@@ -174,7 +174,7 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Oldest People</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Oldest People</h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for person in people %}
@@ -189,7 +189,7 @@
 
     {% if bornToday %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Born Today<a style="float:right" href={% url 'calendar' %}>See All</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Born Today<a style="float:right" href={% url 'calendar' %}>See All</a></h5>
             <div class="scroller" >
                 <ul class="hs full">
                     {% for person in bornToday %}
@@ -204,7 +204,7 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">OLDEST FILMS</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Newest Films</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for film in newestFilms %}
@@ -219,7 +219,22 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">LONGEST RUNNING TELEVISION SERIES</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Oldest Films</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for film in oldestFilms %}
+                    <a href="/films/{{ film.slug }}">
+                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Longest Running Television Series</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for television in longestRunningTV %}
@@ -234,22 +249,7 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL FILMS</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for film in films %}
-                    <a href="/films/{{ film.slug }}">
-                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL VIDEO GAMES</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Video Games</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for game in games %}
@@ -264,7 +264,7 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL BOOKS</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Books</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for book in books %}
@@ -278,7 +278,7 @@
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ALL WEB SERIES</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Web Series</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for ws in webseries %}

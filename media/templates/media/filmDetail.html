@@ -15,113 +15,114 @@
     {% endif %}
 
     <div class="container titleSection">
-            <form id="listForm">
-                {% csrf_token %}
-                <div style="float:right" class="plus-toggle">
-                  <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
-                  <label for="plus-toggle"></label>
-                </div>
-            </form>
-            {{ film.id }}
-            <h2>{{film.title}}</h2>
-            <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
-            {% if genres %}
-                {% for genre in genres %}
-                    <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
-                {% endfor %}
-                <br>
-            {% endif %}
-        </div><br>
+
+        <form id="listForm">
+            {% csrf_token %}
+            <div style="float:right" class="plus-toggle">
+              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+              <label for="plus-toggle"></label>
+            </div>
+        </form>
+
+        <h2>{{film.title}}</h2>
+        <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
+        {% if genres %}
+            {% for genre in genres %}
+                <a style="padding-right:10px" href="/genre/{{ genre.genre.title }}"> {{ genre.genre.title }}</a>
+            {% endfor %}
+            <br>
+        {% endif %}
+    </div><br>
 
 
-        <!-- If there is a poster or a trailer then create parent element for them -->
-        {% if film.poster != 'MissingIcon.png' or film.trailerVideoPath or averageRating %}
-            <div class="container posterTrailerContainer">
-                <div class="row" style="padding: 10px">
-                    <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">
-                    {% if film.trailerVideoPath %}
-                        <iframe class="trailer" src={{film.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if film.poster != 'MissingIcon.png' or film.trailerVideoPath or averageRating %}
+        <div class="container posterTrailerContainer">
+            <div class="row" style="padding: 10px">
+                <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">
+                {% if film.trailerVideoPath %}
+                    <iframe class="trailer" src={{film.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
+
+                <div class="col">
+                    {% if averageRating %}
+                        <div class="container ratingBox">
+                            <h5>Average Rating: </h5>
+                            <h4>{{ averageRatingText }}</h4>
+                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                        </div>
                     {% endif %}
 
-                    <div class="col">
-                        {% if averageRating %}
-                            <div class="container ratingBox">
-                                <h5>Average Rating: </h5>
-                                <h4>{{ averageRatingText }}</h4>
-                                <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_authenticated %}
-                            <div class="container ratingBox">
-                                <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="container ratingBox">
+                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
 
-        {% if directors or writers or producers %}
-            <div class="container infoSection">
-                {% if directors %}
-                    <h5 style="padding-top:10px"> Directed by:</h5>
-                    {% for director in directors %}
-                        <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
-                    {% endfor %}
-                {% endif %}
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5 style="padding-top:10px"> Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
 
-                {% if writers %}
-                    <h5 style="padding-top:10px"> Written by:</h5>
-                    {% for writer in writers %}
-                        <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
-                    {% endfor %}
-                {% endif %}
+            {% if writers %}
+                <h5 style="padding-top:10px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
 
-                {% if producers %}
-                    <h5 style="padding-top:10px"> Produced by:</h5>
-                    {% for producer in producers %}
-                        <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endif %}
+            {% if producers %}
+                <h5 style="padding-top:10px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
 
-        {% if nominationCount != 0 %}
-            <div class="container infoSection">
-                {{ nominationCount }} Nomination{% if nominationCount > 1 %}s{% endif %}
-                {% if winCount != 0 %}
-                     | {{ winCount }} Win{% if winCount > 1 %}s{% endif %}
-                {% endif %}
-            </div>
-        {% endif %}
+    {% if nominationCount != 0 %}
+        <div class="container infoSection">
+            {{ nominationCount }} Nomination{% if nominationCount > 1 %}s{% endif %}
+            {% if winCount != 0 %}
+                 | {{ winCount }} Win{% if winCount > 1 %}s{% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
 
-        {% if film.synopsis %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
-                <h6>{{ film.synopsis }}</h6>
-            </div>
-        {% endif %}
+    {% if film.synopsis %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+            <h6>{{ film.synopsis }}</h6>
+        </div>
+    {% endif %}
 
-        {% if cast %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
-                <div class="scroller">
-                    <ul class="hs full">
-                        {% for actor in cast %}
-                            <div class="bottomOverlay">
-                                <a class="item" href="/person/{{ actor.person.slug }}">
-                                    <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
-                                </a>
-                                <div class="content">
-                                    <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
-                                </div>
+    {% if cast %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in cast %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
+                                <img class="item personSmall" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
                             </div>
-                        {% endfor %}
-                    </ul>
-                </div>
+                        </div>
+                    {% endfor %}
+                </ul>
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
 
     {% if franchises %}
         <div class="container infoSection">

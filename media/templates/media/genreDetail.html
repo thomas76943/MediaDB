@@ -2,12 +2,14 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2>Browse Genre - {{genre.title}}</h2>
+        <h2 style="padding-top: 7px">Browsing Genre - {{genre.title}}</h2>
     </div>
 
     {% if franchises %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ genre.title }} Franchises:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY FRANCHISE
+                <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
+            </h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in franchises %}
@@ -20,9 +22,39 @@
         </div>
     {% endif %}
 
+    {% if teensFilms %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">2010's {{ genre.title }} Films</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in teensFilms %}
+                        <a href="/films/{{ f.film.slug }}">
+                        <img class="item posterSmall" src="{{f.film.poster.url}}" alt="{{f.film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if tv %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ genre.title }} Television</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for series in tv %}
+                        <a href="/tv/{{ series.television.slug }}">
+                        <img class="item posterSmall" src="{{series.television.poster.url}}" alt="{{series.television.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
     {% if naughtiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">00's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">2000's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in naughtiesFilms %}
@@ -37,7 +69,7 @@
 
     {% if ninetiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">90's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1990's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in ninetiesFilms %}
@@ -52,7 +84,7 @@
 
     {% if eightiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">80's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1980's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in eightiesFilms %}
@@ -67,7 +99,7 @@
 
     {% if seventiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">70's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1970's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in seventiesFilms %}
@@ -82,7 +114,7 @@
 
     {% if sixtiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">60's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1960's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in sixtiesFilms %}
@@ -97,7 +129,7 @@
 
     {% if fiftiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">50's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1950's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in fiftiesFilms %}
@@ -112,7 +144,7 @@
 
     {% if fortiesFilms %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">40's {{ genre.title }} Films:</h5>
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">1940's {{ genre.title }} Films</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in fortiesFilms %}
@@ -125,30 +157,19 @@
         </div>
     {% endif %}
 
-    {% if tv %}
-        <hr>
-        <h5>Television:</h5>
-        {% for t in tv %}
-                <a href="/tv/{{ t.television.slug }}"> {{ t.television.title }} | {{ t.television.getYear }}</a><br>
-        {% endfor %}
-    {% endif %}
-
-    {% if books %}
-        <hr>
-        <h5>Books:</h5>
-        {% for b in books %}
-                <a href="/books/{{ b.book.slug }}"> {{ b.book.title }} | {{ b.book.getYear }}</a><br>
-        {% endfor %}
-    {% endif %}
-
     {% if webseries %}
-        <hr>
-        <h5>Web Series:</h5>
-        {% for w in webseries %}
-                <a href="/web-series/{{ w.webSeries.slug }}"> {{ w.webSeries.title }} | {{ w.webSeries.getYear }}</a><br>
-        {% endfor %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ genre.title }} Web Series</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for w in webseries %}
+                        <a href="/web-series/{{ w.webSeries.slug }}">
+                        <img class="item posterSmall" src="{{w.webSeries.poster.url}}" alt="{{w.webSeries.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     {% endif %}
-
-    <hr><br>
 
 {% endblock %}

@@ -31,7 +31,7 @@ def addUsers():
             print("Created - ", row[1])
 
 def addRatings():
-    ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratingsCopy.csv", "rt")
+    ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratings.csv", "rt")
     ratingsData = csv.reader(ratingsFile)
 
     people = Person.objects.all()
@@ -430,8 +430,8 @@ def home(request):
             break
 
     context = {
-        'films':Film.objects.all().order_by('-id')[:30],
-        'newestFilms':Film.objects.all().order_by('release')[:30],
+        'oldestFilms':Film.objects.all().order_by('release')[:30],
+        'newestFilms':Film.objects.all().order_by('-release')[:30],
         'tv':Television.objects.all()[:30],
         'longestRunningTV':Television.objects.all().order_by('-episodes')[:30],
         'games':VideoGame.objects.all()[:30],
@@ -505,7 +505,7 @@ def searchResults(request):
 
 def browse(request):
     context = {
-        'films': Film.objects.all(),
+        'films': Film.objects.all()[7000:9331],
         'tv': Television.objects.all(),
         'videoGames': VideoGame.objects.all(),
         'books': Book.objects.all(),
@@ -565,8 +565,25 @@ def gameHome(request):
     return render(request, 'media/gameHome.html', context)
 
 def bookHome(request):
+
+    films = Film.objects.all()
+    filmGenreMappings = FilmGenreMapping.objects.all()
+    genreCounts = {}
+    noGenres = []
+
+    for film in films:
+        genreCounts[film.title] = 0
+
+    for map in filmGenreMappings:
+        genreCounts[map.film.title] += 1
+
+    for film in genreCounts:
+        if genreCounts[film] == 0:
+            noGenres.append(film)
+
     context = {
         'books':Book.objects.all(),
+        'nogenres':noGenres,
     }
     return render(request, 'media/bookHome.html', context)
 
@@ -741,11 +758,47 @@ class PersonDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['films'] = FilmPersonMapping.objects.filter(person=self.object.id).order_by('film__release')
-        context['tv'] = TelevisionPersonMapping.objects.filter(person=self.object.id).order_by('television__release')
-        context['videogames'] = VideoGamePersonMapping.objects.filter(person=self.object.id).order_by('videogame__release')
-        context['books'] = BookPersonMapping.objects.filter(person=self.object.id).order_by('book__release')
-        context['webseries'] = WebSeriesPersonMapping.objects.filter(person=self.object.id).order_by('webSeries__release')
+
+        fActing = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-film__release')
+        tvActing = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-television__release')
+        vgActing = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-videogame__release')
+        wsActing = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-webSeries__release')
+        actingAll = list(chain(fActing, tvActing, vgActing, wsActing))
+
+        fDirecting = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-film__release')
+        tvDirecting = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-television__release')
+        vgDirecting = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-videogame__release')
+        wsDirecting = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-webSeries__release')
+        directingAll = list(chain(fDirecting, tvDirecting, vgDirecting, wsDirecting))
+
+        fWriting = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-film__release')
+        tvWriting = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-television__release')
+        vgWriting = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-videogame__release')
+        wsWriting = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-webSeries__release')
+        writingAll = list(chain(fWriting, tvWriting, vgWriting, wsWriting))
+
+        fProducing = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-film__release')
+        tvProducing = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-television__release')
+        vgProducing = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-videogame__release')
+        wsProducing = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-webSeries__release')
+        producingAll = list(chain(fProducing, tvProducing, vgProducing, wsProducing))
+
+        roleOrder = {}
+        if len(actingAll) > 0:
+            #roleOrder[len(actingAll)] = actingAll
+            roleOrder['Actor'] = actingAll
+        if len(directingAll) > 0:
+            #roleOrder[len(directingAll)] = directingAll
+            roleOrder['Director'] = directingAll
+        if len(writingAll) > 0:
+            #roleOrder[len(writingAll)] = writingAll
+            roleOrder['Writer'] = writingAll
+        if len(producingAll) > 0:
+            roleOrder['Producer'] = producingAll
+
+        ordered = sorted(roleOrder.items(), key= lambda x: len(x[1]), reverse=True)
+        context['roles'] = ordered
+
         context['images'] = PersonImages.objects.filter(person=self.object.id)
         context['nominationCount'] = FilmAwardCreditMapping.objects.filter(Person=self.object.id).count()
         context['winCount'] = FilmAwardCreditMapping.objects.filter(Person=self.object.id, FilmAwardMapping__win=True).count()
@@ -809,7 +862,9 @@ class FranchiseDetailView(generic.DetailView):
         completeFranchise = list(chain(franchiseFilms, franchiseTelevision, franchiseVideoGames, franchiseBooks, franchiseWebSeries))
 
 
-        franchisePeople = {}
+        franchiseActors = {}
+        franchiseProducers = {}
+
         for media in completeFranchise:
             if hasattr(media,'film'):
                 crew = FilmPersonMapping.objects.filter(film=media.film)
@@ -824,14 +879,26 @@ class FranchiseDetailView(generic.DetailView):
 
             cast = crew.filter(role=1)
             for mapping in cast:
-                if mapping.person not in franchisePeople:
-                    franchisePeople[mapping.person] = 1
+                if mapping.person not in franchiseActors:
+                    franchiseActors[mapping.person] = 1
                 else:
-                    franchisePeople[mapping.person] += 1
+                    franchiseActors[mapping.person] += 1
 
-        tuples = sorted(franchisePeople.items(), key=operator.itemgetter(1), reverse=True)
-        sortedPeople = {k: v for k,v in tuples}
-        context['franchisePeople'] = sortedPeople
+            producers = crew.filter(role=6)
+            for mapping in producers:
+                if mapping.person not in franchiseProducers:
+                    franchiseProducers[mapping.person] = 1
+                else:
+                    franchiseProducers[mapping.person] += 1
+
+        actorTuples = sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True)
+        sortedActors = {k: v for k,v in actorTuples}
+
+        producerTuples = sorted(franchiseProducers.items(), key=operator.itemgetter(1), reverse=True)
+        sortedProducers = {k: v for k,v in producerTuples}
+
+        context['franchiseActors'] = sortedActors
+        context['franchiseProducers'] = sortedProducers
 
         return context
 
@@ -1212,10 +1279,12 @@ class WebSeriesDetailView(generic.UpdateView):
 class GenreDetailView(generic.DetailView):
     model = Genre
     template_name = 'media/genreDetail.html'
+    slug_field, slug_url_kwarg = "title", "title"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['franchises'] = FranchiseGenreMapping.objects.filter(genre=self.object.id)[:30]
+        context['teensFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["2010-01-01", "2019-12-25"])[:30]
         context['naughtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["2000-01-01", "2009-12-25"])[:30]
         context['ninetiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1990-01-01", "1999-12-25"])[:30]
         context['eightiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1980-01-01", "1989-12-25"])[:30]

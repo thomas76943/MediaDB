@@ -35,7 +35,7 @@ urlpatterns = [
     path('video-game-franchises/', views.videoGameFranchiseHome, name='media-videogamefranchise-home'),
     path('video-game-franchises/<str:slug>', views.VideoGameFranchiseDetailView.as_view(), name='media-videogamefranchise-detail'),
 
-    path('genre/<int:pk>', views.GenreDetailView.as_view(), name='media-genre-detail'),
+    path('genre/<str:title>', views.GenreDetailView.as_view(), name='media-genre-detail'),
     path('video-game-genre/<int:pk>', views.VideoGameGenreDetailView.as_view(), name='media-gamegenre-detail'),
 
     path('tag/<str:pk>', views.TagDetailView.as_view(), name='media-tag-detail'),

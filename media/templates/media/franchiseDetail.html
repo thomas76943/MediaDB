@@ -19,7 +19,27 @@
             <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Actors</h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for key, val in franchisePeople.items %}
+                    {% for key, val in franchiseActors.items %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ key.slug }}">
+                                <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ val }} - {{ key.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if franchise.showProducers %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Producers</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for key, val in franchiseProducers.items %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ key.slug }}">
                                 <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
