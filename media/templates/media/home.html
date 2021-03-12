@@ -109,22 +109,45 @@
     <br>
 
     <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
+            <br>Recommendation Algorithm<br><br>
+            Datasets: Television, Video Games, Books, Web Series, Awards<br><br>
+
+            Features:<br>
+            Form to Add Custom Profile Sections<br>
+            Form to Add Media to Custom Profile Sections<br>
+            Form to Log Media Watched, Give Rating, Write Review<br>
+            Forms for Editing / Contributing<br>
+            Forms to apply tags to media<br>
+            Form to follow Users + Page to View Friend's Activity<br><br>
+
+            Fixes:<br>
+            Fix Rating Value Rounding<br>
+            Fix Rate/Add to List Refreshes<br>
+            Fix Megamenus on Mobile<br>
+            Fix Posters + Trailers on Mobile<br>
+            Fix Navbar on Mobile<br>
+            Change Login/Sign Up Forms<br><br>
+
+            Misc:<br>
+            Add Genres manually added media<br><br>
+            Genre Icons<br>
+            Paginate Media Browsing Grid<br>
+        </h5>
+    </div>
+
+    <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">Highest Rated <a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for film, rating in highestRatedFilms.items %}
                     <div class="bottomOverlay">
-
                         <a href="/films/{{ film.slug }}">
                             <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                             <div class="content">
-
                                 <h6 class = "font-weight-bold text-uppercase" >
-
-
                                     <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
                                     <div style="display: inline-block">{{ rating }}</div>
-
                                     <script>
                                         $('#{{film.slug}}').rateYo({
                                             rating:'{% widthratio rating 1 2 %}',
@@ -138,10 +161,6 @@
                                             readOnly:true,
                                         })
                                     </script>
-                                    <!--
-                                    <div class="ratingStars small" style="--rating: {{ rating }};"></div>
-                                    -->
-
                                 </h6>
                             </div>
                         </a>

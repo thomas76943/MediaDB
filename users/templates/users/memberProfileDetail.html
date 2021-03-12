@@ -37,7 +37,6 @@
                                 <a class="item" href="/films/{{ rating.film.slug }}">
                                 <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
                                 </a>
-
                             {% endif %}
                             {%  if rating.television != NULL %}
                                 <a class="item" href="/tv/{{ rating.television.slug }}">
@@ -90,15 +89,21 @@
             <div class="container infoSection">
                 <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ section.sectionName }}</h5>
                 <div class="scroller">
-                    <ul class="hs full">
-                        {% with var=section.sectionName %}
-                        {% dynamicVariableValue var as var_url %}
+                    {% with var=section.sectionName %}
+                    {% dynamicVariableValue var as var_url %}
+                        <ul class="hs full" id="{{ section.sectionName }}">
                         {% for entry in var_url %}
+
                             {%  if entry.film != NULL %}
-                                <a class="item" href="/films/{{ entry.film.slug }}">
-                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
-                                </a>
+                                <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                    <a class="item" href="/films/{{ entry.film.slug }}">
+                                    <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                    </a>
+                                </li>
+
                             {% endif %}
+
+                            <!--
                             {%  if entry.television != NULL %}
                                 <a class="item" href="/tv/{{ entry.television.slug }}">
                                 <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
@@ -119,12 +124,32 @@
                                 <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
                                 </a>
                             {% endif %}
+                            -->
                         {% endfor %}
-                        {% endwith %}
                     </ul>
+                        <script type="text/javascript" language="javascript">
+                          $(document).ready(function() {
+                            $("#{{ section.sectionName }}").sortable({
+                                axis:'x',
+                                update: function(event, ui) {
+                                    var data = $(this).sortable('serialize');
+                                    $.ajax({
+                                      url: "/user/{{ memberProfile.username }}",
+                                      type: "POST",
+                                      data: { 'content': data, 'csrfmiddlewaretoken' : '{{ csrf_token }}' }
+                                    });
+                                },
+                            }).disableSelection();
+                          });
+                        </script>
+                    {% endwith %}
+
                 </div>
             </div>
         {% endfor %}
     {% endif %}
+
+    <!-- Sortable Sections -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 {% endblock %}

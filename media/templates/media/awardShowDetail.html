@@ -2,12 +2,13 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2>{{ awardsshow.name }} | {{ awardsshow.date }}</h2>
+        <h2 style="padding-top: 7px;">{{ awardsshow.name }} | {{ awardsshow.date }}</h2>
         <a href="/awards/type/{{ awardsshow.award.id }}">See all {{ awardsshow.award.name }} Shows</a>
     </div>
 
     {% if images %}
-            <h5>Images:</h5>
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Images</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
@@ -17,43 +18,42 @@
                     {% endfor %}
                 </ul>
             </div>
+        </div>
     {% endif %}
 
     <div class="container infoSection">
-        <h2 class="font-weight-bold text-uppercase">Winners:</h2>
+        <h2 style="padding-top: 7px;">Winners:</h2>
+        {% for fn in filmNominees %}
+            {% if fn.win %}
+                <a href="/awards/category/{{ fn.category.id }}">{{ fn.category.name }}</a> -
+                <a href="/films/{{ fn.film.slug }}">{{ fn.film.title }} ({{ fn.film.getYear }})</a>
+                {% for credit in filmCredits %}
+                    {% if credit.FilmAwardMapping == fn %}
+                        {% if credit.Person %}
+                            | <a href="/person/{{ credit.Person.slug }}"> {{ credit.Person.getFullName }}</a>
+                        {% endif %}
+                        {% if credit.Company %}
+                            | <a href="/company/{{ credit.Company.slug }}"> {{ credit.Company.name }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                <br>
+            {% endif %}
+        {% endfor %}
     </div>
 
-    {% for fn in filmNominees %}
-        {% if fn.win %}
-            <a href="/awards/category/{{ fn.category.id }}">{{ fn.category.name }}</a> -
-            <a href="/films/{{ fn.film.slug }}">{{ fn.film.title }} ({{ fn.film.getYear }})</a>
-            {% for credit in filmCredits %}
-                {% if credit.FilmAwardMapping == fn %}
-                    {% if credit.Person %}
-                        | <a href="/person/{{ credit.Person.slug }}"> {{ credit.Person.getFullName }}</a>
-                    {% endif %}
-                    {% if credit.Company %}
-                        | <a href="/company/{{ credit.Company.slug }}"> {{ credit.Company.name }}</a>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-
-            <br>
-        {% endif %}
-    {% endfor %}
-    <br><br>
-
     <div class="container infoSection">
-        <h2 class="font-weight-bold text-uppercase">Full List of Nominations:</h2>
+        <h2 style="padding-top: 7px;">Full List of Nominations:</h2>
     </div>
 
     {% if categories %}
         {% for category in categories %}
+
             {% if filmNominees %}
                 <div class="container infoSection">
-                    <h5 class="font-weight-bold text-uppercase border-bottom mb-0">
-                        <a href="/awards/category/{{ category.id }}">{{ category.name }}</a>
-                    </h5>
+                    <a href="/awards/category/{{ category.id }}">
+                        <h5 class="font-weight-bold border-bottom mb-0">{{ category.name }}</h5>
+                    </a>
                     <div class="scroller">
                         <ul class="hs full">
                         {% for fn in filmNominees %}
@@ -69,11 +69,9 @@
                                                 {% endif %}
                                                 {{ credit.Person.getFullName }}<br>
                                                 <p href="/films/{{ fn.film.slug }}">{{ fn.film.title }}</p>
-
                                                 </a>
                                             {% endif %}
                                         {% endfor %}
-
                                 {% else %}
                                     <a href="/films/{{ fn.film.slug }}">
                                     {% if fn.win %}
@@ -93,7 +91,6 @@
                         </ul>
                     </div>
                 </div>
-                <br>
 
             {% endif %}
         {% endfor %}

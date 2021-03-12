@@ -21,6 +21,10 @@ from django.db.models import Count
 import requests, json, datetime, re
 from django.core.files import File
 
+from django.core.paginator import Paginator, EmptyPage
+from django.db.models.functions import Length
+from .filters import *
+
 def addUsers():
     with open("D:/MediaDB Datasets/movielensSmall/users.csv", 'r') as users:
         userData = csv.reader(users)
@@ -420,6 +424,151 @@ def csvUpload(request):
 
     return render(request, 'media/csvUpload.html', context)
 
+def topRatedUnseen(user):
+    userFilmRatings = FilmRating.objects.filter(user=user)
+    topRated = calculateHighestRated(1000, True)
+    seen = []
+    unseen = []
+    for rating in userFilmRatings:
+        seen.append(rating.film)
+    for film in topRated:
+        if film not in seen:
+            unseen.append(film)
+    return unseen[:500]
+
+def actorScores(user):
+    userFilmRatings = FilmRating.objects.filter(user=user)
+    actorScores = {}
+    directorScores = {}
+    writerScores = {}
+    actorAverages = {}
+
+    for ufr in userFilmRatings:
+        film = ufr.film
+        rating = ufr.rating
+        people = FilmPersonMapping.objects.filter(film=film)
+        actors = people.filter(role=1)
+        directors = people.filter(role=2)
+        writers = people.filter(role=3)
+
+        if actors:
+            for a in actors:
+                actor = a.person.getFullName()
+                if actor not in actorScores:
+                    actorScores[actor] = []
+                    actorScores[actor].append(rating)
+                else:
+                    actorScores[actor].append(rating)
+
+            for actorScore in actorScores:
+                sum = 0
+                for score in actorScores[actorScore]:
+                    sum += score
+                average = sum/len(actorScores[actorScore])
+                actorAverages[actorScore] = average
+
+    return actorAverages
+
+def genreScores(user):
+    userFilmRatings = FilmRating.objects.filter(user=user)
+    genreScores = {}
+    genreAverages = {}
+
+    for ufr in userFilmRatings:
+        film = ufr.film
+        rating = ufr.rating
+        genres = FilmGenreMapping.objects.filter(film=film)
+
+        if genres:
+            for g in genres:
+                genre = g.genre.title
+                if genre not in genreScores:
+                    genreScores[genre] = []
+                    genreScores[genre].append(rating)
+                else:
+                    genreScores[genre].append(rating)
+
+            for gs in genreScores:
+                sum = 0
+                for score in genreScores[gs]:
+                    sum += score
+                average = sum/len(genreScores[gs])
+                genreAverages[gs] = average
+
+    return genreAverages
+
+def genreBasedRecommender(user):
+    genresScores = genreScores(user)
+    unseen = topRatedUnseen(user)
+    filmScores = {}
+
+    for film in unseen:
+        score = 0
+        filmGenres = FilmGenreMapping.objects.filter(film=film)
+        for genre in filmGenres:
+            if genre.genre.title in genresScores:
+                score += genresScores[genre.genre.title]
+        if filmGenres.count() > 1:
+            score = score / filmGenres.count()
+        score = score/2
+        filmScores[film] = "{:.1f}".format(score)
+
+    #Sort films by highest genre score
+    sort = dict(sorted(filmScores.items(), key=lambda item: item[1], reverse=True))
+
+    #Retrieve only the top 100 highest predicted ratings
+    recommendations = {}
+    iterator = iter(sort.items())
+    for i in range(100):
+        film = next(iterator)[0]
+        recommendations[film] = sort[film]
+
+    return recommendations, genresScores
+
+def actorBasedRecommender(user):
+    actorsScores = actorScores(user)
+    unseen = topRatedUnseen(user)
+    filmScores = {}
+
+    for film in unseen:
+        score = 0
+        filmPeople = FilmPersonMapping.objects.filter(film=film)
+        filmActors = filmPeople.filter(role=1)
+
+        for actor in filmActors:
+            if actor.person.getFullName() in actorsScores:
+                score += actorsScores[actor.person.getFullName()]
+        if filmActors.count() > 1:
+            score = score / filmActors.count()
+        score = score / 2
+        filmScores[film] = "{:.1f}".format(score)
+
+    # Sort films by highest genre score
+    sort = dict(sorted(filmScores.items(), key=lambda item: item[1], reverse=True))
+
+    # Retrieve only the top 100 highest predicted ratings
+    recommendations = {}
+    iterator = iter(sort.items())
+    for i in range(100):
+        film = next(iterator)[0]
+        recommendations[film] = sort[film]
+
+    return recommendations, actorsScores
+
+def recommendationsTestingPage(request):
+    context = {}
+    if request.user.is_authenticated:
+        #context['recommendationsV1'] = topRatedUnseen(request.user)
+        genreRecommendations, genreScores = genreBasedRecommender(request.user)
+        context['genreRecommendations'] = genreRecommendations
+        context['genreScores'] = genreScores
+
+        actorRecommendations, actorScores = actorBasedRecommender(request.user)
+        context['actorRecommendations'] = actorRecommendations
+        context['actorScores'] = actorScores
+
+    return render(request, 'media/recommendations.html', context)
+
 def home(request):
 
     oldest = []
@@ -504,15 +653,36 @@ def searchResults(request):
     return render(request, 'media/searchResults.html', context)
 
 def browse(request):
-    context = {
-        'films': Film.objects.all()[7000:9331],
-        'tv': Television.objects.all(),
-        'videoGames': VideoGame.objects.all(),
-        'books': Book.objects.all(),
-        'webSeries': WebSeries.objects.all(),
-        'people': Person.objects.all(),
 
+    films = Film.objects.all()
+    #television = Television.objects.all()
+    #videoGames = VideoGame.objects.all()
+    #books = Book.objects.all()
+    #webSeries = WebSeries.objects.all()
+    #people = Person.objects.exclude(image='MissingIcon.png')
+
+    #print(people.count())
+    #allMedia = list(chain(films, television, videoGames, books, webSeries, people))
+
+    filteredFilms = filmFilter(request.GET, queryset=films)
+
+    paginatedFilteredFilms = Paginator(filteredFilms.qs, 95)
+    page_number = request.GET.get('page', 1)
+    mediaPageObject = paginatedFilteredFilms.get_page(page_number)
+
+    #try:
+    #    page = p.page(page_number)
+    #except EmptyPage:
+    #    page = p.page(1)
+
+
+
+    context = {
+        'filteredFilms' : filteredFilms,
+        'mediaPageObject': mediaPageObject,
+        'seenFilms' : FilmRating.objects.filter(user=request.user)
     }
+
 
     if request.user.is_authenticated:
         userRatings = FilmRating.objects.filter(user=request.user)
@@ -664,7 +834,6 @@ def franchiseHome(request):
         'franchises':Franchise.objects.all()
     }
     return render(request, 'media/franchisesHome.html', context)
-
 
 def videoGameFranchiseHome(request):
     context = {
@@ -924,7 +1093,6 @@ class VideoGameFranchiseDetailView(generic.DetailView):
                 context[subcategories[x].title] = completeSubCat
 
         return context
-
 
 class FilmDetailView(generic.UpdateView):
     model = Film

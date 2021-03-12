@@ -12,6 +12,11 @@ from django.views import generic
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from users.models import *
 
+from django import http
+from django.http import QueryDict
+
+from django.shortcuts import render, redirect
+
 # Create your views here.
 def register(request):
     if request.method == 'POST':
@@ -104,12 +109,14 @@ class userList(generic.DetailView):
         return context
 
 
-class memberProfile(generic.DetailView):
+class memberProfile(generic.UpdateView):
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
     template_name = 'users/memberProfileDetail.html'
     context_object_name = "memberProfile"
+    fields = []
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -146,6 +153,15 @@ class memberProfile(generic.DetailView):
                 context[profileSections[x].sectionName] = completeProfileSection
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        entries = QueryDict(request.POST['content'])
+        for index, entry_id in enumerate(entries.getlist('entry[]')):
+            entry = ProfileSectionFilmMapping.objects.get(id=entry_id)
+            entry.orderInSection = index
+            entry.save()
+        object = self.get_object()
+        return http.HttpResponseRedirect('/user/'+object.username)
 
 class memberProfileActivity(memberProfile):
     template_name = 'users/memberProfileActivityDetail.html'

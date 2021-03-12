@@ -1,11 +1,16 @@
 {% extends "media/base.html" %}
 {% block content %}
 
-    <h2>The {{ awardtype.name }}s</h2>
+    <div class="container infoSection">
+        <h2 style="padding-top: 7px;">The {{ awardtype.name }}s</h2>
+    </div>
+
     {% if shows %}
-        {% for show in shows %}
-            <a href="/awards/show/{{ show.id }}">{{ show.name }}</a><br>
-        {% endfor %}
+        <div class="container infoSection">
+            {% for show in shows %}
+                <a href="/awards/show/{{ show.id }}">{{ show.name }}</a><br>
+            {% endfor %}
+        </div>
     {%  endif %}
 
 {% endblock %}

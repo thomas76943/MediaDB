@@ -1,0 +1,101 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2 style="padding-top: 7px;">Recommendations Testing</h2>
+    </div>
+
+    {% if recommendationsV1 %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Highest-Rated Films Not Seen</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film in recommendationsV1 %}
+                        <a href="/films/{{ film.slug }}">
+                        <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if genreRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Genre Scores</h5>
+            {% if genreScores %}
+                {{ genreScores }}
+            {% endif %}
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in genreRecommendations.items %}
+                        <div class="bottomOverlay">
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                <div class="content">
+                                    <h6 class = "font-weight-bold text-uppercase" >
+                                        <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
+                                        <div style="display: inline-block">{{ score }}</div>
+                                        <script>
+                                            $('#{{film.slug}}').rateYo({
+                                                rating:'{% widthratio score 1 2 %}',
+                                                starWidth:'15px',
+                                                numStars:5,
+                                                minValue:0,
+                                                maxValue:10,
+                                                normalFill:'gray',
+                                                ratedFill:'orange',
+                                                halfStar:true,
+                                                readOnly:true,
+                                            })
+                                        </script>
+                                    </h6>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if actorRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Actor Scores</h5>
+            {% if actorScores %}
+                {{ actorScores }}
+            {% endif %}
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in actorRecommendations.items %}
+                        <div class="bottomOverlay">
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                <div class="content">
+                                    <h6 class = "font-weight-bold text-uppercase" >
+                                        <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
+                                        <div style="display: inline-block">{{ score }}</div>
+                                        <script>
+                                            $('#{{film.slug}}').rateYo({
+                                                rating:'{% widthratio score 1 2 %}',
+                                                starWidth:'15px',
+                                                numStars:5,
+                                                minValue:0,
+                                                maxValue:10,
+                                                normalFill:'gray',
+                                                ratedFill:'orange',
+                                                halfStar:true,
+                                                readOnly:true,
+                                            })
+                                        </script>
+                                    </h6>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

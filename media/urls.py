@@ -60,6 +60,8 @@ urlpatterns = [
 
     path('calendar/', views.calendar, name="calendar"),
 
+    path('recommender/', views.recommendationsTestingPage, name="recommender-testing")
+
 ]
 
 #REST API URLS Below

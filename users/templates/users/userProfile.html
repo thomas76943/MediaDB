@@ -5,7 +5,9 @@
 
     <div class="container profileSection">
         <div class="media">
-            <img class="item additionalImage" alt="profilePicture" src={{ user.profile.image.url }}>
+            {% if user.profile.image.url %}
+                <img class="item additionalImage" alt="profilePicture" src={{ user.profile.image.url }}>
+            {% endif %}
             <div class="media-body" style="padding-left:15px">
                 <h2 class="account-heading">{{user.username}}</h2>
                 <p class="text-secondary">{{ user.email }}</p>

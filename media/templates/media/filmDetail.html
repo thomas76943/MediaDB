@@ -112,7 +112,7 @@
                     {% for actor in cast %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ actor.person.slug }}">
-                                <img class="item personSmall" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
                             </a>
                             <div class="content">
                                 <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>

@@ -179,11 +179,11 @@ class VideoGame(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.poster.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.poster.path)
+        #img = Image.open(self.poster.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
             super(VideoGame, self).save(*args, **kwargs)
