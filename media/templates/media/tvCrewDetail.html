@@ -90,19 +90,4 @@
         </div>
     {% endif %}
 
-    {% if images %}
-        <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Posters, Stills, Concept Art, Behind the Scenes</h5>
-            <div class="scroller">
-                <ul class="hs full">
-                    {% for image in images %}
-                        <a class="item" href="{{ image.image.url }}">
-                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
-                        </a>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    {% endif %}
-
 {% endblock %}

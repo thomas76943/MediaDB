@@ -29,6 +29,8 @@
     <!--Bootstrap Material Design-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+    <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
 
     <!--Google Material Icons-->
@@ -361,9 +363,9 @@
                     'toggle': toggle,
                     'csrfmiddlewaretoken': csrftoken
                 },
-                success: setTimeout(function(){// wait for 5 secs(2)
-                    location.reload(); // then reload the page.(3)
-                }, 0.01),
+                success: setTimeout(function(){
+                    $('#addListToggle').load(' #addListToggle', function (){$(this).children().unwrap()})
+                }, 500),
 
             });
         });
@@ -401,18 +403,58 @@
         }
         ).on("rateyo.set", function (e, data) {
             var newRating = data.rating/2
+            ratingDiv = document.getElementById("ratingDiv");
 
             $.ajax({
                 url:document.URL,
                 //url: window.url_root + cid + "#",
                 type: "POST",
-                data: { 'type': "rating", 'nr': newRating, 'csrfmiddlewaretoken': csrftoken },
-                success: setTimeout(function(){ location.reload(); }, 0.01),
+                data: {
+                    'type': "rating",
+                    'nr': newRating,
+                    'csrfmiddlewaretoken': csrftoken
+                },
+                success: setTimeout(function(){
+                    $('#ratingDiv').load(' #ratingDiv', function (){$(this).children().unwrap()})
+                    $('#reviewButtonContainer').load(' #reviewButtonContainer', function (){$(this).children().unwrap()})
+                }, 1000),
             });
-        }
+        },
     );
 
     </script>
+
+    <!-- Review Script -->
+    <script type="text/javascript">
+
+        var frm = $('#writeReview')
+
+        console.log(frm)
+        frm.submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url:document.URL,
+                type : "POST",
+                data : {
+                    'type': "review",
+                    'newReview': document.querySelector('#reviewTextArea').value,
+                    'csrfmiddlewaretoken' : '{{ csrf_token }}',
+                },
+                success: setTimeout(function(){
+                    var modal = document.getElementById("myModal");
+                    modal.style.display = "none";
+
+                    $('#writeReviewButton').load(' #writeReviewButton', function (){$(this).children().unwrap()})
+                    $('#reviewTextArea').load(' #reviewTextArea', function (){$(this).children().unwrap()})
+                    $('#submitReview').load(' #submitReview', function (){$(this).children().unwrap()})
+                }, 1000),
+            })
+            return false;
+        })
+
+    </script>
+
+
 
 
 </body>

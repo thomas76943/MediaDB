@@ -33,7 +33,11 @@ urlpatterns = [
     path('user/<str:username>', user_views.memberProfile.as_view(), name='member-profile-detail'),
     path('user/<str:username>/activity', user_views.memberProfileActivity.as_view(), name='member-profile-activity-detail'),
 
+    path('profile-section/<str:slug>', user_views.profileSection.as_view(), name='member-profile-section-edit'),
+
     path('list/', user_views.userList.as_view(), name='user-List'),
+
+    path('feed/', user_views.activityFeed, name='activity-feed'),
 
     #MediaDB URLs
     path('', include('media.urls')),

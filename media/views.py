@@ -15,6 +15,8 @@ from django.views import generic
 from django.db.models import Q
 from .models import *
 from users.models import *
+from users.views import getFeed
+
 from .forms import *
 from django.db.models import Count
 
@@ -311,13 +313,13 @@ def findDulplicateTitles():
 
     return repeatedTitles
 
-def postRequest(self, request, *args, **kwargs):
+def ratingListPostRequests(self, request, *args, **kwargs):
     object = self.get_object()
     print(type(object))
 
     if self.request.user.is_authenticated:
 
-        # POST Request: Adding/Removing from List
+        #POST Request: Adding/Removing from List
         if request.POST['type'] == "listToggle":
             toggle = request.POST['toggle']
             #Adding Media to List
@@ -347,7 +349,7 @@ def postRequest(self, request, *args, **kwargs):
                     UserListWebSeriesMapping.objects.filter(user=self.request.user, webSeries=object.id).delete()
 
         #POST Request: Adding/Changing a Rating
-        else:
+        elif request.POST['type'] == "rating":
             newRating = float(request.POST['nr']) * 2
             if isinstance(object, Film):
                 r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
@@ -378,18 +380,30 @@ def postRequest(self, request, *args, **kwargs):
                     rating = WebSeries(user=self.request.user, webSeries=object, rating=newRating)
                 rating.save()
 
+        #POST Request: Review
+        else:
+            print("doing a review")
+            newReview = request.POST['newReview']
+            print(newReview)
+            if isinstance(object, Film):
+                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
+            elif isinstance(object, Television):
+                r = TelevisionRating.objects.filter(user=self.request.user, television=object.id).first()
+            elif isinstance(object, VideoGame):
+                r = VideoGameRating.objects.filter(user=self.request.user, videoGame=object.id).first()
+            elif isinstance(object, Book):
+                r = BookRating.objects.filter(user=self.request.user, book=object.id).first()
+            elif isinstance(object, WebSeries):
+                r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=object.id).first()
+
+            r.review = newReview
+            r.save()
+
+
     return super(FilmDetailView, self).post(request, *args, **kwargs)
 
 def dataSources(request):
-    fImages = FilmImages.objects.all()
-    tvImages = TelevisionImages.objects.all()
-    vgImages = VideoGameImages.objects.all()
-    bImages = BookImages.objects.all()
-    wsImages = WebSeriesImages.objects.all()
-    images = sorted(list(chain(fImages, tvImages, vgImages, bImages, wsImages)), key=attrgetter("id"))
-    context = {
-        'images':images
-    }
+    context = {}
     return render(request, "media/dataSources.html", context)
 
 def csvUpload(request):
@@ -579,19 +593,22 @@ def home(request):
             break
 
     context = {
-        'oldestFilms':Film.objects.all().order_by('release')[:30],
+        #'oldestFilms':Film.objects.all().order_by('release')[:30],
         'newestFilms':Film.objects.all().order_by('-release')[:30],
         'tv':Television.objects.all()[:30],
-        'longestRunningTV':Television.objects.all().order_by('-episodes')[:30],
-        'games':VideoGame.objects.all()[:30],
-        'books':Book.objects.all()[:30],
-        'webseries':WebSeries.objects.all()[:30],
-        'people':oldest,
+        'longestRunningTV':Television.objects.all().order_by('-episodes')[:16],
+        #'games':VideoGame.objects.all()[:30],
+        #'books':Book.objects.all()[:30],
+        #'webseries':WebSeries.objects.all()[:30],
+        #'people':oldest,
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
-        'highestRatedFilms':calculateHighestRated(20, True),
-        'topGrossing':calculateTopGrossing(30),
+        'highestRatedFilms':calculateHighestRated(16, True),
+        'topGrossing':calculateTopGrossing(16),
     }
 
+    if request.user.is_authenticated:
+        feed, following = getFeed(request.user, 16)
+        context['feed'] = feed
     #addRatings()
 
     return render(request, 'media/home.html', context)
@@ -694,10 +711,16 @@ def browse(request):
     return render(request, 'media/browse.html', context)
 
 def filmHome(request):
+    genres = []
+    g = Genre.objects.all()
+    for genre in g:
+        if genre.image:
+            genres.append(genre)
+
     context = {
         'films': Film.objects.all(),
         'franchises':Franchise.objects.all(),
-        'genres':Genre.objects.all(),
+        'genres':genres,
         'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"])[:30],
         'eighties': Film.objects.all().filter(release__range=["1980-01-01", "1989-12-25"])[:30],
         'nineties':Film.objects.all().filter(release__range=["1990-01-01", "1999-12-25"])[:30],
@@ -725,11 +748,17 @@ def gameHome(request):
         if vgcm.company not in gameCompanies:
             gameCompanies.append(vgcm.company)
 
+    genres = []
+    g = VideoGameGenre.objects.all()
+    for genre in g:
+        if genre.image:
+            genres.append(genre)
+
     context = {
         'games': VideoGame.objects.all(),
         'consoles': Console.objects.all().order_by('-release'),
         'franchises':VideoGameFranchise.objects.all()[:30],
-        'genres': VideoGameGenre.objects.all(),
+        'genres': genres,
         'companies': gameCompanies,
     }
     return render(request, 'media/gameHome.html', context)
@@ -928,42 +957,78 @@ class PersonDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        fActing = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-film__release')
-        tvActing = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-television__release')
-        vgActing = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-videogame__release')
-        wsActing = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-webSeries__release')
+        fActing = []
+        for fa in FilmPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-film__release'):
+            fActing.append(fa.film)
+        tvActing = []
+        for tva in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-television__release'):
+            tvActing.append(tva.television)
+        vgActing = []
+        for vga in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-videogame__release'):
+            vgActing.append(vga.videoGame)
+        wsActing = []
+        for wsa in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-webSeries__release'):
+            wsActing.append(wsa.webSeries)
         actingAll = list(chain(fActing, tvActing, vgActing, wsActing))
+        acting = sorted(actingAll, key=attrgetter('release'), reverse=True)
 
-        fDirecting = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-film__release')
-        tvDirecting = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-television__release')
-        vgDirecting = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-videogame__release')
-        wsDirecting = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-webSeries__release')
+        fDirecting = []
+        for fd in FilmPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-film__release'):
+            fDirecting.append(fd.film)
+        tvDirecting = []
+        for tvd in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-television__release'):
+            tvDirecting.append(tvd.television)
+        vgDirecting = []
+        for vgd in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-videogame__release'):
+            vgDirecting.append(vgd.videoGame)
+        wsDirecting = []
+        for wsd in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-webSeries__release'):
+            wsDirecting.append(wsd.webSeries)
         directingAll = list(chain(fDirecting, tvDirecting, vgDirecting, wsDirecting))
+        directing = sorted(directingAll, key=attrgetter('release'), reverse=True)
 
-        fWriting = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-film__release')
-        tvWriting = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-television__release')
-        vgWriting = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-videogame__release')
-        wsWriting = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-webSeries__release')
-        writingAll = list(chain(fWriting, tvWriting, vgWriting, wsWriting))
+        fWriting = []
+        for fw in FilmPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-film__release'):
+            fWriting.append(fw.film)
+        tvWriting = []
+        for tvw in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-television__release'):
+            tvWriting.append(tvw.television)
+        vgWriting = []
+        for vgw in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-videogame__release'):
+            vgWriting.append(vgw.videoGame)
+        bWriting = []
+        for bw in BookPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('book__release'):
+            bWriting.append(bw.webSeries)
+        wsWriting = []
+        for wsw in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-webSeries__release'):
+            wsWriting.append(wsw)
+        writingAll = list(chain(fWriting, tvWriting, vgWriting, bWriting, wsWriting))
+        writing = sorted(writingAll, key=attrgetter('release'), reverse=True)
 
-        fProducing = FilmPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-film__release')
-        tvProducing = TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-television__release')
-        vgProducing = VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-videogame__release')
-        wsProducing = WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-webSeries__release')
+        fProducing = []
+        for fp in FilmPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-film__release'):
+            fProducing.append(fp.film)
+        tvProducing = []
+        for tvp in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-television__release'):
+            tvProducing.append(tvp.television)
+        vgProducing = []
+        for vgp in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-videogame__release'):
+            vgProducing.append(vgp.videoGame)
+        wsProducing = []
+        for wsp in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-webSeries__release'):
+            wsProducing.append(wsp.webSeries)
         producingAll = list(chain(fProducing, tvProducing, vgProducing, wsProducing))
+        producing = sorted(producingAll, key=attrgetter('release'), reverse=True)
 
         roleOrder = {}
         if len(actingAll) > 0:
-            #roleOrder[len(actingAll)] = actingAll
-            roleOrder['Actor'] = actingAll
+            roleOrder['Actor'] = acting
         if len(directingAll) > 0:
-            #roleOrder[len(directingAll)] = directingAll
-            roleOrder['Director'] = directingAll
+            roleOrder['Director'] = directing
         if len(writingAll) > 0:
-            #roleOrder[len(writingAll)] = writingAll
-            roleOrder['Writer'] = writingAll
+            roleOrder['Writer'] = writing
         if len(producingAll) > 0:
-            roleOrder['Producer'] = producingAll
+            roleOrder['Producer'] = producing
 
         ordered = sorted(roleOrder.items(), key= lambda x: len(x[1]), reverse=True)
         context['roles'] = ordered
@@ -1099,46 +1164,9 @@ class FilmDetailView(generic.UpdateView):
     template_name = 'media/filmDetail.html'
     slug_field, slug_url_kwarg = "slug", "slug"
     fields = []
-    """
-    def post(self, request, *args, **kwargs):
-        object = self.get_object()
-
-        if self.request.user.is_authenticated:
-
-            #List Toggle Request
-            if request.POST['type'] == "listToggle":
-
-                toggle = request.POST['toggle']
-                if toggle == "add":
-                    l = UserListFilmMapping(user=self.request.user, film=object)
-                    l.save()
-                else:
-                    UserListFilmMapping.objects.filter(user=self.request.user, film=object.id).delete()
-
-            #Rating Post Request
-            else:
-
-                newRating = float(request.POST['nr'])*2
-
-                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
-                #If Updating a Rating
-                if r is not None:
-                    r.rating = newRating
-                    r.save()
-                #If Creating a New Rating
-                else:
-                    rating = FilmRating(user=self.request.user, film=object, rating=newRating)
-                    rating.save()
-
-                print("New Rating (DB):")
-                r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
-                print(r.rating)
-    
-        return super(FilmDetailView, self).post(request, *args, **kwargs)
-    """
 
     def post(self, request, *args, **kwargs):
-        postRequest(self,request,*args,**kwargs)
+        ratingListPostRequests(self, request, *args, **kwargs)
         return super(FilmDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1184,6 +1212,8 @@ class FilmDetailView(generic.UpdateView):
                 if r is not None:
                     context['userRating'] = r.rating
                     context['userRatingText'] = r.rating / 2
+                    if r.review is not None:
+                        context['review'] = r.review
 
         if self.request.user.is_authenticated:
             context['inList'] = False
@@ -1220,7 +1250,7 @@ class TVDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        postRequest(self,request,*args,**kwargs)
+        ratingListPostRequests(self, request, *args, **kwargs)
         return super(TVDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1248,7 +1278,9 @@ class TVDetailView(generic.UpdateView):
             for rating in ratings:
                 ratingSum += rating.rating
             average = ratingSum/ratingCount
-            context['averageRating'] = "{:.1f}".format(average)
+            averageRating = "{:.1f}".format(average)
+            context['averageRating'] = averageRating
+            context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
 
             if self.request.user.is_authenticated:
                 r = TelevisionRating.objects.filter(user=self.request.user, television=self.object.id).first()
@@ -1290,7 +1322,7 @@ class VideoGameDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        postRequest(self,request,*args,**kwargs)
+        ratingListPostRequests(self, request, *args, **kwargs)
         return super(VideoGameDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1343,13 +1375,13 @@ class BookDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        postRequest(self,request,*args,**kwargs)
+        ratingListPostRequests(self, request, *args, **kwargs)
         return super(BookDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['genres'] = BookGenreMapping.objects.filter(book=self.object.id)
-        context['authors'] = BookPersonMapping.objects.filter(role=5, book=self.object.id)
+        context['authors'] = BookPersonMapping.objects.filter(role=3, book=self.object.id)
         context['publishers'] = BookCompanyMapping.objects.filter(role=5, book=self.object.id)
 
         franchises = []
@@ -1394,7 +1426,7 @@ class WebSeriesDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        postRequest(self,request,*args,**kwargs)
+        ratingListPostRequests(self, request, *args, **kwargs)
         return super(WebSeriesDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1503,6 +1535,7 @@ class ConsoleDetailView(generic.DetailView):
 # REST API Views Below #
 
 from rest_framework import viewsets, permissions
+from .serializers import *
 from .serializers import *
 
 

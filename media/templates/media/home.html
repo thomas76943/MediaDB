@@ -24,7 +24,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SpritiedAway.jpg)">
             </a>
             <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>FILMS</span></h2>
+                <h2 class="font-weight-bold"><span>Films</span></h2>
             </div>
           </div>
 
@@ -34,7 +34,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/peaky-blinders-banner-4.jpg)">
             </a>
             <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Television</span></h2>
+                <h2 class="font-weight-bold"><span>Television</span></h2>
             </div>
           </div>
 
@@ -44,7 +44,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/Cyberpunk2077.jpg)">
             </a>
             <div class="carousel-caption">
-              <h2 class="font-weight-bold text-uppercase"><span>Video Games</span></h2>
+              <h2 class="font-weight-bold"><span>Video Games</span></h2>
             </div>
           </div>
 
@@ -54,7 +54,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/HarryPotter.png)">
             </a>
             <div class="carousel-caption">
-              <h2 class="font-weight-bold text-uppercase"><span>Books</span></h2>
+              <h2 class="font-weight-bold"><span>Books</span></h2>
             </div>
           </div>
 
@@ -64,7 +64,7 @@
                   style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SinginInTheRainBanner-New.jpg)">
               </a>
               <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Classics</span></h2>
+                <h2 class="font-weight-bold"><span>Classics</span></h2>
               </div>
           </div>
 
@@ -74,7 +74,7 @@
                   style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/caseyVlogCover.jpg)">
               </a>
               <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Web Series</span></h2>
+                <h2 class="font-weight-bold"><span>Web Series</span></h2>
               </div>
           </div>
 
@@ -84,7 +84,7 @@
                   style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/mcuCarousel.png)">
               </a>
               <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Marvel Cinematic Universe</span></h2>
+                <h2 class="font-weight-bold"><span>Marvel Cinematic Universe</span></h2>
               </div>
           </div>
 
@@ -99,6 +99,7 @@
         </a>
     </div>
 
+    <!--Carousel Script-->
     <script>
     $('#c1').carousel({
       interval: 30000,
@@ -108,36 +109,104 @@
 
     <br>
 
+    <!-- Temp -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
             <br>Recommendation Algorithm<br><br>
             Datasets: Television, Video Games, Books, Web Series, Awards<br><br>
 
             Features:<br>
-            Form to Add Custom Profile Sections<br>
             Form to Add Media to Custom Profile Sections<br>
-            Form to Log Media Watched, Give Rating, Write Review<br>
+            Change profile section name<br>
+            Change profile section order<br>
+
             Forms for Editing / Contributing<br>
             Forms to apply tags to media<br>
-            Form to follow Users + Page to View Friend's Activity<br><br>
+
+            Browsing Grid Filter Forms<br><br>
 
             Fixes:<br>
-            Fix Rating Value Rounding<br>
-            Fix Rate/Add to List Refreshes<br>
+            Remove all link underlines<br>
+            Double Click Megamenus<br>
             Fix Megamenus on Mobile<br>
             Fix Posters + Trailers on Mobile<br>
             Fix Navbar on Mobile<br>
-            Change Login/Sign Up Forms<br><br>
+            Change Login/Sign Up Forms colours and layouts<br>
+            Set up carousels on TV/Game/Web/Book Home Pages<br><br>
 
             Misc:<br>
-            Add Genres manually added media<br><br>
-            Genre Icons<br>
-            Paginate Media Browsing Grid<br>
+            Add Genres to manually added media<br><br>
         </h5>
     </div>
 
+    <br>
+
+    {% if feed %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Activity Feed<a style="float:right" href={% url 'activity-feed' %}>See All</a></h5>
+                <div class="scroller">
+                    <ul class="hs full">
+                        {% for rating in feed %}
+                            {% if rating.film != NULL %}
+                                <div class="bottomOverlay">
+                                    <a href="/films/{{ rating.film.slug }}">
+                                        <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                        <div class="content">
+                                            <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {%  if rating.television != NULL %}
+                                <div class="bottomOverlay">
+                                    <a href="/tv/{{ rating.television.slug }}">
+                                        <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                                        <div class="content">
+                                            <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {%  if rating.videoGame != NULL %}
+                                <div class="bottomOverlay">
+                                    <a href="/video-games/{{ rating.videoGame.slug }}">
+                                        <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                        <div class="content">
+                                            <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {%  if rating.book != NULL %}
+                                <div class="bottomOverlay">
+                                    <a href="/books/{{ rating.book.slug }}">
+                                        <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                                        <div class="content">
+                                            <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {%  if rating.webSeries != NULL %}
+                                <div class="bottomOverlay">
+                                    <a href="/web-series/{{ rating.webSeries.slug }}">
+                                        <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                                        <div class="content">
+                                            <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+        </div>
+    {% endif %}
+
+    <br>
+
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated <a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Films<a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for film, rating in highestRatedFilms.items %}
@@ -145,7 +214,7 @@
                         <a href="/films/{{ film.slug }}">
                             <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                             <div class="content">
-                                <h6 class = "font-weight-bold text-uppercase" >
+                                <h6 class="font-weight-bold" >
                                     <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
                                     <div style="display: inline-block">{{ rating }}</div>
                                     <script>
@@ -173,7 +242,7 @@
     <br>
 
     <div class="container infoSection">
-    <h5 class="font-weight-bold border-bottom mb-0">Highest Grossing<a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
+    <h5 class="font-weight-bold border-bottom mb-0">Highest Grossing Films<a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
                 {% for film, gross in topGrossing.items %}
@@ -181,7 +250,7 @@
                         <a href="/films/{{ film.slug }}">
                             <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                             <div class="content">
-                                <h6 class = "font-weight-bold text-uppercase" >{{ gross }}</h6>
+                                <h6 class = "font-weight-bold" >{{ gross }}</h6>
                             </div>
                         </a>
                     </div>
@@ -190,20 +259,6 @@
         </div>
     </div>
 
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Oldest People</h5>
-        <div class="scroller" >
-            <ul class="hs full">
-                {% for person in people %}
-                    <a href="/person/{{ person.slug }}">
-                        <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
     <br>
 
     {% if bornToday %}
@@ -223,25 +278,10 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Newest Films</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Upcoming Films</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for film in newestFilms %}
-                    <a href="/films/{{ film.slug }}">
-                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Oldest Films</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for film in oldestFilms %}
                     <a href="/films/{{ film.slug }}">
                     <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                     </a>
@@ -265,49 +305,6 @@
         </div>
     </div>
 
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Video Games</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for game in games %}
-                    <a href="/video-games/{{ game.slug }}">
-                    <img class="item posterSmall" src="{{game.poster.url}}" alt="{{game.title}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Books</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for book in books %}
-                    <a href="/books/{{ book.slug }}">
-                    <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <br>
-
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Web Series</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for ws in webseries %}
-                    <a href="/web-series/{{ ws.slug }}">
-                    <img class="item posterSmall" src="{{ws.poster.url}}" alt="{{ws.title}}">
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
     <!--
     <div class="scroller">
         <ul class="hs full">
@@ -332,7 +329,7 @@
     </div>
     -->
 
-    <hr>
+    <br><hr><br>
 
 
 {% endblock %}

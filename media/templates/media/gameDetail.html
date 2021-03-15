@@ -15,13 +15,13 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
         </form>
 
-        <h2>{{videogame.title}} | {{ videogame.getYear }}</h2>
+        <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
             {% for genre in genres %}
@@ -30,6 +30,7 @@
         {% endif %}
     </div>
 
+    <br>
 
     {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
         <div class="container posterTrailerContainer">
@@ -41,7 +42,7 @@
 
                 <div class="col">
                     {% if averageRating %}
-                        <div class="container ratingBox">
+                        <div class="container ratingBox" id="ratingDiv">
                             <h5>Average Rating: </h5>
                             <h4>{{ averageRatingText }}</h4>
                             <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
@@ -62,7 +63,7 @@
 
     {% if consoles %}
         <div class="container infoSection">
-            <h5>Released On:</h5>
+            <h5 style="padding-top:5px">Released On:</h5>
             {% for console in consoles %}
                 <a style="padding-right:10px" href="/console/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
             {% endfor %}
@@ -71,27 +72,27 @@
 
     {% if videogame.synopsis %}
         <div class="container infoSection">
-            <h5>Synopsis:</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ videogame.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if franchises %}
         <div class="container infoSection">
-            <h5>Franchise:</h5>
+            <h5 style="padding-top:5px">Franchise:</h5>
             {% for franchise in franchises %}
-                <a href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+                <a style="padding-right: 10px" href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a>
             {% endfor %}
         </div>
     {% endif %}
 
     <div class="container infoSection">
-        <h6>Release Date: {{ videogame.release }}</h6>
+        <h6 style="padding-top:10px">Initial Release Date: {{ videogame.release }}</h6>
     </div>
 
      {% if developers %}
         <div class="container infoSection">
-            <h6>Developed by:</h6>
+            <h6 style="padding-top:5px">Developed by:</h6>
             {% for company in developers %}
                 <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
             {% endfor %}
@@ -100,7 +101,7 @@
 
     {% if publishers %}
         <div class="container infoSection">
-            <h6>Published by:</h6>
+            <h6 style="padding-top:5px">Published by:</h6>
             {% for company in publishers %}
                 <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
             {% endfor %}
@@ -109,12 +110,12 @@
 
     {% if images %}
         <div class="container infoSection">
-            <h5>Additional Posters, Stills, Concept Art, Behind the Scenes:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
-                        <a class="item" href="{{ image.filePath }}">
-                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        <a class="item" href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
                         </a>
                     {% endfor %}
                 </ul>

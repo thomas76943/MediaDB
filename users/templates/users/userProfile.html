@@ -20,14 +20,14 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="font-weight-bold text-uppercase border-bottom mb-4">Profile Info</legend>
+                <h5 class="font-weight-bold border-bottom mb-4">Profile Info</h5>
                 {{ userUpdateForm|crispy }}
                 {{ profileUpdateForm|crispy }}
 
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">
-                    <a class="font-weight-bold text-uppercase">Update</a>
+                <button class="btn btn-primary btn-raised" type="submit">
+                    <a class="font-weight-bold">Update</a>
                 </button>
             </div>
         </form>

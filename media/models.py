@@ -2,10 +2,10 @@ from PIL import Image
 from django.db import models
 from django.utils import timezone
 from django.contrib.staticfiles.urls import static
-
-#---People and Roles---------------------------------------------------------------------------------------------------#
 from django.utils.text import slugify
 
+
+#---People and Roles---------------------------------------------------------------------------------------------------#
 class Person(models.Model):
     firstName = models.CharField(max_length=500, default='NoFirstNameSpecified')
     surname = models.CharField(max_length=500, blank=True)
@@ -210,11 +210,11 @@ class Book(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.image.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600, 600)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        #img = Image.open(self.image.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600, 600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
             super(Book, self).save(*args, **kwargs)
@@ -246,11 +246,11 @@ class WebSeries(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.poster.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.poster.path)
+        #img = Image.open(self.poster.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(WebSeries, self).save(*args, **kwargs)
@@ -271,6 +271,7 @@ class WebSeries(models.Model):
 #---Genre Mappings-------------------------------------------------------------------------------------------------------#
 class Genre(models.Model):
     title = models.CharField(max_length=500, default='NoFilmGenreSpecified')
+    image = models.ImageField(blank=True, default='', upload_to='icons')
 
     def __str__(self):
         return self.title
@@ -281,6 +282,7 @@ class Genre(models.Model):
 
 class VideoGameGenre(models.Model):
     title = models.CharField(max_length=500, default='NoVideoGameGenreSpecified')
+    image = models.ImageField(blank=True, default='', upload_to='icons')
 
     def __str__(self):
         return self.title
@@ -674,12 +676,12 @@ class Console(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        if self.image:
-            img = Image.open(self.image.path)
-            if img.height > 600 or img.width > 600:
-                output_size = (600, 600)
-                img.thumbnail(output_size)
-                img.save(self.image.path)
+        #if self.image:
+        #    img = Image.open(self.image.path)
+        #    if img.height > 600 or img.width > 600:
+        #        output_size = (600, 600)
+        #        img.thumbnail(output_size)
+        #        img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.shortName)
         super(Console, self).save(*args, **kwargs)

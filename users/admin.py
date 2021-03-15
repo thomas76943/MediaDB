@@ -3,6 +3,8 @@ from .models import *
 
 admin.site.register(Profile)
 
+admin.site.register(UserFollows)
+
 admin.site.register(FilmRating)
 admin.site.register(TelevisionRating)
 admin.site.register(VideoGameRating)

@@ -7,7 +7,7 @@
 
     {% if franchises %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY FRANCHISE
+            <h5 class="font-weight-bold border-bottom mb-0">Browse by Franchise
                 <a style="float:right;" href="{% url 'media-videogamefranchise-home' %}">See All</a></h5>
             </h5>
             <div class="scroller">
@@ -24,7 +24,7 @@
 
     {% if projects %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ videogamegenre.title }} Games</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ videogamegenre.title }} Games</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for game in projects %}

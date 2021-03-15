@@ -26,7 +26,7 @@
                     <a href="/console/{{ console.slug }}">
                         <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
                         <div class="lowerLabel">
-                            <h7 class="font-weight-bold text-uppercase">{{ console.shortName }}</h7>
+                            <h7 class="font-weight-bold ">{{ console.shortName }}</h7>
                         </div>
                     </a>
                 {% endfor %}
@@ -34,15 +34,29 @@
         </div>
     </div>
 
+    <style>
+        .item.box.genre {
+            padding: 40px;
+        }
+        @media screen and (max-width: 675px) {
+             .item.box.genre {
+                padding: 20px;
+            }
+            .lowerLabel {
+                display: none;
+            }
+        }
+    </style>
+
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">Browse by Genre</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for genre in genres %}
                     <a href="/video-game-genre/{{ genre.id }}">
-                        <img class="item box white" src="{{console.image.url}}" alt="|">
+                        <img class="item box white genre" src="{{genre.image.url}}" alt="|">
                         <div class="lowerLabel">
-                            <h7 class="font-weight-bold text-uppercase">{{ genre.title }}</h7>
+                            <h7 class="font-weight-bold">{{ genre.title }}</h7>
                         </div>
                     </a>
                 {% endfor %}

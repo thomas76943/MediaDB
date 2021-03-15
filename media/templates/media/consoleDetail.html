@@ -12,14 +12,14 @@
 
     {% if versions %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Versions:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Versions:</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for version in versions %}
                         <a href="/console/{{ console.slug }}">
                             <img class="item box white" src="{{version.image.url}}" alt="{{version.name}}">
                             <div class="lowerLabel">
-                                <h7 class="font-weight-bold text-uppercase">{{ version.shortName }}</h7>
+                                <h7 class="font-weight-bold">{{ version.shortName }}</h7>
                             </div>
                         </a>
                     {% endfor %}
@@ -30,13 +30,16 @@
 
     {% if games %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Games:</h5>
-            {% for game in games %}
-            {%  if game.videoGame != NULL %}
-                <br>
-                <a href="/video-games/{{ game.videoGame.slug }}"> {{ game.videoGame.title }} | {{ game.videoGame.getYear }}</a><br>
-            {% endif %}
-        {% endfor %}
+            <h5 class="font-weight-bold border-bottom mb-1">Video Games</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for g in games %}
+                        <a href="/video-games/{{ g.videoGame.slug }}">
+                            <img class="item posterSmall" src="{{ g.videoGame.poster.url }}" alt="{{ g.videoGame.title }}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     {% endif %}
 

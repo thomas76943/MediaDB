@@ -9,8 +9,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import generic
 
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, ProfileSectionForm
+
+from media.models import *
 from users.models import *
+
+import json
 
 from django import http
 from django.http import QueryDict
@@ -56,8 +60,6 @@ def userProfile(request):
         'profileUpdateForm' : profileUpdateForm,
     }
     return render(request, 'users/userProfile.html', context)
-
-
 
 class userList(generic.DetailView):
     model = User
@@ -108,15 +110,13 @@ class userList(generic.DetailView):
 
         return context
 
-
 class memberProfile(generic.UpdateView):
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
     template_name = 'users/memberProfileDetail.html'
     context_object_name = "memberProfile"
-    fields = []
-
+    fields=[]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -152,16 +152,43 @@ class memberProfile(generic.UpdateView):
 
                 context[profileSections[x].sectionName] = completeProfileSection
 
+        context['newSectionForm'] = ProfileSectionForm
+
+        if self.request.user.is_authenticated:
+            allFollowing = UserFollows.objects.filter(userA=self.request.user)
+            print(self.object)
+            print(allFollowing)
+            isFollowing = False
+            for following in allFollowing:
+                if following.userB == self.object:
+                    isFollowing = True
+                    break
+            context['inList'] = isFollowing
+
         return context
 
     def post(self, request, *args, **kwargs):
-        entries = QueryDict(request.POST['content'])
-        for index, entry_id in enumerate(entries.getlist('entry[]')):
-            entry = ProfileSectionFilmMapping.objects.get(id=entry_id)
-            entry.orderInSection = index
-            entry.save()
+        print("got here15")
         object = self.get_object()
-        return http.HttpResponseRedirect('/user/'+object.username)
+
+        #Following the user
+        if request.POST.get('toggle') == "add":
+            f = UserFollows(userA=request.user, userB=object)
+            f.save()
+
+        #Unfollowing the user
+        elif request.POST.get('toggle') == "remove":
+            print("trying to remove")
+            f = UserFollows.objects.filter(userA=request.user, userB=object)
+            f.delete()
+        #Creating new profile section
+        else:
+            newSectionName = request.POST.get('name')
+            newSectionType = request.POST.get('type')
+            s = ProfileSection(profile=object.profile, sectionName=newSectionName, type=newSectionType)
+            s.save()
+
+        return http.HttpResponseRedirect('/user/' + object.username)
 
 class memberProfileActivity(memberProfile):
     template_name = 'users/memberProfileActivityDetail.html'
@@ -176,4 +203,92 @@ class memberProfileActivity(memberProfile):
         ratings = sorted(list(chain(filmRatings, televisionRatings, videoGameRatings, bookRatings, webSeriesRatings)), key=attrgetter('dateTime'), reverse=True)
         context['ratings'] = ratings
         return context
+
+class profileSection(generic.UpdateView):
+    model = ProfileSection
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    template_name = 'users/profileSectionEdit.html'
+    context_object_name = "profileSection"
+    fields = []
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        entries = []
+        if self.object.type == 'Films':
+            entries = ProfileSectionFilmMapping.objects.filter(profileSection=self.object.id)
+            context['media'] = json.dumps(list(Film.objects.values('title', 'slug')[:300]))
+        elif self.object.type == 'Television':
+            entries =  ProfileSectionTelevisionMapping.objects.filter(profileSection=self.object.id)
+            context['media'] = json.dumps(list(Television.objects.values('title', 'slug')[:300]))
+        elif self.object.type == 'Video Games':
+            entries = ProfileSectionVideoGameMapping.objects.filter(profileSection=self.object.id)
+            context['media'] = json.dumps(list(VideoGame.objects.values('title', 'slug')[:300]))
+        elif self.object.type == 'Books':
+            entries = ProfileSectionBookMapping.objects.filter(profileSection=self.object.id)
+            context['media'] = json.dumps(list(Book.objects.values('title', 'slug')[:300]))
+        elif self.object.type == 'Web Series':
+            entries = ProfileSectionWebSeriesMapping.objects.filter(profileSection=self.object.id)
+            context['media'] = json.dumps(list(WebSeries.objects.values('title', 'slug')[:300]))
+        context['entries'] = sorted(list(entries), key=attrgetter('orderInSection'))
+        return context
+
+    def post(self, request, *args, **kwargs):
+
+        object = self.get_object()
+        username = object.profile.user.username
+        print("Delete POST get:")
+        print(request.POST.get('delete'))
+
+        if request.POST.get('delete') == None:
+            print("change found")
+            entries = QueryDict(request.POST.get('content'))
+            print(entries)
+            for index, entry_id in enumerate(entries.getlist('entry[]')):
+                if object.type == 'Films':
+                    entry = ProfileSectionFilmMapping.objects.get(id=entry_id)
+                elif object.type == 'Television':
+                    entry = ProfileSectionTelevisionMapping.objects.get(id=entry_id)
+                elif object.type == 'Video Games':
+                    entry = ProfileSectionVideoGameMapping.objects.get(id=entry_id)
+                elif object.type == 'Books':
+                    entry = ProfileSectionBookMapping.objects.get(id=entry_id)
+                elif object.type == 'Web Series':
+                    entry = ProfileSectionWebSeriesMapping.objects.get(id=entry_id)
+                entry.orderInSection = index
+                entry.save()
+
+        elif request.POST.get('delete') == 'confirm':
+            print("delete found")
+            thisSection = ProfileSection.objects.filter(id=object.id)
+            thisSection.delete()
+            return render('/user/' + username)
+
+        return http.HttpResponseRedirect('/profile-section/' + object.slug)
+
+def getFeed(user, limit):
+    following = UserFollows.objects.filter(userA=user)
+    f = []
+
+    for account in following:
+        accountFilms = FilmRating.objects.filter(user=account.userB)
+        accountTV = TelevisionRating.objects.filter(user=account.userB)
+        accountVG = VideoGameRating.objects.filter(user=account.userB)
+        accountBooks = BookRating.objects.filter(user=account.userB)
+        accountWeb = WebSeriesRating.objects.filter(user=account.userB)
+        accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
+        for ar in accountRatings:
+            f.append(ar)
+
+    feed = sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
+    return feed, following
+
+def activityFeed(request):
+    context = {}
+    if request.user.is_authenticated:
+        feed, following = getFeed(request.user, 250)
+        context['feed'] = feed
+        context['following'] = following
+
+    return render(request, 'users/feed.html', context)
 

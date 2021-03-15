@@ -15,14 +15,15 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
         </form>
 
-        <h2>
-        {{webseries.title}} | {{ webseries.getYear }}
+        <h2>{{webseries.title}}</h2>
+        <h5>
+        {{ webseries.getYear }}
         {% if webseries.ongoing == False %}
             {% if webseries.getYear != webseries.getEndYear %}
                 - {{ webseries.getEndYear }}
@@ -30,7 +31,7 @@
         {% else %}
             -
         {% endif %}
-        </h2>
+        </h5>
 
         <h5>{{ webseries.episodes }} Episodes | Seasons: {{ webseries.seasons }}</h5>
 
@@ -53,7 +54,7 @@
 
                 <div class="col">
                     {% if averageRating %}
-                        <div class="container ratingBox">
+                        <div class="container ratingBox" id="ratingDiv">
                             <h5>Average Rating: </h5>
                             <h4>{{ averageRatingText }}</h4>
                             <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
@@ -74,21 +75,21 @@
     {% if showrunners or writers or producers %}
         <div class="container infoSection">
             {% if showrunners %}
-                <h5>Created by:</h5>
+                <h5 style="padding-top:5px">Created by:</h5>
                 {% for showrunner in showrunners %}
                     <a style="padding-right:10px" href="/person/{{ showrunner.person.slug }}"> {{ showrunner.getPerson }}</a>
                 {% endfor %}
             {% endif %}
 
             {% if writers %}
-                <h5 style="padding-top:10px"> Written by:</h5>
+                <h5 style="padding-top:5px"> Written by:</h5>
                 {% for writer in writers %}
                     <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} </a>
                 {% endfor %}
             {% endif %}
 
             {% if producers %}
-                <h5 style="padding-top:10px"> Produced by:</h5>
+                <h5 style="padding-top:5px"> Produced by:</h5>
                 {% for producer in producers %}
                     <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
                 {% endfor %}
@@ -98,14 +99,14 @@
 
     {% if webseries.synopsis %}
         <div class="container infoSection">
-            <h5>Synopsis:</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ webseries.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="#">See Full Cast & Crew</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="#">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
@@ -129,18 +130,19 @@
 
 
     <div class="container infoSection">
-        <h6>First Episode Air  Date: {{ webseries.release }}</h6>
-
+        <h6 style="padding-top:10px">First Episode Air  Date: {{ webseries.release }}</h6>
         {% if webseries.ongoing == False %}
-            <h6>Final Episode Air Date: {{ webseries.end }}</h6>
+            <h6 style="padding-top:5px">Final Episode Air Date: {{ webseries.end }}</h6>
         {% endif %}
     </div>
 
-     {% if productionCompanies %}
-        <h6 style="padding-top:10px"> Produced by:</h6>
-        {% for company in productionCompanies %}
-            <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-        {% endfor %}
+    {% if productionCompanies %}
+        <div class="container infoSection">
+            <h6 style="padding-top:5px; "> Produced by:</h6>
+            {% for company in productionCompanies %}
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+            {% endfor %}
+        </div>
     {% endif %}
 
     {% if networks %}
@@ -152,12 +154,12 @@
 
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ADDITIONAL POSTERS, STILLS, CONCEPT ART, BEHIND THE SCENES</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
-                        <a class="item" href="{{ image.filePath }}">
-                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        <a class="item" href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
                         </a>
                     {% endfor %}
                 </ul>

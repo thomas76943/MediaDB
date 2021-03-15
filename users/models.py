@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
 from django.utils.datetime_safe import datetime
+from django.utils.text import slugify
 
 from media.models import Film, Television, VideoGame, Book, WebSeries
 
@@ -23,9 +24,28 @@ class Profile(models.Model):
         #        img.thumbnail(output_size)
         #        img.save(self.image.name)
 
+class UserFollows(models.Model):
+    userA = models.ForeignKey(User, on_delete=models.PROTECT, related_name='userA')
+    userB = models.ForeignKey(User, on_delete=models.PROTECT, related_name='userB')
+
+    def __str__(self):
+        return self.userA.username + " follows " + self.userB.username
+
+    class Meta:
+        verbose_name = "User Follows"
+        verbose_name_plural = "User Follows"
+
 class ProfileSection(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    sectionName = models.TextField(max_length=20, default='Profile Section')
+    sectionName = models.CharField(max_length=20, default='Profile Section')
+    type = models.CharField(max_length=11, default='Films')
+    slug = models.SlugField(max_length=150, blank=True, editable=True)
+
+    def save(self, *args, **kwargs):
+        super().save()
+        if not self.slug:
+            self.slug = slugify(self.profile.user.username + "-" + str(self.sectionName))
+        super(ProfileSection, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.profile.user.username + " - " + self.sectionName

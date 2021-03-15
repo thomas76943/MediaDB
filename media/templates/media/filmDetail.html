@@ -18,7 +18,7 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
@@ -30,10 +30,10 @@
             {% for genre in genres %}
                 <a style="padding-right:10px" href="/genre/{{ genre.genre.title }}"> {{ genre.genre.title }}</a>
             {% endfor %}
-            <br>
         {% endif %}
-    </div><br>
+    </div>
 
+    <br>
 
     <!-- If there is a poster or a trailer then create parent element for them -->
     {% if film.poster != 'MissingIcon.png' or film.trailerVideoPath or averageRating %}
@@ -46,7 +46,7 @@
 
                 <div class="col">
                     {% if averageRating %}
-                        <div class="container ratingBox">
+                        <div class="container ratingBox" id="ratingDiv">
                             <h5>Average Rating: </h5>
                             <h4>{{ averageRatingText }}</h4>
                             <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
@@ -55,8 +55,23 @@
 
                     {% if user.is_authenticated %}
                         <div class="container ratingBox">
-                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
+                            <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
                         </div>
+
+                    <div id="reviewButtonContainer">
+                        {% if userRating %}
+                            <div class="container ratingBox">
+                                <button id="writeReviewButton" class="btn btn-primary btn-raised" style="float:right;margin-top:8px;margin-right: 3px ">
+                                    {% if review %}
+                                        Edit Review
+                                    {% else %}
+                                        Write Review
+                                    {% endif %}
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+
                     {% endif %}
                 </div>
             </div>
@@ -66,21 +81,21 @@
     {% if directors or writers or producers %}
         <div class="container infoSection">
             {% if directors %}
-                <h5 style="padding-top:10px"> Directed by:</h5>
+                <h5 style="padding-top:5px"> Directed by:</h5>
                 {% for director in directors %}
                     <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
                 {% endfor %}
             {% endif %}
 
             {% if writers %}
-                <h5 style="padding-top:10px"> Written by:</h5>
+                <h5 style="padding-top:5px"> Written by:</h5>
                 {% for writer in writers %}
                     <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
                 {% endfor %}
             {% endif %}
 
             {% if producers %}
-                <h5 style="padding-top:10px"> Produced by:</h5>
+                <h5 style="padding-top:5px"> Produced by:</h5>
                 {% for producer in producers %}
                     <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
                 {% endfor %}
@@ -99,14 +114,14 @@
 
     {% if film.synopsis %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ film.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
@@ -135,11 +150,10 @@
 
     {% if tags %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Tags</h5>
-            <br>
+            <h5 style="padding-top:5px">Tags:</h5>
             <ul class="cloud-tags">
                 {% for t in tags %}
-                    <li class="font-weight-bold text-uppercase" style="padding-right:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
+                    <li class="font-weight-bold" style="margin-top:0; padding-right:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -153,7 +167,7 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6>US Release Date: {{ film.release }}</h6>
+        <h6 style="padding-top:10px">US Release Date: {{ film.release }}</h6>
         {% if film.budget %}<h6>Budget: {{ budgetFormatted }}</h6>{% endif %}
         {% if film.boxOffice %}<h6>Box Office: {{ boxOfficeFormatted }}</h6>{% endif %}
     </div>
@@ -169,7 +183,7 @@
 
     {% if productionCompanies %}
         <div class="container infoSection">
-            <h6 style="padding-top:5px"> Produced by:</h6>
+            <h6 style="padding-top:5px; padding-right: 10px"> Produced by:</h6>
             {% for company in productionCompanies %}
                 <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
             {% endfor %}
@@ -178,7 +192,7 @@
 
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ADDITIONAL POSTERS, STILLS, CONCEPT ART, BEHIND THE SCENES</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
@@ -190,5 +204,135 @@
             </div>
         </div>
     {% endif %}
+
+    <!-- Modal Styling -->
+    <style>
+
+        /* The Modal (background) */
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 200px; /* Location of the box */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 3px solid #888;
+          width: 50%;
+          max-width: 610px;
+          min-width: 330px;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          -webkit-animation-name: animatetop;
+          -webkit-animation-duration: 0.4s;
+          animation-name: animatetop;
+          animation-duration: 0.4s
+        }
+
+        div.container.profileSection {
+            margin-bottom: 0;
+        }
+
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        /* The Close Button */
+        .close {
+        }
+
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .modal-body {padding: 2px 16px;}
+
+    </style>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="container profileSection">
+            {% if review %}
+            <h5 class="font-weight-bold border-bottom mb-0">Edit Review: {{ film.title }}</h5>
+            {% else %}
+            <h5 class="font-weight-bold border-bottom mb-0">Write Review: {{ film.title }}</h5>
+            {% endif %}
+
+            <br>
+            <form id="writeReview">
+                {%  csrf_token %}
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="reviewTextArea">Review:</label>
+                  <textarea class="form-control" id="reviewTextArea" rows="8" style="color: white">{% if review %}{{ review }}{% endif %}</textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <input type="submit" id="submitReview" class="btn btn-primary btn-raised"
+                       {% if review %}
+                        value="Save Changes"
+                        {% else %}
+                        value="Post Review"
+                        {% endif %}>
+                    <span class="close btn btn-default" style="color: white">X</span>
+                </div>
+            </form>
+
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Script -->
+    <script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("writeReviewButton");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+    </script>
 
 {% endblock %}

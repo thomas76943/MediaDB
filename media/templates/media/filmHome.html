@@ -25,7 +25,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SpritiedAway.jpg)">
             </a>
             <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Studio Ghibli</span></h2>
+                <h2 class="font-weight-bold"><span>Studio Ghibli</span></h2>
             </div>
           </div>
 
@@ -35,7 +35,7 @@
                 style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/sw-esb-cover.png)">
             </a>
             <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Star Wars</span></h2>
+                <h2 class="font-weight-bold"><span>Star Wars</span></h2>
             </div>
           </div>
 
@@ -45,7 +45,7 @@
                   style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SinginInTheRainBanner-New.jpg)">
               </a>
               <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Classics</span></h2>
+                <h2 class="font-weight-bold"><span>Classics</span></h2>
               </div>
           </div>
 
@@ -55,7 +55,7 @@
                   style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/mcuCarousel.png)">
               </a>
               <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Marvel Cinematic Universe</span></h2>
+                <h2 class="font-weight-bold"><span>Marvel Cinematic Universe</span></h2>
               </div>
           </div>
 
@@ -93,6 +93,20 @@
         </div>
     </div>
 
+    <style>
+        .item.box.genre {
+            padding: 40px;
+        }
+        @media screen and (max-width: 675px) {
+             .item.box.genre {
+                padding: 20px;
+            }
+            .lowerLabel {
+                display: none;
+            }
+        }
+    </style>
+
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre
             <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a>
@@ -101,9 +115,9 @@
             <ul class="hs full">
                 {% for genre in genres %}
                     <a href="/genre/{{ genre.title }}">
-                        <img class="item box" src="#" alt="|">
+                        <img class="item box genre" src="{{ genre.image.url }}" alt="|">
                         <div class="lowerLabel">
-                            <h7 class="font-weight-bold text-uppercase">{{ genre.title }}</h7>
+                            <h7 class="font-weight-bold">{{ genre.title }}</h7>
                         </div>
                     </a>
                 {% endfor %}

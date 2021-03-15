@@ -4,7 +4,7 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ user.username }} - My List</h5><br>
+        <h5 class="font-weight-bold border-bottom mb-0">{{ user.username }} - My List</h5><br>
 
         <ul class="auto-grid">
             {% for f in films %}
@@ -63,6 +63,7 @@
                 </li>
             {% endfor %}
         </ul>
+    <br>
     </div>
 
 

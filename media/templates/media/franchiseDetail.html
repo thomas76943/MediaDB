@@ -16,7 +16,7 @@
 
     {% if franchise.showPeople %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Actors</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ franchise.title }} Actors</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for key, val in franchiseActors.items %}
@@ -36,7 +36,7 @@
 
     {% if franchise.showProducers %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Producers</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ franchise.title }} Producers</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for key, val in franchiseProducers.items %}
@@ -57,7 +57,7 @@
     {% if subcategories %}
         {% for subcategory in subcategories %}
             <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ subcategory.title }}</h5>
+                <h5 class="font-weight-bold border-bottom mb-0">{{ subcategory.title }}</h5>
                 <div class="scroller">
                     <ul class="hs full">
                         {% with var=subcategory.title %}

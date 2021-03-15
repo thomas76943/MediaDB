@@ -22,14 +22,15 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
         </form>
 
-        <h2>
-        {{television.title}} | {{ television.getYear }}
+        <h2>{{television.title}}</h2>
+        <h5>
+        {{ television.getYear }}
         {% if television.ongoing == False %}
             {% if television.getYear != television.getEndYear %}
                 - {{ television.getEndYear }}
@@ -37,8 +38,7 @@
         {% else %}
             -
         {% endif %}
-        </h2>
-
+        </h5>
         <h5>{{ television.episodes }} Episodes | Seasons: {{ television.seasons }}</h5>
 
         {% if genres %}
@@ -59,21 +59,18 @@
                 {% endif %}
 
                 <div class="col">
-
                     {% if averageRating %}
-                        <div class="container ratingBox">
+                        <div class="container ratingBox" id="ratingDiv">
                             <h5>Average Rating: </h5>
-                            <h4>{{ averageRating }}</h4>
+                            <h4>{{ averageRatingText }}</h4>
                             <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
                         </div>
                     {% endif %}
-
                     {% if user.is_authenticated %}
                         <div class="container ratingBox">
                             <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
                         </div>
                     {% endif %}
-
                 </div>
             </div>
         </div>
@@ -89,14 +86,14 @@
             {% endif %}
 
             {% if writers %}
-                <h5 style="padding-top:10px">Written by:</h5>
+                <h5 style="padding-top:5px">Written by:</h5>
                 {% for writer in writers %}
                     <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} </a>
                 {% endfor %}
             {% endif %}
 
             {% if producers %}
-                <h5 style="padding-top:10px">Produced by:</h5>
+                <h5 style="padding-top:5px">Produced by:</h5>
                 {% for producer in producers %}
                     <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
                 {% endfor %}
@@ -106,14 +103,14 @@
 
     {% if television.synopsis %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ television.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
@@ -141,19 +138,19 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6 style="padding-top:5px">First Episode Air  Date: {{ television.release }}</h6>
+        <h6 style="padding-top:10px">First Episode Air  Date: {{ television.release }}</h6>
         {% if television.ongoing == False %}
-            <h6>Final Episode Air Date: {{ television.end }}</h6>
+            <h6 style="padding-top:5px">Final Episode Air Date: {{ television.end }}</h6>
         {% endif %}
     </div>
 
-     {% if productionCompanies %}
-         <div class="container infoSection">
-            <h6> Produced by:</h6>
+    {% if productionCompanies %}
+        <div class="container infoSection">
+            <h6 style="padding-top:5px; "> Produced by:</h6>
             {% for company in productionCompanies %}
-                <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
-         </div>
+        </div>
     {% endif %}
 
     {% if networks %}
@@ -167,7 +164,7 @@
 
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Posters, Stills, Concept Art, Behind the Scenes</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}

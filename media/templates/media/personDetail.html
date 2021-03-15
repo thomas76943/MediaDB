@@ -1,9 +1,10 @@
 {% extends "media/base.html" %}
+{% load media_tags %}
 {% block title %}{{person.getFullName}}{% endblock title %}
 {% block content %}
 
     <div class="container infoSection">
-        <h2>{{person.firstName}} {{ person.surname }}</h2>
+        <h2 style="padding-top:5px">{{person.firstName}} {{ person.surname }}</h2>
         {% if person.DoB %}
             <h5>Born: {{ person.DoB }}</h5>
         {% endif %}
@@ -41,36 +42,37 @@
     {% if roles %}
         {% for roleType, mappings in roles %}
                 <div class="container infoSection">
-                    <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ roleType }}</h5>
+                    <h5 class="font-weight-bold border-bottom mb-0">{{ roleType }}</h5>
                     <div class="scroller">
                         <ul class="hs full">
                             {% for entry in mappings %}
-
-                                {%  if entry.film != NULL %}
-                                    <a class="item" href="/films/{{ entry.film.slug }}">
-                                    <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
-                                    </a>
-                                {% endif %}
-                                {%  if entry.television != NULL %}
-                                    <a class="item" href="/tv/{{ entry.television.slug }}">
-                                    <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
-                                    </a>
-                                {% endif %}
-                                {%  if entry.videogame != NULL %}
-                                    <a class="item" href="/video-games/{{ entry.videogame.slug }}">
-                                    <img class="item posterSmall" src="{{entry.videogame.poster.url}}" alt="{{entry.videogame.title}}">
-                                    </a>
-                                {% endif %}
-                                {%  if entry.book != NULL %}
-                                    <a class="item" href="/video-games/{{ entry.videogame.slug }}">
-                                    <img class="item posterSmall" src="{{entry.videogame.poster.url}}" alt="{{entry.videogame.title}}">
-                                    </a>
-                                {% endif %}
-                                {%  if entry.webSeries != NULL %}
-                                    <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
-                                    <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
-                                    </a>
-                                {% endif %}
+                                {% with entry|classname as modelclass %}
+                                    {%  if modelclass == "Film" %}
+                                        <a class="item" href="/films/{{ entry.slug }}">
+                                        <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if modelclass == "Television" %}
+                                        <a class="item" href="/tv/{{ entry.slug }}">
+                                        <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if modelclass == "VideoGame" %}
+                                        <a class="item" href="/video-games/{{ entry.videogame.slug }}">
+                                        <img class="item posterSmall" src="{{entry.videogame.poster.url}}" alt="{{entry.videogame.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if modelclass == "Books" %}
+                                        <a class="item" href="/books/{{ entry.book.slug }}">
+                                        <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if modelclass == "WebSeries" %}
+                                        <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                        <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                        </a>
+                                    {% endif %}
+                                {% endwith %}
                             {% endfor %}
                         </ul>
                     </div>
@@ -81,7 +83,7 @@
 
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Images:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Additional Images</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
@@ -93,17 +95,5 @@
             </div>
         </div>
     {% endif %}
-
-    {% if books %}
-        <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Books</h5>
-            {% for b in books %}
-                <br>
-                <a href="/books/{{ b.book.slug }}"> {{ b.book.title }} | {{ b.book.getYear }} ({{ b.role }})</a><br>
-            {% endfor %}
-        <br></div>
-    {% endif %}
-
-
 
 {% endblock %}

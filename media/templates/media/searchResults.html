@@ -1,21 +1,21 @@
 {% extends "media/base.html" %}
 {% block content %}
 
-    <div class="container infoSection">
+    <div class="container profileSection">
         <h1>Search Results for '{{ searchQuery }}'</h1>
     </div>
 
     {% if people %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>People:</h5>
             {% for person in people %}
-                <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }} {{ person.id }}</a><br>
+                <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }}</a><br>
             {% endfor %}
         </div>
     {% endif %}
 
     {% if franchises %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Franchises:</h5>
             {% for franchise in franchises %}
                 <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }}</a><br>
@@ -24,7 +24,7 @@
     {% endif %}
 
     {% if videogamefranchises %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Video Game Franchises:</h5>
             {% for videoGameFranchise in videogamefranchises %}
                 <a href="/video-game-franchises/{{ videoGameFranchise.slug }}"> {{ videoGameFranchise.title }}</a><br>
@@ -33,7 +33,7 @@
     {% endif %}
 
     {% if consoles %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Video Game Consoles:</h5>
             {% for console in consoles %}
                 <a href="/console/{{ console.slug }}"> {{ console.name }}</a><br>
@@ -42,7 +42,7 @@
     {% endif %}
 
     {% if films %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Films:</h5>
             {% for film in films %}
                 <a href="/films/{{ film.slug }}"> {{ film.title }} | {{ film.getYear }}</a><br>
@@ -51,7 +51,7 @@
     {% endif %}
 
     {% if tv %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Television:</h5>
             {% for television in tv %}
                 <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
@@ -68,7 +68,7 @@
 
 
     {% if books %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Books:</h5>
             {% for book in books %}
                 <a href="/books/{{ book.slug }}"> {{ book.title }} | {{ book.getYear }}</a><br>
@@ -77,7 +77,7 @@
     {% endif %}
 
     {% if games %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Video Games:</h5>
             {% for videoGame in games %}
                 <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }}</a><br>
@@ -86,7 +86,7 @@
     {% endif %}
 
     {% if webseries %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Web Series:</h5>
             {% for ws in webseries %}
                 <a href="/web-series/{{ ws.slug }}"> {{ ws.title }} | {{ ws.getYear }}</a><br>
@@ -95,7 +95,7 @@
     {% endif %}
 
     {% if companies %}
-        <div class="container infoSection">
+        <div class="container profileSection">
             <h5>Companies:</h5>
             {% for company in companies %}
                 <a href="/company/{{ company.slug }}"> {{ company.name }}</a><br>
