@@ -185,7 +185,7 @@
         <div class="container infoSection">
             <h6 style="padding-top:5px; padding-right: 10px"> Produced by:</h6>
             {% for company in productionCompanies %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
         </div>
     {% endif %}

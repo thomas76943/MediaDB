@@ -54,8 +54,8 @@ class PersonRole(models.Model):
 #---Companies----------------------------------------------------------------------------------------------------------#
 class Company(models.Model):
     name = models.CharField(max_length=500, default='NoFilmStudioNameSpecified')
-    baseCountry = models.CharField(max_length=500, default='NoCountrySpecified')
-    dateFounded = models.DateField(default=timezone.now)
+    baseCountry = models.CharField(max_length=500, blank=True)
+    dateFounded = models.DateField(blank=True, null=True)
     image = models.ImageField(upload_to='companyLogos', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
@@ -68,11 +68,11 @@ class Company(models.Model):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.image.path)
-        if img.height > 600 or img.width > 600:
-            output_size = (600,600)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        #img = Image.open(self.image.path)
+        #if img.height > 600 or img.width > 600:
+        #    output_size = (600,600)
+        #    img.thumbnail(output_size)
+        #    img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.name)
         super(Company, self).save(*args, **kwargs)
@@ -169,7 +169,7 @@ class Television(models.Model):
 class VideoGame(models.Model):
     title = models.CharField(max_length=500, default='NoVideoGameTitleSpecified')
     release = models.DateField(default=timezone.now)
-    synopsis = models.CharField(max_length=500, default='', blank=True)
+    synopsis = models.CharField(max_length=1000, default='', blank=True)
     posterFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png', blank=True)
     trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
     coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
@@ -270,7 +270,7 @@ class WebSeries(models.Model):
 
 #---Genre Mappings-------------------------------------------------------------------------------------------------------#
 class Genre(models.Model):
-    title = models.CharField(max_length=500, default='NoFilmGenreSpecified')
+    title = models.CharField(max_length=500, default='NoGenreSpecified')
     image = models.ImageField(blank=True, default='', upload_to='icons')
 
     def __str__(self):

@@ -34,7 +34,7 @@
 
     {% if consoles %}
         <div class="container profileSection">
-            <h5>Video Game Consoles:</h5>
+            <h5>Platforms:</h5>
             {% for console in consoles %}
                 <a href="/console/{{ console.slug }}"> {{ console.name }}</a><br>
             {% endfor %}
@@ -80,7 +80,7 @@
         <div class="container profileSection">
             <h5>Video Games:</h5>
             {% for videoGame in games %}
-                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }}</a><br>
+                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }} - {{ videoGame.id }}</a><br>
             {% endfor %}
         </div>
     {% endif %}

@@ -21,6 +21,7 @@
             </div>
         </form>
 
+        {{ videogame.id }}
         <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
@@ -35,12 +36,14 @@
     {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
+                {% if videogame.poster %}
+                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
+                {% endif %}
                 {% if videogame.trailerVideoPath %}
                     <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
 
-                <div class="col">
+                <div class="col"">
                     {% if averageRating %}
                         <div class="container ratingBox" id="ratingDiv">
                             <h5>Average Rating: </h5>
@@ -94,7 +97,7 @@
         <div class="container infoSection">
             <h6 style="padding-top:5px">Developed by:</h6>
             {% for company in developers %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
         </div>
     {% endif %}
@@ -103,7 +106,7 @@
         <div class="container infoSection">
             <h6 style="padding-top:5px">Published by:</h6>
             {% for company in publishers %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
         </div>
     {% endif %}

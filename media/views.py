@@ -9,6 +9,7 @@ import collections
 from django import http
 from django.contrib import messages
 from datetime import datetime, date
+import time
 
 from django.shortcuts import render, redirect
 from django.views import generic
@@ -36,7 +37,7 @@ def addUsers():
             user = User.objects.create_user(username=row[1], email=row[3], password=row[2])
             print("Created - ", row[1])
 
-def addRatings():
+def addFilmRatings():
     ratingsFile = open("D:/MediaDB Datasets/movielensSmall/ratings.csv", "rt")
     ratingsData = csv.reader(ratingsFile)
 
@@ -583,24 +584,44 @@ def recommendationsTestingPage(request):
 
     return render(request, 'media/recommendations.html', context)
 
+def getUpcomingTitles(f, tv, vg, b, ws):
+    upcoming = []
+    if f:
+        for film in Film.objects.filter(release__year=datetime.datetime.now().year)[:50]:
+            if film.release > date.today():
+                upcoming.append(film)
+
+    if tv:
+        for television in Television.objects.filter(release__year=datetime.datetime.now().year)[:50]:
+            if television.release > date.today():
+                upcoming.append(television)
+
+    if vg:
+        for videoGame in VideoGame.objects.filter(release__year=datetime.datetime.now().year)[:50]:
+            if videoGame.release > date.today():
+                upcoming.append(videoGame)
+
+    if b:
+        for book in Book.objects.filter(release__year=datetime.datetime.now().year)[:50]:
+            if book.release > date.today():
+                upcoming.append(book)
+
+    if ws:
+        for webSeries in WebSeries.objects.filter(release__year=datetime.datetime.now().year)[:50]:
+            if webSeries.release > date.today():
+                upcoming.append(webSeries)
+
+    return sorted(upcoming, key=attrgetter('release'))
+
 def home(request):
 
-    oldest = []
-    for p in Person.objects.all().order_by('DoB'):
-        if p.DoB != None:
-            oldest.append(p)
-        if len(oldest) == 30:
-            break
-
     context = {
-        #'oldestFilms':Film.objects.all().order_by('release')[:30],
-        'newestFilms':Film.objects.all().order_by('-release')[:30],
+        'upcoming':getUpcomingTitles(f=True, tv=True, vg=True, b=True, ws=True),
         'tv':Television.objects.all()[:30],
         'longestRunningTV':Television.objects.all().order_by('-episodes')[:16],
-        #'games':VideoGame.objects.all()[:30],
+        'games':VideoGame.objects.all().order_by('-id')[:100],
         #'books':Book.objects.all()[:30],
         #'webseries':WebSeries.objects.all()[:30],
-        #'people':oldest,
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
         'highestRatedFilms':calculateHighestRated(16, True),
         'topGrossing':calculateTopGrossing(16),
@@ -609,7 +630,8 @@ def home(request):
     if request.user.is_authenticated:
         feed, following = getFeed(request.user, 16)
         context['feed'] = feed
-    #addRatings()
+
+    #addFilmRatings()
 
     return render(request, 'media/home.html', context)
 
@@ -642,11 +664,193 @@ def calendar(request):
     }
     return render (request, 'media/calendar.html', context)
 
+def addVideoGameData():
+    badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
+
+    #dataFile = open("D:\MediaDB Datasets\gamesDataCopy.json")
+    #data = json.load(dataFile)
+
+    with open("D:\MediaDB Datasets\gamesDataCopy.json", "r", encoding="utf8") as f:
+        data = json.loads(f.read())
+
+    for franchise in data:
+        print("--------- Found:", franchise['name'], "-----------------------------")
+
+        for game in franchise['games']:
+
+            videoGames = []
+            qs = VideoGame.objects.all()
+            for vg in qs:
+                videoGames.append(vg.title)
+
+            title = game['name']
+
+            if any(badChar in title for badChar in badCharsTitles):
+                print("--- Skipped Game:", title, ". Invalid Characters")
+                continue
+
+            if 'first_release_date' not in game:
+                print("--- Skipped Game:", title, ". Requires Release Date" )
+                continue
+            else:
+                dateConv = time.strftime('%Y-%m-%d', time.localtime(game['first_release_date']))
+
+            #Making New Game
+            if title not in videoGames:
+                print("--- Adding Game:", title)
+                newGame = VideoGame()
+                newGame.title = title
+                newGame.release = dateConv
+                newGame.save()
+
+            #Getting Game (whether it is newly made or not)
+            slug = slugify(title + "-" + str(dateConv))
+            getGame = VideoGame.objects.filter(slug=slug)[0]
+
+            getGameGenres = []
+            for gg in VideoGameGenreMapping.objects.filter(videoGame=getGame):
+                getGameGenres.append(gg.genre.title)
+            getGamePlatforms = []
+            for gp in VideoGameConsoleMapping.objects.filter(videoGame=getGame):
+                getGamePlatforms.append(gp.console.name)
+            getGameCompanies = []
+            for gc in VideoGameCompanyMapping.objects.filter(videoGame=getGame):
+                getGameCompanies.append(gc.company.name)
+
+            #Adding synopsis if there isn't one already
+            if not getGame.synopsis:
+                if 'summary' in game:
+                    if len(game['summary']) < 1000:
+                        print("--- Adding synopsis to:", title)
+                        getGame.synopsis = game['summary']
+                        getGame.save()
+
+            #Adding poster if there isn't one already
+            if not getGame.poster:
+                if 'cover' in game:
+                    print("--- Adding poster to:", title)
+                    coverURL = game['cover']['url']
+                    img = coverURL.rsplit('/', 1)[-1]
+                    newURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + img
+
+                    img_data = requests.get(newURL).content
+                    img_name = title + "-" + str(dateConv) + ".jpg"
+                    with open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, 'wb') as handler:
+                        handler.write(img_data)
+
+                    getGame.poster.save(img_name, File(open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, "rb")))
+                    getGame.save()
+
+
+            if 'genres' in game:
+                for genre in game['genres']:
+                    if genre['name'] not in getGameGenres:
+                        #Make List of All Video Game Genres
+                        allGameGenres = []
+                        qs = VideoGameGenre.objects.all()
+                        for vgg in qs:
+                            allGameGenres.append(vgg.title)
+
+                        #Create New Genre If Required
+                        if genre['name'] not in allGameGenres:
+                            newGameGenre = VideoGameGenre(title=genre['name'])
+                            newGameGenre.save()
+
+                        #Get Genre (whether it is old or has just been made)
+                        getGenre = VideoGameGenre.objects.filter(title=genre['name'])[0]
+
+                        #Make Mapping
+                        gameGenreMap = VideoGameGenreMapping(videoGame=getGame, genre=getGenre)
+                        gameGenreMap.save()
+
+            if 'platforms' in game:
+                for platform in game['platforms']:
+                    if platform['name'] not in getGamePlatforms:
+                        # Make List of All Video Game Genres
+                        allGamePlatforms = []
+                        qs = Console.objects.all()
+                        for c in qs:
+                            allGamePlatforms.append(c.name)
+                            allGamePlatforms.append(c.shortName)
+
+                        # Skip this console if it does not exist in the database
+                        if platform['name'] not in allGamePlatforms:
+                            continue
+
+                        # Get console
+                        if Console.objects.filter(name=platform['name']) != None:
+                            getConsole = Console.objects.filter(name=platform['name'])[0]
+                        else:
+                            getConsole = Console.objects.filter(shortName=platform['name'])[0]
+
+                        # Make Mapping
+                        gameConsoleMap = VideoGameConsoleMapping(videoGame=getGame, console=getConsole)
+                        gameConsoleMap.save()
+
+            if 'involved_companies' in game:
+                for company in game['involved_companies']:
+                    if company['company']['name'] not in getGameCompanies:
+
+                        allGameCompanies = []
+                        qs = Company.objects.all()
+                        for c in qs:
+                            allGameCompanies.append(c.name)
+
+                        #Create new company if required
+                        if company['company']['name'] not in allGameCompanies:
+                            newCompany = Company(name=company['company']['name'])
+                            newCompany.save()
+
+                        #Get Company
+                        getCompany = Company.objects.filter(name=company['company']['name'])[0]
+
+                        if company['developer'] == True:
+                            getDevRole = CompanyRole.objects.filter(id=4)[0]
+                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getDevRole)
+                            gameCompanyMap.save()
+                        if company['publisher'] == True:
+                            getPubRole = CompanyRole.objects.filter(id=5)[0]
+                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getPubRole)
+                            gameCompanyMap.save()
+
+        print("\n")
+
+def removeDupes(modelType):
+    counts = {}
+    maps = modelType.objects.all()
+    for map in maps:
+        slug = map.videoGame.title+map.company.name
+        if slug in counts.keys():
+            counts[slug] += 1
+        else:
+            counts[slug] = 1
+
+    print(counts)
+    dupes = []
+    for map in maps:
+        slug = map.videoGame.title+map.company.name
+        if counts[slug] > 1:
+            dupes.append(map.id)
+
+    print(dupes)
+
+    #everyother = 1
+    #for dupe in dupes:
+    #    getobj = modelType.objects.filter(id=dupe)[0]
+    #    if everyother % 2 == 0:
+    #        getobj.delete()
+    #    everyother += 1
+
 def searchResults(request):
+
+    ###DONT USE THIS###
+    #removeDupes(VideoGameCompanyMapping)
+
+    #addVideoGameData()
+
     title_contains = request.GET.get('q')
 
     context = {}
-
     if title_contains != '' and title_contains is not None:
         people = []
         for p in Person.objects.all():
@@ -743,11 +947,12 @@ def gameHome(request):
     gameCompanies = []
     for vgcm in VideoGameCompanyMapping.objects.filter(role=4):
         if vgcm.company not in gameCompanies:
-            gameCompanies.append(vgcm.company)
+            if vgcm.company.image:
+                gameCompanies.append(vgcm.company)
     for vgcm in VideoGameCompanyMapping.objects.filter(role=5):
         if vgcm.company not in gameCompanies:
-            gameCompanies.append(vgcm.company)
-
+            if vgcm.company.image:
+                gameCompanies.append(vgcm.company)
     genres = []
     g = VideoGameGenre.objects.all()
     for genre in g:
@@ -765,20 +970,20 @@ def gameHome(request):
 
 def bookHome(request):
 
-    films = Film.objects.all()
-    filmGenreMappings = FilmGenreMapping.objects.all()
+    tv = Television.objects.all()
+    tvGenreMappings = TelevisionGenreMapping.objects.all()
     genreCounts = {}
     noGenres = []
 
-    for film in films:
-        genreCounts[film.title] = 0
+    for t in tv:
+        genreCounts[t.title] = 0
 
-    for map in filmGenreMappings:
-        genreCounts[map.film.title] += 1
+    for map in tvGenreMappings:
+        genreCounts[map.television.title] += 1
 
-    for film in genreCounts:
-        if genreCounts[film] == 0:
-            noGenres.append(film)
+    for television in genreCounts:
+        if genreCounts[television] == 0:
+            noGenres.append(television)
 
     context = {
         'books':Book.objects.all(),
@@ -1492,7 +1697,7 @@ class GenreDetailView(generic.DetailView):
         context['sixtiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1960-01-01", "1969-12-25"])[:30]
         context['fiftiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1950-01-01", "1959-12-25"])[:30]
         context['fortiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1940-01-01", "1949-12-25"])[:30]
-        context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('television__release')[:30]
+        context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('-television__release')[:30]
         context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:30]
         context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')[:30]
         context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('webSeries__release')[:30]

@@ -9,14 +9,18 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h2>{{company.name}}</h2>
-        <h5>Based in: {{ company.baseCountry }}</h5>
-        <h5>Founded: {{ company.dateFounded }}</h5>
+        <h2 style="padding-top: 5px">{{company.name}}</h2>
+        {% if company.baseCountry %}
+            <h5>Based in: {{ company.baseCountry }}</h5>
+        {% endif %}
+        {% if company.dateFounded %}
+            <h5>Founded: {{ company.dateFounded }}</h5>
+        {% endif %}
     </div>
 
     {% if consoles %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold border-bottom mb-1">Consoles</h5>
+            <h5 class="font-weight-bold border-bottom mb-1">Platforms</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for console in consoles %}

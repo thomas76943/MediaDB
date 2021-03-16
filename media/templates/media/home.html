@@ -1,4 +1,5 @@
 {% extends "media/base.html" %}
+{% load media_tags %}
 {% block content %}
 
     <!--Carousel-->
@@ -109,7 +110,7 @@
 
     <br>
 
-    <!-- Temp -->
+    <!-- To Do List -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
             <br>Recommendation Algorithm<br><br>
@@ -126,6 +127,13 @@
             Browsing Grid Filter Forms<br><br>
 
             Fixes:<br>
+            After game imports: add icons to new genres<br>
+            After game imports: rename new genres<br>
+            After game imports: fix console names/shortnames<br>
+            After game imports: assign to franchises<br>
+            After game imports: game genre slugs<br>
+            Rating box position when no poster/trailer<br>
+            Franchise actor numbers<br>
             Remove all link underlines<br>
             Double Click Megamenus<br>
             Fix Megamenus on Mobile<br>
@@ -141,6 +149,7 @@
 
     <br>
 
+    <!-- Activity Feed -->
     {% if feed %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">Activity Feed<a style="float:right" href={% url 'activity-feed' %}>See All</a></h5>
@@ -205,6 +214,7 @@
 
     <br>
 
+    <!-- Highest Rated -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Films<a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
         <div class="scroller" >
@@ -241,6 +251,7 @@
 
     <br>
 
+    <!-- Top Grossing -->
     <div class="container infoSection">
     <h5 class="font-weight-bold border-bottom mb-0">Highest Grossing Films<a style="float:right" href={% url 'media-top-grossing' %}>See All</a></h5>
         <div class="scroller" >
@@ -261,6 +272,7 @@
 
     <br>
 
+    <!-- Born Today -->
     {% if bornToday %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">Born Today<a style="float:right" href={% url 'calendar' %}>See All</a></h5>
@@ -277,14 +289,65 @@
         <br>
     {% endif %}
 
+    <!-- Upcoming -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Upcoming Films</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Upcoming Media</h5>
         <div class="scroller">
             <ul class="hs full">
-                {% for film in newestFilms %}
-                    <a href="/films/{{ film.slug }}">
-                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                    </a>
+                {% for entry in upcoming %}
+                    {% with entry|classname as modelclass %}
+                        {%  if modelclass == "Film" %}
+                            <div class="bottomOverlay">
+                                <a class="item" href="/films/{{ entry.slug }}">
+                                <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                </a>
+                                <div class="content">
+                                    <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {%  if modelclass == "Television" %}
+                            <div class="bottomOverlay">
+                                <a class="item" href="/tv/{{ entry.slug }}">
+                                <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                </a>
+                                <div class="content">
+                                    <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {%  if modelclass == "VideoGame" %}
+                            <div class="bottomOverlay">
+                                <a class="item" href="/video-games/{{ entry.videogame.slug }}">
+                                <img class="item posterSmall" src="{{entry.videogame.poster.url}}" alt="{{entry.videogame.title}}">
+                                </a>
+                                <div class="content">
+                                    <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {%  if modelclass == "Books" %}
+                            <div class="bottomOverlay">
+                                <a class="item" href="/books/{{ entry.book.slug }}">
+                                <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                </a>
+                                <div class="content">
+                                    <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                                </div>
+                            </div>
+
+                        {% endif %}
+                        {%  if modelclass == "WebSeries" %}
+                            <div class="bottomOverlay">
+                                <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                </a>
+                                <div class="content">
+                                    <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
                 {% endfor %}
             </ul>
         </div>
@@ -292,6 +355,7 @@
 
     <br>
 
+    <!-- Longest Running TV -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">Longest Running Television Series</h5>
         <div class="scroller">
@@ -299,6 +363,24 @@
                 {% for television in longestRunningTV %}
                     <a href="/tv/{{ television.slug }}">
                     <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Recent Games Added</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for game in games %}
+                    <a href="/video-games/{{ game.slug }}">
+                    {% if game.poster %}
+                        <img class="item posterSmall" src="{{game.poster.url}}" alt="{{game.title}}">
+                    {% else %}
+                        <img class="item posterSmall" src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png" alt="{{game.title}}">
+                    {% endif %}
                     </a>
                 {% endfor %}
             </ul>
@@ -330,6 +412,5 @@
     -->
 
     <br><hr><br>
-
 
 {% endblock %}
