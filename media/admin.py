@@ -64,6 +64,7 @@ admin.site.register(VideoGameFranchiseSubcategory)
 admin.site.register(FilmFranchiseSubcategoryMapping)
 admin.site.register(TelevisionFranchiseSubcategoryMapping)
 admin.site.register(VideoGameFranchiseSubcategoryMapping)
+admin.site.register(VideoGameVideoGameFranchiseSubcategoryMapping)
 admin.site.register(BookFranchiseSubcategoryMapping)
 admin.site.register(WebSeriesFranchiseSubcategoryMapping)
 

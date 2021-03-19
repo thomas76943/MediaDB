@@ -18,6 +18,8 @@ urlpatterns = [
     path('tv/<str:slug>/crew', views.TVCrewDetailView.as_view(), name='media-tv-crew-detail'),
 
     path('video-games/<str:slug>', views.VideoGameDetailView.as_view(), name='media-videogame-detail'),
+    path('video-games/<str:slug>/crew', views.VideoGameCrewDetailView.as_view(), name='media-videogame-crew-detail'),
+
     path('books/<str:slug>', views.BookDetailView.as_view(), name='media-book-detail'),
     path('web-series/<str:slug>', views.WebSeriesDetailView.as_view(), name='media-webseries-detail'),
 

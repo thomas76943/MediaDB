@@ -667,21 +667,20 @@ def calendar(request):
 def addVideoGameData():
     badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
 
-    #dataFile = open("D:\MediaDB Datasets\gamesDataCopy.json")
-    #data = json.load(dataFile)
-
     with open("D:\MediaDB Datasets\gamesDataCopy.json", "r", encoding="utf8") as f:
         data = json.loads(f.read())
 
     for franchise in data:
         print("--------- Found:", franchise['name'], "-----------------------------")
 
-        for game in franchise['games']:
+        if 'games' not in franchise:
+            continue
 
+        for game in franchise['games']:
             videoGames = []
             qs = VideoGame.objects.all()
             for vg in qs:
-                videoGames.append(vg.title)
+                videoGames.append(vg.slug)
 
             title = game['name']
 
@@ -695,8 +694,10 @@ def addVideoGameData():
             else:
                 dateConv = time.strftime('%Y-%m-%d', time.localtime(game['first_release_date']))
 
+            slug = slugify(title + "-" + str(dateConv))
+
             #Making New Game
-            if title not in videoGames:
+            if slug not in videoGames:
                 print("--- Adding Game:", title)
                 newGame = VideoGame()
                 newGame.title = title
@@ -704,46 +705,39 @@ def addVideoGameData():
                 newGame.save()
 
             #Getting Game (whether it is newly made or not)
-            slug = slugify(title + "-" + str(dateConv))
             getGame = VideoGame.objects.filter(slug=slug)[0]
-
-            getGameGenres = []
-            for gg in VideoGameGenreMapping.objects.filter(videoGame=getGame):
-                getGameGenres.append(gg.genre.title)
-            getGamePlatforms = []
-            for gp in VideoGameConsoleMapping.objects.filter(videoGame=getGame):
-                getGamePlatforms.append(gp.console.name)
-            getGameCompanies = []
-            for gc in VideoGameCompanyMapping.objects.filter(videoGame=getGame):
-                getGameCompanies.append(gc.company.name)
 
             #Adding synopsis if there isn't one already
             if not getGame.synopsis:
                 if 'summary' in game:
                     if len(game['summary']) < 1000:
-                        print("--- Adding synopsis to:", title)
+                        print("Adding synopsis")
                         getGame.synopsis = game['summary']
                         getGame.save()
 
             #Adding poster if there isn't one already
-            if not getGame.poster:
+            if bool(getGame.poster) == False:
+                print("No Poster on this object")
                 if 'cover' in game:
-                    print("--- Adding poster to:", title)
+                    print("Adding poster")
                     coverURL = game['cover']['url']
                     img = coverURL.rsplit('/', 1)[-1]
                     newURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + img
 
                     img_data = requests.get(newURL).content
-                    img_name = title + "-" + str(dateConv) + ".jpg"
+                    img_name = slugify(title + "-" + str(dateConv)) + ".jpg"
                     with open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, 'wb') as handler:
                         handler.write(img_data)
 
                     getGame.poster.save(img_name, File(open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, "rb")))
                     getGame.save()
 
-
             if 'genres' in game:
+                print("Adding genres")
                 for genre in game['genres']:
+                    getGameGenres = []
+                    for gg in VideoGameGenreMapping.objects.filter(videoGame=getGame):
+                        getGameGenres.append(gg.genre.title)
                     if genre['name'] not in getGameGenres:
                         #Make List of All Video Game Genres
                         allGameGenres = []
@@ -764,7 +758,11 @@ def addVideoGameData():
                         gameGenreMap.save()
 
             if 'platforms' in game:
+                print("Adding platforms")
                 for platform in game['platforms']:
+                    getGamePlatforms = []
+                    for gp in VideoGameConsoleMapping.objects.filter(videoGame=getGame):
+                        getGamePlatforms.append(gp.console.name)
                     if platform['name'] not in getGamePlatforms:
                         # Make List of All Video Game Genres
                         allGamePlatforms = []
@@ -788,9 +786,12 @@ def addVideoGameData():
                         gameConsoleMap.save()
 
             if 'involved_companies' in game:
+                print("Adding companies")
                 for company in game['involved_companies']:
+                    getGameCompanies = []
+                    for gc in VideoGameCompanyMapping.objects.filter(videoGame=getGame):
+                        getGameCompanies.append(gc.company.name)
                     if company['company']['name'] not in getGameCompanies:
-
                         allGameCompanies = []
                         qs = Company.objects.all()
                         for c in qs:
@@ -825,14 +826,14 @@ def removeDupes(modelType):
         else:
             counts[slug] = 1
 
-    print(counts)
     dupes = []
     for map in maps:
         slug = map.videoGame.title+map.company.name
         if counts[slug] > 1:
-            dupes.append(map.id)
+            dupes.append(slug + " - " + str(map.id))
 
-    print(dupes)
+    for dupe in dupes:
+        print(dupe)
 
     #everyother = 1
     #for dupe in dupes:
@@ -847,6 +848,23 @@ def searchResults(request):
     #removeDupes(VideoGameCompanyMapping)
 
     #addVideoGameData()
+
+    for vg in VideoGame.objects.all():
+        if vg.title == "NoSynopsisSpecified":
+            vg.synopsis = ""
+            vg.save()
+
+    noposters = []
+    str = "Pokémon"
+    VideoGame.objects.all().filter(title__icontains=str)
+
+
+    for vgid in range(510):
+        id = vgid+628
+        getgame = VideoGame.objects.filter(id=id)[0]
+        if bool(getgame.poster) == False:
+            noposters.append(getgame.id)
+    print(noposters)
 
     title_contains = request.GET.get('q')
 
@@ -1002,15 +1020,15 @@ def contributeHome(request):
 
 def contributeMedia(request):
 
-    filmForm = ContributeFilmForm(request.POST or None, initial={
-        'title':'', 'release':'', 'rating':'', 'synopsis':'', 'length':'',
-        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    })
+    #filmForm = ContributeFilmForm(request.POST or None, initial={
+    #    'title':'', 'release':'', 'rating':'', 'synopsis':'', 'length':'',
+    #    'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
+    #})
 
-    televisionForm = ContributeTelevisionForm(request.POST or None, initial={
-        'title':'', 'release':'', 'synopsis':'', 'seasons':'', 'episodes':'',
-        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    })
+    #televisionForm = ContributeTelevisionForm(request.POST or None, initial={
+     #   'title':'', 'release':'', 'synopsis':'', 'seasons':'', 'episodes':'',
+     #   'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
+    #})
 
     forms = [filmForm, televisionForm]
 
@@ -1170,7 +1188,7 @@ class PersonDetailView(generic.DetailView):
             tvActing.append(tva.television)
         vgActing = []
         for vga in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-videogame__release'):
-            vgActing.append(vga.videoGame)
+            vgActing.append(vga.videogame)
         wsActing = []
         for wsa in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=1).order_by('-webSeries__release'):
             wsActing.append(wsa.webSeries)
@@ -1185,7 +1203,7 @@ class PersonDetailView(generic.DetailView):
             tvDirecting.append(tvd.television)
         vgDirecting = []
         for vgd in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-videogame__release'):
-            vgDirecting.append(vgd.videoGame)
+            vgDirecting.append(vgd.videogame)
         wsDirecting = []
         for wsd in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=2).order_by('-webSeries__release'):
             wsDirecting.append(wsd.webSeries)
@@ -1200,13 +1218,13 @@ class PersonDetailView(generic.DetailView):
             tvWriting.append(tvw.television)
         vgWriting = []
         for vgw in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-videogame__release'):
-            vgWriting.append(vgw.videoGame)
+            vgWriting.append(vgw.videogame)
         bWriting = []
-        for bw in BookPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('book__release'):
-            bWriting.append(bw.webSeries)
+        for bw in BookPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-book__release'):
+            bWriting.append(bw.book)
         wsWriting = []
         for wsw in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-webSeries__release'):
-            wsWriting.append(wsw)
+            wsWriting.append(wsw.webSeries)
         writingAll = list(chain(fWriting, tvWriting, vgWriting, bWriting, wsWriting))
         writing = sorted(writingAll, key=attrgetter('release'), reverse=True)
 
@@ -1218,7 +1236,7 @@ class PersonDetailView(generic.DetailView):
             tvProducing.append(tvp.television)
         vgProducing = []
         for vgp in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-videogame__release'):
-            vgProducing.append(vgp.videoGame)
+            vgProducing.append(vgp.videogame)
         wsProducing = []
         for wsp in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=6).order_by('-webSeries__release'):
             wsProducing.append(wsp.webSeries)
@@ -1330,13 +1348,13 @@ class FranchiseDetailView(generic.DetailView):
                 else:
                     franchiseProducers[mapping.person] += 1
 
-        actorTuples = sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True)
-        sortedActors = {k: v for k,v in actorTuples}
+        actorTuples = dict(sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True))
+        #sortedActors = {k: v for k,v in actorTuples}
 
         producerTuples = sorted(franchiseProducers.items(), key=operator.itemgetter(1), reverse=True)
         sortedProducers = {k: v for k,v in producerTuples}
 
-        context['franchiseActors'] = sortedActors
+        context['franchiseActors'] = actorTuples
         context['franchiseProducers'] = sortedProducers
 
         return context
@@ -1354,7 +1372,8 @@ class VideoGameFranchiseDetailView(generic.DetailView):
 
         if subcategories != None:
             for x in range(subcategories.count()):
-                subCatGames = VideoGameFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
+                subCatGames = VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(
+                    videoGameFranchiseSubcategory__parentFranchise=self.object.id).filter(videoGameFranchiseSubcategory__title=subcategories[x].title)
 
                 #Collect all media for that subcategory
                 completeSubCat = sorted(list(subCatGames), key=attrgetter('orderInFranchise'))
@@ -1537,12 +1556,17 @@ class VideoGameDetailView(generic.UpdateView):
         context['developers'] = VideoGameCompanyMapping.objects.filter(role=4, videoGame=self.object.id)
         context['publishers'] = VideoGameCompanyMapping.objects.filter(role=5, videoGame=self.object.id)
         context['images'] = VideoGameImages.objects.filter(videoGame=self.object.id)
+        context['actors'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id)
+        context['directors'] = VideoGamePersonMapping.objects.filter(role=2, videogame=self.object.id)
+        context['writers'] = VideoGamePersonMapping.objects.filter(role=3, videogame=self.object.id)
+        context['producers'] = VideoGamePersonMapping.objects.filter(role=6, videogame=self.object.id)
+        context['cast'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id).order_by('billing')
 
         franchises = []
-        for x in VideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
+        for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
             if x.videoGame.id == self.object.id:
                 print("hello")
-                franchises.append(x.franchiseSubcategory.parentFranchise)
+                franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
         ratings = VideoGameRating.objects.filter(videoGame=self.object.id)
@@ -1569,6 +1593,38 @@ class VideoGameDetailView(generic.UpdateView):
                 if listvg.videoGame.id == self.object.id:
                     context['inList'] = True
                     break
+
+        return context
+
+
+class VideoGameCrewDetailView(generic.UpdateView):
+    model = VideoGame
+    template_name = 'media/gameCrewDetail.html'
+    slug_field, slug_url_kwarg = "slug", "slug"
+    fields = []
+
+    def post(self, request, *args, **kwargs):
+        ratingListPostRequests(self, request, *args, **kwargs)
+        return super(VideoGameCrewDetailView, self).post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['genres'] = VideoGameGenreMapping.objects.filter(videoGame=self.object.id)
+        context['consoles'] = VideoGameConsoleMapping.objects.filter(videoGame=self.object.id).order_by('console__name')
+        context['developers'] = VideoGameCompanyMapping.objects.filter(role=4, videoGame=self.object.id)
+        context['publishers'] = VideoGameCompanyMapping.objects.filter(role=5, videoGame=self.object.id)
+        context['actors'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id)
+        context['directors'] = VideoGamePersonMapping.objects.filter(role=2, videogame=self.object.id)
+        context['writers'] = VideoGamePersonMapping.objects.filter(role=3, videogame=self.object.id)
+        context['producers'] = VideoGamePersonMapping.objects.filter(role=6, videogame=self.object.id)
+        context['cast'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id).order_by('billing')
+
+        franchises = []
+        for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
+            if x.videoGame.id == self.object.id:
+                print("hello")
+                franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
+        context['franchises'] = franchises
 
         return context
 

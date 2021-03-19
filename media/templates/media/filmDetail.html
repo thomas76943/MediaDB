@@ -172,23 +172,27 @@
         {% if film.boxOffice %}<h6>Box Office: {{ boxOfficeFormatted }}</h6>{% endif %}
     </div>
 
-    {% if distributors %}
+    {% if distributors or productionCompanies %}
         <div class="container infoSection">
-            <h6 style="padding-top:5px"> Distributed by:</h6>
-            {% for company in distributors %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
+            {% if distributors %}
+                <h6 style="padding-top:5px"> Distributors:</h6>
+                {% for company in distributors %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
+
+            {% if productionCompanies %}
+                <h6 style="padding-top:5px"> Production Companies:</h6>
+                {% for company in productionCompanies %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
 
-    {% if productionCompanies %}
-        <div class="container infoSection">
-            <h6 style="padding-top:5px; padding-right: 10px"> Produced by:</h6>
-            {% for company in productionCompanies %}
-                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/films/{{ film.slug }}/crew">See All Details</a></h6>
+    </div>
 
     {% if images %}
         <div class="container infoSection">

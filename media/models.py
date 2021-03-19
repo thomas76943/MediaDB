@@ -135,9 +135,7 @@ class Television(models.Model):
     synopsis = models.CharField(max_length=500, default='', blank=True)
     seasons = models.IntegerField(default=1)
     episodes = models.IntegerField(default=1)
-    posterFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png')
     trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
     poster = models.ImageField(default='', upload_to='posters', blank=True)
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -170,9 +168,7 @@ class VideoGame(models.Model):
     title = models.CharField(max_length=500, default='NoVideoGameTitleSpecified')
     release = models.DateField(default=timezone.now)
     synopsis = models.CharField(max_length=1000, default='', blank=True)
-    posterFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png', blank=True)
     trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
     poster = models.ImageField(default='', upload_to='posters', blank=True)
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -202,8 +198,6 @@ class Book(models.Model):
     title = models.CharField(max_length=500, default='NoBookTitleSpecified')
     release = models.DateField(default=timezone.now)
     synopsis = models.CharField(max_length=500, default='', blank=True)
-    imageFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png')
-    coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
     image = models.ImageField(default='', upload_to='bookImages', blank=True)
     cover = models.ImageField(default='', upload_to='bookCoverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -237,9 +231,7 @@ class WebSeries(models.Model):
     seasons = models.IntegerField(default=1)
     episodes = models.IntegerField(default=1)
     synopsis = models.CharField(max_length=500, default='', blank=True)
-    posterFilePath = models.CharField(max_length=500, default='../static/media/MissingIcon.png')
     trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    coverImageFilePath = models.CharField(max_length=500, default='', blank=True)
     poster = models.ImageField(default='', upload_to='posters', blank=True)
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -448,6 +440,8 @@ class VideoGamePersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     videogame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
     role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    character = models.CharField(max_length=500, default='', blank=True)
+    billing = models.IntegerField(default=1, unique=False)
 
     def __str__(self):
         return (self.person.firstName + " " + self.person.surname + " || " + self.videogame.title + " || " + self.role.role)
@@ -494,7 +488,6 @@ class WebSeriesPersonMapping(models.Model):
 #---Franchises---------------------------------------------------------------------------------------------------------#
 class Franchise(models.Model):
     title = models.CharField(max_length=500, default='NoFranchiseNameSpecified')
-    posterFilePath = models.CharField(max_length=500, default='https://i.gyazo.com/94770d8db3ef2cf193553e34f6e29e2d.png')
     image = models.ImageField(blank=True, upload_to='franchises')
     description = models.CharField(max_length=1000, blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -528,7 +521,6 @@ class FranchiseSubcategory(models.Model):
 class VideoGameFranchise(models.Model):
     title = models.CharField(max_length=500, default='NoFranchiseNameSpecified')
     image = models.ImageField(blank=True, upload_to='franchises')
-    posterFilePath = models.CharField(max_length=500, default='https://i.gyazo.com/94770d8db3ef2cf193553e34f6e29e2d.png')
     description = models.CharField(max_length=1000, blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
@@ -580,9 +572,10 @@ class TelevisionFranchiseSubcategoryMapping(models.Model):
         verbose_name = "Television - Franchise  Subcategory Mapping"
         verbose_name_plural = "Television - Franchise  Subcategory Mappings"
 
+
 class VideoGameFranchiseSubcategoryMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    franchiseSubcategory = models.ForeignKey(VideoGameFranchiseSubcategory, on_delete=models.PROTECT)
+    franchiseSubcategory = models.ForeignKey(FranchiseSubcategory, on_delete=models.PROTECT)
     orderInFranchise = models.IntegerField(default=1)
 
     def __str__(self):
@@ -591,6 +584,19 @@ class VideoGameFranchiseSubcategoryMapping(models.Model):
     class Meta:
         verbose_name = "Video Games - Franchise  Subcategory Mapping"
         verbose_name_plural = "Video Games - Franchise  Subcategory Mappings"
+
+
+class VideoGameVideoGameFranchiseSubcategoryMapping(models.Model):
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    videoGameFranchiseSubcategory = models.ForeignKey(VideoGameFranchiseSubcategory, on_delete=models.PROTECT)
+    orderInFranchise = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.videoGameFranchiseSubcategory.title + " - " + str(self.orderInFranchise) + " - " + self.videoGame.title)
+
+    class Meta:
+        verbose_name = "Video Games - Video Game Franchise  Subcategory Mapping"
+        verbose_name_plural = "Video Games - Video Game Franchise  Subcategory Mappings"
 
 class BookFranchiseSubcategoryMapping(models.Model):
     book = models.ForeignKey(Book, on_delete=models.PROTECT)
@@ -670,7 +676,6 @@ class Console(models.Model):
     shortName = models.CharField(max_length=500, default='NoShortConsoleNameSpecified')
     release = models.DateField(default=timezone.now)
     developer = models.ForeignKey(Company, on_delete=models.PROTECT)
-    imageFilePath = models.CharField(max_length=500,blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True, default='')
     image = models.ImageField(blank=True, upload_to='consoles')
 
@@ -903,7 +908,6 @@ class WebSeriesAwardCreditMapping(models.Model):
 # ---Additional Image Mappings---------------------------------------------------------------------------------------------------------#
 
 class MiscImages(models.Model):
-    filePath = models.CharField(max_length=500, default='', blank=True)
     awardsShow = models.ForeignKey(AwardsShow, on_delete=models.PROTECT, null=True)
     image = models.ImageField(default='MissingIcon.png', upload_to='miscImages', blank=True)
 
@@ -936,7 +940,6 @@ class PersonImages(models.Model):
 
 class FilmImages(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
-    filePath = models.CharField(max_length=500, default='')
     image = models.ImageField(default='MissingIcon.png', upload_to='extraImages', blank=True)
 
     def __str__(self):
@@ -948,7 +951,6 @@ class FilmImages(models.Model):
 
 class TelevisionImages(models.Model):
     television = models.ForeignKey(Television, on_delete=models.PROTECT)
-    filePath = models.CharField(max_length=500, default='')
     image = models.ImageField(default='MissingIcon.png', upload_to='extraImages', blank=True)
 
     def __str__(self):
@@ -960,7 +962,6 @@ class TelevisionImages(models.Model):
 
 class VideoGameImages(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    filePath = models.CharField(max_length=500, default='')
     image = models.ImageField(default='MissingIcon.png', upload_to='extraImages', blank=True)
 
     def __str__(self):
@@ -983,7 +984,6 @@ class BookImages(models.Model):
 
 class WebSeriesImages(models.Model):
     webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
-    filePath = models.CharField(max_length=500, default='')
     image = models.ImageField(default='MissingIcon.png', upload_to='extraImages', blank=True)
 
     def __str__(self):

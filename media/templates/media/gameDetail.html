@@ -21,7 +21,6 @@
             </div>
         </form>
 
-        {{ videogame.id }}
         <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
@@ -63,6 +62,30 @@
         </div>
     {% endif %}
 
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5 style="padding-top:5px"> Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:5px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5 style="padding-top:5px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
 
     {% if consoles %}
         <div class="container infoSection">
@@ -89,6 +112,26 @@
         </div>
     {% endif %}
 
+    {% if cast %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/video-games/{{ videogame.slug }}/crew">See Full Cast & Crew</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in cast %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
+                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="container infoSection">
         <h6 style="padding-top:10px">Initial Release Date: {{ videogame.release }}</h6>
     </div>
@@ -110,6 +153,10 @@
             {% endfor %}
         </div>
     {% endif %}
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/video-games/{{ videogame.slug }}/crew">See All Details</a></h6>
+    </div>
 
     {% if images %}
         <div class="container infoSection">

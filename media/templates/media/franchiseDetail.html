@@ -65,7 +65,7 @@
                         {% for entry in var_url %}
                             {%  if entry.film != NULL %}
                                 <a class="item" href="/films/{{ entry.film.slug }}">
-                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                    <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
                                 </a>
                             {% endif %}
                             {%  if entry.television != NULL %}
@@ -73,8 +73,10 @@
                                 <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
                                 </a>
                             {% endif %}
-                            {%  if entry.videogame != NULL %}
-                                <a class="item posterSmall" style="background:url({{entry.videogame.poster.url}})" href="/video-games/{{ entry.videogame.slug }}"></a>
+                            {%  if entry.videoGame != NULL %}
+                                <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                    <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                </a>
                             {% endif %}
                             {%  if entry.book != NULL %}
                                 <a class="item posterSmall" style="background:url({{entry.book.image.url}})" href="/books/{{ entry.book.slug }}"></a>

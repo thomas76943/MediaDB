@@ -12,8 +12,8 @@
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
-                        <a class="item" href="{{ image.filePath }}">
-                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        <a class="item" href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
                         </a>
                     {% endfor %}
                 </ul>

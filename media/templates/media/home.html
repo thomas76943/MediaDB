@@ -133,7 +133,6 @@
             After game imports: assign to franchises<br>
             After game imports: game genre slugs<br>
             Rating box position when no poster/trailer<br>
-            Franchise actor numbers<br>
             Remove all link underlines<br>
             Double Click Megamenus<br>
             Fix Megamenus on Mobile<br>
@@ -318,8 +317,8 @@
                         {% endif %}
                         {%  if modelclass == "VideoGame" %}
                             <div class="bottomOverlay">
-                                <a class="item" href="/video-games/{{ entry.videogame.slug }}">
-                                <img class="item posterSmall" src="{{entry.videogame.poster.url}}" alt="{{entry.videogame.title}}">
+                                <a class="item" href="/video-games/{{ entry.slug }}">
+                                <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
                                 </a>
                                 <div class="content">
                                     <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
@@ -328,8 +327,8 @@
                         {% endif %}
                         {%  if modelclass == "Books" %}
                             <div class="bottomOverlay">
-                                <a class="item" href="/books/{{ entry.book.slug }}">
-                                <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                <a class="item" href="/books/{{ entry.slug }}">
+                                <img class="item posterSmall" src="{{entry.image.url}}" alt="{{entry.title}}">
                                 </a>
                                 <div class="content">
                                     <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
