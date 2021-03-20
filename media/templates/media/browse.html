@@ -3,12 +3,51 @@
 {% block title %}Browse Media{% endblock title %}
 {% block content %}
 
+    <!-- Remove Form Highlights -->
+    <style>
+        .form-control:focus {
+            outline: 0;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+    </style>
+
+    <!-- Filter Forms -->
     <div class="container infoSection">
-        <h2 style="padding-top: 7px;">Browse all Media</h2>
+        <h2 style="padding-top: 7px;">Browse Media</h2>
+        <form method="get">
+            <div class="form-inline">
+                {% for field in filteredFilms.form %}
+                    {% if field.label == "Title" %}
+                        <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
+                    {% elif field.label == "Rating" %}
+                        <div class="form-group col-md-2 col-lg-2" style="max-width: 100px">
+                            <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
+                                {% for choice in field %}
+                                    {{ choice }}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% elif field.label == "Release After" %}
+                        <div class="form-group col-md-2 col-lg-2">
+                            <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="Release">
+                        </div>
+                        <script>
+                            $(function(){
+                               $("#id_{{ field.name }}").dateP
+                            });
+                        </script>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <input class="btn btn-primary btn-raised" type="submit" value="Filter" style="margin-top: 10px">
+
+        </form>
     </div>
 
-    <div class="container infoSection">
-        <ul class="auto-grid">
+    <!-- Grid and Pagination -->
+    <div class="container profileSection">
+        <ul class="auto-grid" style="padding-top: 10px">
             {% for media in mediaPageObject %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     {% with media|classname as modelclass %}
@@ -47,7 +86,6 @@
                             <a href="/person/{{ media.slug }}">
                                 <img class="item personSmall" src="{{media.image.url}}" alt="{{media.getFullName}}">
                             </a>
-
 
                         {% endif %}
                     {% endwith %}
@@ -103,16 +141,6 @@
             </nav>
         </div>
 
-        <div class="container infoSection">
-
-            <form method="get">
-                {{ filteredFilms.form.as_p }}
-                <input type="submit" value="press">
-            </form>
-
-        </div>
-
     </div>
-
 
 {% endblock %}

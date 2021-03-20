@@ -146,7 +146,7 @@
 
     {% if productionCompanies %}
         <div class="container infoSection">
-            <h6 style="padding-top:5px; "> Produced by:</h6>
+            <h6 style="padding-top:5px; "> Production Companies:</h6>
             {% for company in productionCompanies %}
                 <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
@@ -155,7 +155,7 @@
 
     {% if networks %}
         <div class="container infoSection">
-            <h6> Networks:</h6>
+            <h6 style="padding-top:5px; "> Networks:</h6>
             {% for company in networks %}
                 <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}

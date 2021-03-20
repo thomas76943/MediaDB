@@ -155,7 +155,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-
                             {%  if entry.television != NULL %}
                                 <li id="entry_{{ entry.id }}" class="ui-state-default">
                                     <a class="item" href="/tv/{{ entry.television.slug }}">
@@ -184,7 +183,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-
                         {% endfor %}
                     </ul>
                     {% endwith %}
@@ -193,7 +191,7 @@
         {% endfor %}
     {% endif %}
 
-    <!-- Show Button is Page Belongs to Current User -->
+    <!-- Show Button if Page Belongs to Current User -->
     {% if user.username == memberProfile.username %}
         <div class="container profileSection">
             <div style="padding-top: 5px">
@@ -311,10 +309,10 @@
             <!-- New Section Form Script -->
             <script type="text/javascript">
 
-                var frm = $('#newProfileSection')
+                var sectionForm = $('#newProfileSection')
 
-                console.log(frm)
-                frm.submit(function(e) {
+                console.log(sectionForm)
+                sectionForm.submit(function(e) {
                     e.preventDefault();
                     $.ajax({
                         url : "/user/{{ memberProfile.username }}",
@@ -334,6 +332,7 @@
             </script>
         </div>
       </div>
+
     </div>
 
     <!-- Modal Script -->

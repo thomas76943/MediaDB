@@ -80,7 +80,7 @@
         <div class="container profileSection">
             <h5>Video Games:</h5>
             {% for videoGame in games %}
-                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }} - {{ videoGame.id }}</a><br>
+                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }}</a><br>
             {% endfor %}
         </div>
     {% endif %}

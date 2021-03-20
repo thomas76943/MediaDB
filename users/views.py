@@ -1,27 +1,22 @@
 import profile
 from itertools import chain
 from operator import attrgetter
+import json
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-
 from django.contrib import messages
+
 from django.views import generic
-
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, ProfileSectionForm
-
 from media.models import *
 from users.models import *
 
-import json
-
 from django import http
 from django.http import QueryDict
+from django.shortcuts import render, redirect, get_object_or_404
 
-from django.shortcuts import render, redirect
-
-# Create your views here.
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -39,6 +34,18 @@ def register(request):
 
     return render(request, 'users/register.html', context)
 
+"""
+def loginPage(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('')
+    return render(request, 'users/login.html')
+"""
 @login_required
 def userProfile(request):
     if request.POST:
@@ -237,10 +244,84 @@ class profileSection(generic.UpdateView):
 
         object = self.get_object()
         username = object.profile.user.username
-        print("Delete POST get:")
-        print(request.POST.get('delete'))
 
-        if request.POST.get('delete') == None:
+        if request.POST.get('newName') != None:
+            newName = request.POST.get('newName')
+            object.sectionName = newName
+            object.save()
+
+        elif request.POST.get('addMedia') != None:
+            print("adding media attempt")
+            get = request.POST.get('addMedia')
+            spl = get.split('/')
+            mediaSlug = spl[len(spl)-1]
+
+            if object.type == "Films":
+                getFilm = Film.objects.filter(slug=mediaSlug)[0]
+                sectionLength = 0
+                for psfm in ProfileSectionFilmMapping.objects.filter(profileSection=object):
+                    sectionLength += 1
+                newMap = ProfileSectionFilmMapping(film=getFilm, profileSection=object, orderInSection=sectionLength+1)
+                newMap.save()
+
+            elif object.type == "Television":
+                getTV = Television.objects.filter(slug=mediaSlug)[0]
+                sectionLength = 0
+                for pstm in ProfileSectionFilmMapping.objects.filter(profileSection=object):
+                    sectionLength += 1
+                newMap = ProfileSectionTelevisionMapping(television=getTV, profileSection=object, orderInSection=sectionLength + 1)
+                newMap.save()
+
+            elif object.type == "Video Games":
+                getVG = VideoGame.objects.filter(slug=mediaSlug)[0]
+                sectionLength = 0
+                for psvgm in ProfileSectionVideoGameMapping.objects.filter(profileSection=object):
+                    sectionLength += 1
+                newMap = ProfileSectionVideoGameMapping(videoGame=getVG, profileSection=object, orderInSection=sectionLength + 1)
+                newMap.save()
+
+            elif object.type == "Books":
+                getB = Book.objects.filter(slug=mediaSlug)[0]
+                sectionLength = 0
+                for psbm in ProfileSectionBookMapping.objects.filter(profileSection=object):
+                    sectionLength += 1
+                newMap = ProfileSectionBookMapping(book=getB, profileSection=object, orderInSection=sectionLength + 1)
+                newMap.save()
+
+            elif object.type == "Web Series":
+                getWS = WebSeries.objects.filter(slug=mediaSlug)[0]
+                sectionLength = 0
+                for pswsm in ProfileSectionWebSeriesMapping.objects.all():
+                    if pswsm.profileSection == object:
+                        sectionLength += 1
+                newMap = ProfileSectionWebSeriesMapping(webSeries=getWS, profileSection=object, orderInSection=sectionLength + 1)
+                newMap.save()
+
+        elif request.POST.get('removeMedia') != None:
+            print("removing media attempt")
+            get = request.POST.get('removeMedia')
+            if get[0] == 'f':
+                getFilm = Film.objects.filter(slug=get[2:])[0]
+                getMap = ProfileSectionFilmMapping.objects.filter(profileSection=object, film=getFilm)[0]
+                getMap.delete()
+            if get[0] == 't':
+                getTV = Television.objects.filter(slug=get[2:])[0]
+                getMap = ProfileSectionTelevisionMapping.objects.filter(profileSection=object, television=getTV)[0]
+                getMap.delete()
+            if get[0] == 'v':
+                getVG = VideoGame.objects.filter(slug=get[2:])[0]
+                getMap = ProfileSectionVideoGameMapping.objects.filter(profileSection=object, videoGame=getVG)[0]
+                getMap.delete()
+            if get[0] == 'b':
+                getB = Book.objects.filter(slug=get[2:])[0]
+                getMap = ProfileSectionBookMapping.objects.filter(profileSection=object, book=getB)[0]
+                getMap.delete()
+            if get[0] == 'w':
+                getWS = WebSeries.objects.filter(slug=get[2:])[0]
+                getMap = ProfileSectionWebSeriesMapping.objects.filter(profileSection=object, webSeries=getWS)[0]
+                getMap.delete()
+
+        elif request.POST.get('changing') == 'confirm':
             print("change found")
             entries = QueryDict(request.POST.get('content'))
             print(entries)

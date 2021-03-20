@@ -848,22 +848,10 @@ def searchResults(request):
     #removeDupes(VideoGameCompanyMapping)
 
     #addVideoGameData()
-
+    noposters=[]
     for vg in VideoGame.objects.all():
-        if vg.title == "NoSynopsisSpecified":
-            vg.synopsis = ""
-            vg.save()
-
-    noposters = []
-    str = "Pokémon"
-    VideoGame.objects.all().filter(title__icontains=str)
-
-
-    for vgid in range(510):
-        id = vgid+628
-        getgame = VideoGame.objects.filter(id=id)[0]
-        if bool(getgame.poster) == False:
-            noposters.append(getgame.id)
+        if bool(vg.poster) == False:
+            noposters.append(vg.id)
     print(noposters)
 
     title_contains = request.GET.get('q')
@@ -899,29 +887,20 @@ def browse(request):
     #books = Book.objects.all()
     #webSeries = WebSeries.objects.all()
     #people = Person.objects.exclude(image='MissingIcon.png')
-
     #print(people.count())
     #allMedia = list(chain(films, television, videoGames, books, webSeries, people))
 
     filteredFilms = filmFilter(request.GET, queryset=films)
 
-    paginatedFilteredFilms = Paginator(filteredFilms.qs, 95)
+    paginatedFilteredFilms = Paginator(filteredFilms.qs, 90)
     page_number = request.GET.get('page', 1)
     mediaPageObject = paginatedFilteredFilms.get_page(page_number)
-
-    #try:
-    #    page = p.page(page_number)
-    #except EmptyPage:
-    #    page = p.page(1)
-
-
 
     context = {
         'filteredFilms' : filteredFilms,
         'mediaPageObject': mediaPageObject,
         'seenFilms' : FilmRating.objects.filter(user=request.user)
     }
-
 
     if request.user.is_authenticated:
         userRatings = FilmRating.objects.filter(user=request.user)
@@ -988,21 +967,37 @@ def gameHome(request):
 
 def bookHome(request):
 
-    tv = Television.objects.all()
-    tvGenreMappings = TelevisionGenreMapping.objects.all()
     genreCounts = {}
     noGenres = []
 
-    for t in tv:
-        genreCounts[t.title] = 0
+    for v in Film.objects.all():
+        genreCounts[v] = 0
 
-    for map in tvGenreMappings:
-        genreCounts[map.television.title] += 1
+    for map in FilmGenreMapping.objects.all():
+        genreCounts[map.film] += 1
 
-    for television in genreCounts:
-        if genreCounts[television] == 0:
-            noGenres.append(television)
+    for v in genreCounts:
+        if genreCounts[v] == 0:
+            noGenres.append(v)
+    """
+    for ng in noGenres:
+        action = VideoGameGenre.objects.filter(id=1)[0]
+        fantasy = VideoGameGenre.objects.filter(id=3)[0]
+        rpg = VideoGameGenre.objects.filter(id=6)[0]
+        adventure = VideoGameGenre.objects.filter(id=2)[0]
+        openworld = VideoGameGenre.objects.filter(id=12)[0]
+        stealth = VideoGameGenre.objects.filter(id=16)[0]
+        shooter = VideoGameGenre.objects.filter(id=10)[0]
+        fighting = VideoGameGenre.objects.filter(id=14)[0]
+        platform = VideoGameGenre.objects.filter(id=19)[0]
+        arcade = VideoGameGenre.objects.filter(id=9)[0]
+        sport = VideoGameGenre.objects.filter(id=24)[0]
 
+        map1 = VideoGameGenreMapping(videoGame=ng, genre=adventure)
+        map1.save()
+        map2 = VideoGameGenreMapping(videoGame=ng, genre=action)
+        map2.save()
+    """
     context = {
         'books':Book.objects.all(),
         'nogenres':noGenres,
@@ -1565,7 +1560,6 @@ class VideoGameDetailView(generic.UpdateView):
         franchises = []
         for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
             if x.videoGame.id == self.object.id:
-                print("hello")
                 franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
@@ -1622,7 +1616,6 @@ class VideoGameCrewDetailView(generic.UpdateView):
         franchises = []
         for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
             if x.videoGame.id == self.object.id:
-                print("hello")
                 franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
@@ -1648,7 +1641,6 @@ class BookDetailView(generic.UpdateView):
         franchises = []
         for x in BookFranchiseSubcategoryMapping.objects.filter(book=self.object.id):
             if x.book.id == self.object.id:
-                print("hello")
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
@@ -1703,7 +1695,6 @@ class WebSeriesDetailView(generic.UpdateView):
         franchises = []
         for x in WebSeriesFranchiseSubcategoryMapping.objects.filter(webSeries=self.object.id):
             if x.webSeries.id == self.object.id:
-                print("hello")
                 franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
