@@ -270,23 +270,33 @@ def addFilmRatings():
         r = FilmRating(film=thisFilm, user=currentUser, rating=ratingScore)
         r.save()
 
-def calculateHighestRated(quantity, reverse):
-    films = Film.objects.all()
-    filmRatingsDict = {}
+def calculateHighestRated(type, minRatings, quantity, reverse):
+    media = type.objects.all()
+    ratingsDict = {}
 
-    for f in films:
-        fRatings = FilmRating.objects.filter(film=f)
-        fRatingsCount = fRatings.count()
-        if fRatingsCount > 30:
-            fRatingSum = 0
-            for rating in fRatings:
-                fRatingSum += float(rating.rating / 2)
-            fRatingAverage = (fRatingSum / fRatingsCount)
-            average2DP = "{:.1f}".format(fRatingAverage)
-            filmRatingsDict[f] = average2DP
+    for m in media:
+        if type == Film:
+            ratings = FilmRating.objects.filter(film=m)
+        elif type == Television:
+            ratings = TelevisionRating.objects.filter(television=m)
+        elif type == VideoGame:
+            ratings = VideoGameRating.objects.filter(videoGame=m)
+        elif type == Book:
+            ratings = BookRating.objects.filter(book=m)
+        elif type == WebSeries:
+            ratings = WebSeriesRating.objects.filter(webSeries=m)
+
+        ratingsCount = ratings.count()
+        if ratingsCount >= minRatings:
+            ratingSum = 0
+            for rating in ratings:
+                ratingSum += float(rating.rating / 2)
+            ratingAverage = (ratingSum / ratingsCount)
+            average2DP = "{:.1f}".format(ratingAverage)
+            ratingsDict[m] = average2DP
 
     #Anonymous function takes x and returns float(x[1]) (ie: the score as a float), used in the key parameter to sort dict
-    sortedRatings = dict(sorted(filmRatingsDict.items(), key=lambda x: float(x[1]), reverse=reverse))
+    sortedRatings = dict(sorted(ratingsDict.items(), key=lambda x: float(x[1]), reverse=reverse))
     highestRated = dict(itertools.islice(sortedRatings.items(), quantity))
     return highestRated
 
@@ -314,7 +324,7 @@ def findDulplicateTitles():
 
     return repeatedTitles
 
-def ratingListPostRequests(self, request, *args, **kwargs):
+def mediaPagePostRequests(self, request, *args, **kwargs):
     object = self.get_object()
     print(type(object))
 
@@ -363,9 +373,11 @@ def ratingListPostRequests(self, request, *args, **kwargs):
             elif isinstance(object, WebSeries):
                 r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=object.id).first()
 
+
             # If Updating a Rating
             if r is not None:
                 r.rating = newRating
+                r.dateTime = datetime.datetime.now()
                 r.save()
             # If Creating a New Rating
             else:
@@ -378,7 +390,7 @@ def ratingListPostRequests(self, request, *args, **kwargs):
                 elif isinstance(object, Book):
                     rating = BookRating(user=self.request.user, book=object, rating=newRating)
                 elif isinstance(object, WebSeries):
-                    rating = WebSeries(user=self.request.user, webSeries=object, rating=newRating)
+                    rating = WebSeriesRating(user=self.request.user, webSeries=object, rating=newRating)
                 rating.save()
 
         #POST Request: Review
@@ -398,8 +410,8 @@ def ratingListPostRequests(self, request, *args, **kwargs):
                 r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=object.id).first()
 
             r.review = newReview
+            r.dateTime = datetime.datetime.now()
             r.save()
-
 
     return super(FilmDetailView, self).post(request, *args, **kwargs)
 
@@ -441,7 +453,7 @@ def csvUpload(request):
 
 def topRatedUnseen(user):
     userFilmRatings = FilmRating.objects.filter(user=user)
-    topRated = calculateHighestRated(1000, True)
+    topRated = calculateHighestRated(type=Film, minRatings=30, quantity=1000, reverse=True)
     seen = []
     unseen = []
     for rating in userFilmRatings:
@@ -617,21 +629,17 @@ def home(request):
 
     context = {
         'upcoming':getUpcomingTitles(f=True, tv=True, vg=True, b=True, ws=True),
-        'tv':Television.objects.all()[:30],
         'longestRunningTV':Television.objects.all().order_by('-episodes')[:16],
-        'games':VideoGame.objects.all().order_by('-id')[:100],
-        #'books':Book.objects.all()[:30],
-        #'webseries':WebSeries.objects.all()[:30],
+        'books':Book.objects.all()[:30],
+        'webseries':WebSeries.objects.all()[:30],
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
-        'highestRatedFilms':calculateHighestRated(16, True),
+        'highestRatedFilms':calculateHighestRated(type=Film, minRatings=30, quantity=16, reverse=True),
         'topGrossing':calculateTopGrossing(16),
     }
 
     if request.user.is_authenticated:
         feed, following = getFeed(request.user, 16)
         context['feed'] = feed
-
-    #addFilmRatings()
 
     return render(request, 'media/home.html', context)
 
@@ -849,7 +857,7 @@ def searchResults(request):
 
     #addVideoGameData()
     noposters=[]
-    for vg in VideoGame.objects.all():
+    for vg in Film.objects.all():
         if bool(vg.poster) == False:
             noposters.append(vg.id)
     print(noposters)
@@ -957,7 +965,8 @@ def gameHome(request):
             genres.append(genre)
 
     context = {
-        'games': VideoGame.objects.all(),
+        'topRated':calculateHighestRated(type=VideoGame, minRatings=1, quantity=12, reverse=True),
+        'upcoming':getUpcomingTitles(f=False, tv=False, vg=True, b=False, ws=False),
         'consoles': Console.objects.all().order_by('-release'),
         'franchises':VideoGameFranchise.objects.all()[:30],
         'genres': genres,
@@ -1101,7 +1110,7 @@ def topGrossing(request):
 
 def topRated(request):
     context = {
-        'topRated':calculateHighestRated(100, True),
+        'topRated':calculateHighestRated(type=Film, minRatings=30, quantity=100, reverse=True)
     }
     return render(request, 'media/topRated.html', context)
 
@@ -1385,7 +1394,7 @@ class FilmDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(FilmDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1469,7 +1478,7 @@ class TVDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(TVDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1506,6 +1515,8 @@ class TVDetailView(generic.UpdateView):
                 if r is not None:
                     context['userRating'] = r.rating
                     context['userRatingText'] = r.rating / 2
+                    if r.review is not None:
+                        context['review'] = r.review
 
         if self.request.user.is_authenticated:
             context['inList'] = False
@@ -1541,7 +1552,7 @@ class VideoGameDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(VideoGameDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1580,6 +1591,8 @@ class VideoGameDetailView(generic.UpdateView):
                 if r is not None:
                     context['userRating'] = r.rating
                     context['userRatingText'] = r.rating / 2
+                    if r.review is not None:
+                        context['review'] = r.review
 
         if self.request.user.is_authenticated:
             context['inList'] = False
@@ -1598,7 +1611,7 @@ class VideoGameCrewDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(VideoGameCrewDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1629,7 +1642,7 @@ class BookDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(BookDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1679,7 +1692,7 @@ class WebSeriesDetailView(generic.UpdateView):
     fields = []
 
     def post(self, request, *args, **kwargs):
-        ratingListPostRequests(self, request, *args, **kwargs)
+        mediaPagePostRequests(self, request, *args, **kwargs)
         return super(WebSeriesDetailView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1717,6 +1730,8 @@ class WebSeriesDetailView(generic.UpdateView):
                 if r is not None:
                     context['userRating'] = r.rating
                     context['userRatingText'] = r.rating / 2
+                    if r.review is not None:
+                        context['review'] = r.review
 
         if self.request.user.is_authenticated:
             context['inList'] = False

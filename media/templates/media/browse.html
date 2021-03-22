@@ -21,7 +21,7 @@
                     {% if field.label == "Title" %}
                         <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
                     {% elif field.label == "Rating" %}
-                        <div class="form-group col-md-2 col-lg-2" style="max-width: 100px">
+                        <div class="form-group col-md-2 col-lg-2" style="max-width: 125px">
                             <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
                                 {% for choice in field %}
                                     {{ choice }}

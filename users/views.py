@@ -16,6 +16,7 @@ from users.models import *
 from django import http
 from django.http import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
 
 def register(request):
     if request.method == 'POST':
@@ -34,18 +35,6 @@ def register(request):
 
     return render(request, 'users/register.html', context)
 
-"""
-def loginPage(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('')
-    return render(request, 'users/login.html')
-"""
 @login_required
 def userProfile(request):
     if request.POST:
@@ -138,9 +127,9 @@ class memberProfile(generic.UpdateView):
         webSeriesRatings = WebSeriesRating.objects.filter(user=self.object.id)
         context['wsCount'] = webSeriesRatings.count()
         ratings = sorted(list(chain(filmRatings, televisionRatings, videoGameRatings, bookRatings, webSeriesRatings)), key=attrgetter('dateTime'), reverse=True)
-        context['ratings'] = ratings[:8]
+        context['ratings'] = ratings[:12]
 
-        profileSections = ProfileSection.objects.filter(profile__user=self.object.id)
+        profileSections = ProfileSection.objects.filter(profile__user=self.object.id).order_by('order')
         context['profileSections'] = profileSections
 
         if profileSections != None:
@@ -175,7 +164,6 @@ class memberProfile(generic.UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print("got here15")
         object = self.get_object()
 
         #Following the user
@@ -185,9 +173,21 @@ class memberProfile(generic.UpdateView):
 
         #Unfollowing the user
         elif request.POST.get('toggle') == "remove":
-            print("trying to remove")
+            print("Unfollowing User")
             f = UserFollows.objects.filter(userA=request.user, userB=object)
             f.delete()
+
+        #Reordering the Profile Sections
+        elif request.POST.get('changing') == 'confirm':
+            print("Changing Profile Sections")
+            entries = QueryDict(request.POST.get('content'))
+            print(entries)
+            for index, entry_id in enumerate(entries.getlist('section[]')):
+                entry = ProfileSection.objects.get(id=entry_id)
+                entry.order = index
+                entry.save()
+            return http.HttpResponseRedirect('/user/' + object.username)
+
         #Creating new profile section
         else:
             newSectionName = request.POST.get('name')
@@ -249,6 +249,7 @@ class profileSection(generic.UpdateView):
             newName = request.POST.get('newName')
             object.sectionName = newName
             object.save()
+            return http.HttpResponseRedirect('/profile-section/' + object.slug)
 
         elif request.POST.get('addMedia') != None:
             print("adding media attempt")
@@ -296,6 +297,7 @@ class profileSection(generic.UpdateView):
                         sectionLength += 1
                 newMap = ProfileSectionWebSeriesMapping(webSeries=getWS, profileSection=object, orderInSection=sectionLength + 1)
                 newMap.save()
+            return http.HttpResponseRedirect('/profile-section/' + object.slug)
 
         elif request.POST.get('removeMedia') != None:
             print("removing media attempt")
@@ -320,6 +322,7 @@ class profileSection(generic.UpdateView):
                 getWS = WebSeries.objects.filter(slug=get[2:])[0]
                 getMap = ProfileSectionWebSeriesMapping.objects.filter(profileSection=object, webSeries=getWS)[0]
                 getMap.delete()
+            return http.HttpResponseRedirect('/profile-section/' + object.slug)
 
         elif request.POST.get('changing') == 'confirm':
             print("change found")
@@ -338,14 +341,14 @@ class profileSection(generic.UpdateView):
                     entry = ProfileSectionWebSeriesMapping.objects.get(id=entry_id)
                 entry.orderInSection = index
                 entry.save()
+            return http.HttpResponseRedirect('/profile-section/' + object.slug)
 
         elif request.POST.get('delete') == 'confirm':
             print("delete found")
             thisSection = ProfileSection.objects.filter(id=object.id)
             thisSection.delete()
-            return render('/user/' + username)
-
-        return http.HttpResponseRedirect('/profile-section/' + object.slug)
+            url = "/user/"+username
+            return redirect(url)
 
 def getFeed(user, limit):
     following = UserFollows.objects.filter(userA=user)

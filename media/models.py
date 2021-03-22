@@ -88,19 +88,19 @@ class CompanyRole(models.Model):
         verbose_name = "Company - Role Type"
         verbose_name_plural = "Companies - Role Types"
 
-#---Media Types--------------------------------------------------------------------------------------------------------#
+#---Media Type: Film---------------------------------------------------------#
 class Film(models.Model):
-    title = models.CharField(max_length=500, default='NoFilmTitleSpecified')
+    title = models.CharField(max_length=150, default='NoFilmTitleSpecified')
     release = models.DateField(default=timezone.now)
-    rating = models.CharField(max_length=10, blank=True)
-    synopsis = models.CharField(max_length=500, default='', blank=True)
     length = models.IntegerField(null=True, blank=True)
+    rating = models.CharField(max_length=10, blank=True)
+    synopsis = models.CharField(max_length=500, blank=True)
     budget = models.IntegerField(null=True, blank=True)
     boxOffice = models.IntegerField(null=True, blank=True)
-    trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    poster = models.ImageField(default='MissingIcon.png', upload_to='posters', blank=True)
-    cover = models.ImageField(default='', upload_to='coverImages', blank=True)
-    slug = models.SlugField(max_length=150, blank=True, editable=True)
+    poster = models.ImageField(upload_to='posters', blank=True)
+    cover = models.ImageField(upload_to='coverImages', blank=True)
+    trailerVideoPath = models.CharField(max_length=500, blank=True)
+    slug = models.SlugField(max_length=150, editable=True)
 
     def save(self, *args, **kwargs):
         super().save()
@@ -260,7 +260,7 @@ class WebSeries(models.Model):
         verbose_name = "Web Series"
         verbose_name_plural = "Web Series"
 
-#---Genre Mappings-------------------------------------------------------------------------------------------------------#
+#---Genre Mappings-------------------------------------------------------#
 class Genre(models.Model):
     title = models.CharField(max_length=500, default='NoGenreSpecified')
     image = models.ImageField(blank=True, default='', upload_to='icons')
@@ -400,7 +400,7 @@ class WebSeriesCompanyMapping(models.Model):
         verbose_name_plural = "Web Series - Company Mappings"
 
 
-#---Person Mappings----------------------------------------------------------------------------------------------------#
+#---Film-Person Mappings-------------------------------------------------------#
 class FilmPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     film = models.ForeignKey(Film, on_delete=models.PROTECT)

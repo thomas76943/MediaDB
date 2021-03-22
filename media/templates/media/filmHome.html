@@ -71,17 +71,16 @@
     </div>
 
     <script>
-    $('#c1').carousel({
-      interval: 30000,
-      cycle: true
-    });
+        $('#c1').carousel({
+          interval: 30000,
+          cycle: true
+        });
     </script>
+
     <br>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-1">Browse by Franchise
-            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
-        </h5>
+        <h5 class="font-weight-bold border-bottom mb-1">Browse by Franchise<a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
          <div class="scroller">
             <ul class="hs full">
                 {% for franchise in franchises %}
@@ -108,9 +107,7 @@
     </style>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre
-            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a>
-        </h5>
+        <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre</h5>
          <div class="scroller">
             <ul class="hs full">
                 {% for genre in genres %}

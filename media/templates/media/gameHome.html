@@ -1,54 +1,123 @@
 {% extends "media/base.html" %}
+{% block title %}Video Games{% endblock %}
 {% block content %}
+
 
     <div class="container infoSection">
         <h2 style="padding-top: 7px;">Video Games - Home</h2>
     </div>
 
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Browse by Franchise<a style="float:right;" href="{% url 'media-videogamefranchise-home' %}">See All</a></h5>
-        <div class="scroller">
+    <!--Carousel-->
+    <div id="c1" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#c1" data-slide-to="0" class="active"></li>
+          <li data-target="#c1" data-slide-to="1"></li>
+          <li data-target="#c1" data-slide-to="2"></li>
+          <li data-target="#c1" data-slide-to="3"></li>
+          <li data-target="#c1" data-slide-to="4"></li>
+          <li data-target="#c1" data-slide-to="5"></li>
+          <li data-target="#c1" data-slide-to="6"></li>
+
+        </ul>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+
+          <div class="carousel-item active">
+              <a href="/video-game-franchises/doom">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/doom-eternal-banner.jpg)">
+              </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/video-game-franchises/super-smash-bros">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/smash-ultimate-banner.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+              <a href="/video-games/the-legend-of-zelda-breath-of-the-wild-2017-03-03">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/botw-banner-3.jpg)">
+              </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/video-games/god-of-war-2018-04-20">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/gow-banner.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/video-game-franchises/street-fighter">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/street-fighter-banner.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/video-games/mario-kart-8-deluxe-2017-04-28">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/mk8-banner-2.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/video-game-franchises/sonic-the-hedgehog">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/sonic-mania-banner-2.png)">
+            </a>
+          </div>
+
+        </div>
+
+        <!-- LR controls -->
+        <a class="carousel-control-prev" href="#c1" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#c1" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+    </div>
+
+    <script>
+        $('#c1').carousel({
+          interval: 30000,
+          cycle: true
+        });
+    </script>
+
+    <br>
+
+    <!-- Top Rated Video Games -->
+    <div class="container infoSection fullScroll">
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Video Games</h5>
+        <div class="scroller" >
             <ul class="hs full">
-                {% for franchise in franchises %}
-                    <a href="/video-game-franchises/{{ franchise.slug }}">
-                    <img class="item box white" style="padding:10px" src="{{franchise.image.url}}" alt="{{franchise.title}}">
-                    </a>
+                {% for videoGame, rating in topRated.items %}
+                    <div class="bottomOverlay">
+                        <a href="/video-games/{{ videoGame.slug }}">
+                            <img class="item posterSmall" src="{{videoGame.poster.url}}" alt="{{videoGame.title}}">
+                            <div class="content">
+                                <h6 class="font-weight-bold" >
+                                    <div class="below" style="display: inline-block" id="{{ videoGame.slug }}"></div>
+                                    <div style="display: inline-block">{{ rating }}</div>
+                                    <script>
+                                        $('#{{videoGame.slug}}').rateYo({
+                                            rating:'{% widthratio rating 1 2 %}',
+                                            starWidth:'15px', numStars:5, minValue:0, maxValue:10,
+                                            normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                                        })
+                                    </script>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">Browse by Console</h5>
-        <div class="scroller">
-            <ul class="hs full">
-                {% for console in consoles %}
-                    <a href="/console/{{ console.slug }}">
-                        <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
-                        <div class="lowerLabel">
-                            <h7 class="font-weight-bold ">{{ console.shortName }}</h7>
-                        </div>
-                    </a>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <style>
-        .item.box.genre {
-            padding: 40px;
-        }
-        @media screen and (max-width: 675px) {
-             .item.box.genre {
-                padding: 20px;
-            }
-            .lowerLabel {
-                display: none;
-            }
-        }
-    </style>
-
-    <div class="container infoSection">
+    <!-- Browse Video Games by Genre -->
+    <div class="container infoSection leftScroll">
         <h5 class="font-weight-bold border-bottom mb-0">Browse by Genre</h5>
         <div class="scroller">
             <ul class="hs full">
@@ -64,7 +133,39 @@
         </div>
     </div>
 
-    <div class="container infoSection">
+    <!-- Browse Video Games by Console -->
+    <div class="container infoSection rightScroll">
+        <h5 class="font-weight-bold border-bottom mb-0">Browse by Console</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for console in consoles %}
+                    <a href="/console/{{ console.slug }}">
+                        <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
+                        <div class="lowerLabel">
+                            <h7 class="font-weight-bold ">{{ console.shortName }}</h7>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Browse Video Games by Franchise -->
+    <div class="container infoSection leftScroll">
+        <h5 class="font-weight-bold border-bottom mb-0">Browse by Franchise<a style="float:right;" href="{% url 'media-videogamefranchise-home' %}">See All</a></h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for franchise in franchises %}
+                    <a href="/video-game-franchises/{{ franchise.slug }}">
+                    <img class="item box white" style="padding:10px" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Browse Video Games by Company -->
+    <div class="container infoSection rightScroll">
         <h5 class="font-weight-bold border-bottom mb-0">Browse by Company</h5>
         <div class="scroller">
             <ul class="hs full">
@@ -76,5 +177,28 @@
             </ul>
         </div>
     </div>
+
+    <!-- Top Rated Video Games -->
+    <div class="container infoSection" style="float:left;">
+        <h5 class="font-weight-bold border-bottom mb-0">Upcoming Video Games</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for entry in upcoming %}
+                    <div class="bottomOverlay">
+                        <a class="item" href="/video-games/{{ entry.slug }}">
+                        <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                        </a>
+                        <div class="content">
+                            <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
+                        </div>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <br>
+
+
 
 {% endblock %}

@@ -70,6 +70,21 @@
                         <div class="container ratingBox">
                             <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
                         </div>
+
+                        <div id="reviewButtonContainer">
+                            {% if userRating %}
+                                <div class="container ratingBox">
+                                    <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
+                                        {% if review %}
+                                            Edit Review
+                                        {% else %}
+                                            Write Review
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+
                     {% endif %}
                 </div>
             </div>
@@ -180,5 +195,32 @@
             </div>
         </div>
     {% endif %}
+
+    <!-- Review Modal Contents -->
+    <div id="writeReviewModal" class="modal">
+        <div class="modal-content">
+        <div class="container profileSection inModal">
+            {% if review %}
+            <h5 class="font-weight-bold border-bottom mb-0">Edit Review: {{ television.title }}</h5>
+            {% else %}
+            <h5 class="font-weight-bold border-bottom mb-0">Write Review: {{ television.title }}</h5>
+            {% endif %}
+            <br>
+            <form id="writeReview">
+                {%  csrf_token %}
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="reviewTextArea">Review:</label>
+                  <textarea class="form-control" id="reviewTextArea" rows="8" style="color: white">{% if review %}{{ review }}{% endif %}</textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <input type="submit" id="submitReview" class="btn btn-primary btn-raised" {% if review %} value="Save Changes" {% else %} value="Post Review"{% endif %}>
+                    <span class="close btn btn-default" style="color: white">X</span>
+                </div>
+            </form>
+        </div>
+      </div>
+
+    </div>
 
 {% endblock %}

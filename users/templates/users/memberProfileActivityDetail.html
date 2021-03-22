@@ -4,17 +4,10 @@
 
     <div class="container profileSection">
         <div class="media">
-            <img class="item additionalImage" alt="profilePicture" src=
-            {% if memberProfile.profile.image %}
-                {{ memberProfile.profile.image.url }}
-             {% else %}
-                https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png
-            {% endif %}>
-
+            <img class="item additionalImage" alt="profilePicture" src={% if memberProfile.profile.image %}{{ memberProfile.profile.image.url }}{% else %}https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png{% endif %}>
             <div class="media-body" style="padding-left:15px">
                 <h2 class="account-heading">{{memberProfile.username}}</h2>
-                <p class="text-secondary">{{ memberProfile.email }}</p>
-                <p>{{ memberProfile.profile.bio }}</p>
+                <p class="text-secondary">{{ memberProfile.profile.bio }}</p>
             </div>
         </div>
     </div>
@@ -147,7 +140,7 @@
 
         <div class="container profileSection">
             <h5 class="font-weight-bold border-bottom mb-0">Activity</h5>
-                {% for rating in ratings %}
+            {% for rating in ratings %}
                 <br>
                 {%  if rating.film != NULL %}
                     <div class="media">
@@ -159,7 +152,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/films/{{ rating.film.slug }}">{{ rating.film.title }} ({{ rating.film.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -181,7 +174,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/tv/{{ rating.television.slug }}">{{ rating.television.title }} ({{ rating.television.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -203,7 +196,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/video-games/{{ rating.videoGame.slug }}">{{ rating.videoGame.title }} ({{ rating.videoGame.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -225,7 +218,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/books/{{ rating.book.slug }}">{{ rating.book.title }} ({{ rating.book.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -247,7 +240,9 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/web-series/{{ rating.webSeries.slug }}">{{ rating.webSeries.title }} ({{ rating.webSeries.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    {% with rating.webSeries.slug as unique %}
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                    {% endwith %}
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -258,24 +253,17 @@
                         </div>
                     </div>
                 {% endif %}
-        <br><hr>
+                <br><hr>
 
-        <script>
-            $('#{{ rating.id }}-{{ rating.user.username }}').rateYo({
-                rating:'{{ rating.rating }}',
-                starWidth:'20px',
-                numStars:5,
-                minValue:0,
-                maxValue:10,
-                normalFill:'gray',
-                ratedFill:'orange',
-                halfStar:true,
-                readOnly:true,
-            })
-        </script>
+                <script>
+                    $('#{{ forloop.counter }}').rateYo({
+                        rating:'{{ rating.rating }}',
+                        starWidth:'20px', numStars:5, minValue:0, maxValue:10,
+                        normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                    })
+                </script>
 
-        {% endfor %}
-
+            {% endfor %}
         </div>
     {% endif %}
 

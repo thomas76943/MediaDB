@@ -39,6 +39,7 @@ class ProfileSection(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     sectionName = models.CharField(max_length=20, default='Profile Section')
     type = models.CharField(max_length=11, default='Films')
+    order = models.IntegerField(default=1)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
     def save(self, *args, **kwargs):
