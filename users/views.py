@@ -224,19 +224,19 @@ class profileSection(generic.UpdateView):
         entries = []
         if self.object.type == 'Films':
             entries = ProfileSectionFilmMapping.objects.filter(profileSection=self.object.id)
-            context['media'] = json.dumps(list(Film.objects.values('title', 'slug')[:300]))
+            context['media'] = json.dumps(list(Film.objects.values('title', 'slug')[:500]))
         elif self.object.type == 'Television':
             entries =  ProfileSectionTelevisionMapping.objects.filter(profileSection=self.object.id)
-            context['media'] = json.dumps(list(Television.objects.values('title', 'slug')[:300]))
+            context['media'] = json.dumps(list(Television.objects.values('title', 'slug')[:500]))
         elif self.object.type == 'Video Games':
             entries = ProfileSectionVideoGameMapping.objects.filter(profileSection=self.object.id)
-            context['media'] = json.dumps(list(VideoGame.objects.values('title', 'slug')[:300]))
+            context['media'] = json.dumps(list(VideoGame.objects.values('title', 'slug')[:500]))
         elif self.object.type == 'Books':
             entries = ProfileSectionBookMapping.objects.filter(profileSection=self.object.id)
-            context['media'] = json.dumps(list(Book.objects.values('title', 'slug')[:300]))
+            context['media'] = json.dumps(list(Book.objects.values('title', 'slug')[:500]))
         elif self.object.type == 'Web Series':
             entries = ProfileSectionWebSeriesMapping.objects.filter(profileSection=self.object.id)
-            context['media'] = json.dumps(list(WebSeries.objects.values('title', 'slug')[:300]))
+            context['media'] = json.dumps(list(WebSeries.objects.values('title', 'slug')[:500]))
         context['entries'] = sorted(list(entries), key=attrgetter('orderInSection'))
         return context
 
@@ -366,6 +366,22 @@ def getFeed(user, limit):
 
     feed = sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
     return feed, following
+
+
+def getAllActivity(user, limit):
+    f = []
+    for account in User.objects.all():
+        if user != account:
+            accountFilms = FilmRating.objects.filter(user=account)
+            accountTV = TelevisionRating.objects.filter(user=account)
+            accountVG = VideoGameRating.objects.filter(user=account)
+            accountBooks = BookRating.objects.filter(user=account)
+            accountWeb = WebSeriesRating.objects.filter(user=account)
+            accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
+            for ar in accountRatings:
+                f.append(ar)
+    return sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
+
 
 def activityFeed(request):
     context = {}

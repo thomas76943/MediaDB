@@ -1,17 +1,16 @@
 from django import template
 register = template.Library()
 
-#Access contents of dynamically-created variables that would otherwise not be able to be referenced
+#Access contents of dynamically-created variables
 @register.simple_tag(takes_context=True)
 def dynamicVariableValue(context, DynamicVariableName):
-    """ Returns value of DynamicVariableName into the context """
+    #Returns value of DynamicVariableName into the context
     return context.get(DynamicVariableName, None)
 
 #Access the media type of an instance in a combined queryset of all media types
 @register.filter
 def classname(obj):
     return obj.__class__.__name__
-
 
 #Separating URL parameters and reassembling relative to the current page
 #eg: page=2 and title="her" allowing both filtering and pagination

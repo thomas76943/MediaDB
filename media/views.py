@@ -16,7 +16,7 @@ from django.views import generic
 from django.db.models import Q
 from .models import *
 from users.models import *
-from users.views import getFeed
+from users.views import getFeed, getAllActivity
 
 from .forms import *
 from django.db.models import Count
@@ -270,20 +270,27 @@ def addFilmRatings():
         r = FilmRating(film=thisFilm, user=currentUser, rating=ratingScore)
         r.save()
 
-def calculateHighestRated(type, minRatings, quantity, reverse):
-    media = type.objects.all()
+                        #eg   Film     HighestRatedFilms   50       100       True
+
+def recalculateHighestRated(mediaType, highestRatingType, minRatings, quantity, reverse):
+
+    top = highestRatingType.objects.all()
+    for t in top:
+        t.delete()
+
+    media = mediaType.objects.all()
     ratingsDict = {}
 
     for m in media:
-        if type == Film:
+        if mediaType == Film:
             ratings = FilmRating.objects.filter(film=m)
-        elif type == Television:
+        elif mediaType == Television:
             ratings = TelevisionRating.objects.filter(television=m)
-        elif type == VideoGame:
+        elif mediaType == VideoGame:
             ratings = VideoGameRating.objects.filter(videoGame=m)
-        elif type == Book:
+        elif mediaType == Book:
             ratings = BookRating.objects.filter(book=m)
-        elif type == WebSeries:
+        elif mediaType == WebSeries:
             ratings = WebSeriesRating.objects.filter(webSeries=m)
 
         ratingsCount = ratings.count()
@@ -297,8 +304,24 @@ def calculateHighestRated(type, minRatings, quantity, reverse):
 
     #Anonymous function takes x and returns float(x[1]) (ie: the score as a float), used in the key parameter to sort dict
     sortedRatings = dict(sorted(ratingsDict.items(), key=lambda x: float(x[1]), reverse=reverse))
+
     highestRated = dict(itertools.islice(sortedRatings.items(), quantity))
-    return highestRated
+
+    count=1
+    for hr in highestRated:
+        highestRatingType(media=hr, rating=highestRated[hr], rank=count).save()
+        count += 1
+
+def getHighestRated(type, quantity):
+    if type == Film:
+        return HighestRatedFilms.objects.all().order_by('rank')[:quantity]
+    if type == Television:
+        return HighestRatedTelevision.objects.all().order_by('rank')[:quantity]
+    if type == VideoGame:
+        return HighestRatedVideoGames.objects.all().order_by('rank')[:quantity]
+    if type == Book:
+        return HighestRatedBooks.objects.all().order_by('rank')[:quantity]
+    return HighestRatedWebSeries.objects.all().order_by('rank')[:quantity]
 
 def calculateTopGrossing(quantity):
     topGrossing = Film.objects.all().order_by('-boxOffice')[:quantity]
@@ -361,7 +384,9 @@ def mediaPagePostRequests(self, request, *args, **kwargs):
 
         #POST Request: Adding/Changing a Rating
         elif request.POST['type'] == "rating":
-            newRating = float(request.POST['nr']) * 2
+
+            #Attempt to retrieve a rating made by that user for that
+            newRating = float(request.POST['nr'])
             if isinstance(object, Film):
                 r = FilmRating.objects.filter(user=self.request.user, film=object.id).first()
             elif isinstance(object, Television):
@@ -372,7 +397,6 @@ def mediaPagePostRequests(self, request, *args, **kwargs):
                 r = BookRating.objects.filter(user=self.request.user, book=object.id).first()
             elif isinstance(object, WebSeries):
                 r = WebSeriesRating.objects.filter(user=self.request.user, webSeries=object.id).first()
-
 
             # If Updating a Rating
             if r is not None:
@@ -395,7 +419,6 @@ def mediaPagePostRequests(self, request, *args, **kwargs):
 
         #POST Request: Review
         else:
-            print("doing a review")
             newReview = request.POST['newReview']
             print(newReview)
             if isinstance(object, Film):
@@ -453,14 +476,14 @@ def csvUpload(request):
 
 def topRatedUnseen(user):
     userFilmRatings = FilmRating.objects.filter(user=user)
-    topRated = calculateHighestRated(type=Film, minRatings=30, quantity=1000, reverse=True)
+    topRated = getHighestRated(Film, 250)
     seen = []
     unseen = []
     for rating in userFilmRatings:
         seen.append(rating.film)
-    for film in topRated:
-        if film not in seen:
-            unseen.append(film)
+    for tr in topRated:
+        if tr.media not in seen:
+            unseen.append(tr)
     return unseen[:500]
 
 def actorScores(user):
@@ -526,19 +549,19 @@ def genreScores(user):
 
 def genreBasedRecommender(user):
     genresScores = genreScores(user)
-    unseen = topRatedUnseen(user)
+    trUnseen = topRatedUnseen(user)
     filmScores = {}
 
-    for film in unseen:
+    for unseen in trUnseen:
         score = 0
-        filmGenres = FilmGenreMapping.objects.filter(film=film)
+        filmGenres = FilmGenreMapping.objects.filter(film=unseen.media)
         for genre in filmGenres:
             if genre.genre.title in genresScores:
                 score += genresScores[genre.genre.title]
         if filmGenres.count() > 1:
             score = score / filmGenres.count()
         score = score/2
-        filmScores[film] = "{:.1f}".format(score)
+        filmScores[unseen.media] = "{:.1f}".format(score)
 
     #Sort films by highest genre score
     sort = dict(sorted(filmScores.items(), key=lambda item: item[1], reverse=True))
@@ -554,12 +577,12 @@ def genreBasedRecommender(user):
 
 def actorBasedRecommender(user):
     actorsScores = actorScores(user)
-    unseen = topRatedUnseen(user)
+    trUnseen = topRatedUnseen(user)
     filmScores = {}
 
-    for film in unseen:
+    for unseen in trUnseen:
         score = 0
-        filmPeople = FilmPersonMapping.objects.filter(film=film)
+        filmPeople = FilmPersonMapping.objects.filter(film=unseen.media)
         filmActors = filmPeople.filter(role=1)
 
         for actor in filmActors:
@@ -568,7 +591,7 @@ def actorBasedRecommender(user):
         if filmActors.count() > 1:
             score = score / filmActors.count()
         score = score / 2
-        filmScores[film] = "{:.1f}".format(score)
+        filmScores[unseen.media] = "{:.1f}".format(score)
 
     # Sort films by highest genre score
     sort = dict(sorted(filmScores.items(), key=lambda item: item[1], reverse=True))
@@ -633,13 +656,16 @@ def home(request):
         'books':Book.objects.all()[:30],
         'webseries':WebSeries.objects.all()[:30],
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
-        'highestRatedFilms':calculateHighestRated(type=Film, minRatings=30, quantity=16, reverse=True),
+        'highestRatedFilms':getHighestRated(Film, 30),
         'topGrossing':calculateTopGrossing(16),
     }
 
-    if request.user.is_authenticated:
-        feed, following = getFeed(request.user, 16)
+    feed, following = getFeed(request.user, 16)
+    if following.count() < 1 or not request.user.is_authenticated:
+        context['feed'] = getAllActivity(request.user, 16)
+    else:
         context['feed'] = feed
+        context['personal'] = True
 
     return render(request, 'media/home.html', context)
 
@@ -675,7 +701,7 @@ def calendar(request):
 def addVideoGameData():
     badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
 
-    with open("D:\MediaDB Datasets\gamesDataCopy.json", "r", encoding="utf8") as f:
+    with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
         data = json.loads(f.read())
 
     for franchise in data:
@@ -824,43 +850,31 @@ def addVideoGameData():
 
         print("\n")
 
-def removeDupes(modelType):
-    counts = {}
-    maps = modelType.objects.all()
-    for map in maps:
-        slug = map.videoGame.title+map.company.name
-        if slug in counts.keys():
-            counts[slug] += 1
-        else:
-            counts[slug] = 1
-
-    dupes = []
-    for map in maps:
-        slug = map.videoGame.title+map.company.name
-        if counts[slug] > 1:
-            dupes.append(slug + " - " + str(map.id))
-
-    for dupe in dupes:
-        print(dupe)
-
-    #everyother = 1
-    #for dupe in dupes:
-    #    getobj = modelType.objects.filter(id=dupe)[0]
-    #    if everyother % 2 == 0:
-    #        getobj.delete()
-    #    everyother += 1
-
 def searchResults(request):
 
-    ###DONT USE THIS###
-    #removeDupes(VideoGameCompanyMapping)
-
     #addVideoGameData()
-    noposters=[]
-    for vg in Film.objects.all():
-        if bool(vg.poster) == False:
-            noposters.append(vg.id)
-    print(noposters)
+
+    #recalculateHighestRated(VideoGame, HighestRatedVideoGames, minRatings=1, quantity=50, reverse=True)
+
+    #h = getHighestRated(Television, 50)
+    #for f in h:
+    #    print(str(f.rank) + " - " + f.media.title + " - " + str(f.rating))
+
+    #noposters=[]
+    #for vg in Film.objects.all():
+    #    if bool(vg.poster) == False:
+    #        noposters.append(vg.id)
+    #print(noposters)
+
+    #subcat = VideoGameFranchiseSubcategory.objects.get(pk=145)
+    #subcat2 = VideoGameFranchiseSubcategory.objects.get(pk=143)
+    #subcat3 = VideoGameFranchiseSubcategory.objects.get(pk=144)
+
+    #for g in VideoGame.objects.filter(release__range=["2000-01-01", "2020-12-25"]).order_by('release'):
+    #    if 'donkey kong' in g.title.lower():
+    #        if 'country' not in g.title.lower():
+    #            VideoGameVideoGameFranchiseSubcategoryMapping(videoGame=g, videoGameFranchiseSubcategory=subcat, orderInFranchise=1).save()
+
 
     title_contains = request.GET.get('q')
 
@@ -873,17 +887,16 @@ def searchResults(request):
 
         context = {
             'searchQuery':title_contains,
-            #'people':Person.objects.all().filter(Q(firstName__icontains=title_contains) | Q(surname__icontains=title_contains)).order_by('surname'),
             'people':people,
-            'franchises': Franchise.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'videogamefranchises': VideoGameFranchise.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'consoles' : Console.objects.all().filter(Q(name__icontains=title_contains) | Q(shortName__icontains=title_contains)).order_by('name'),
-            'films':Film.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'tv':Television.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'games':VideoGame.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'books':Book.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'webseries':WebSeries.objects.all().filter(title__icontains=title_contains).order_by('title'),
-            'companies': Company.objects.all().filter(name__icontains=title_contains).order_by('name'),
+            'franchises': Franchise.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'videogamefranchises': VideoGameFranchise.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'consoles' : Console.objects.all().filter(Q(name__icontains=title_contains) | Q(shortName__icontains=title_contains)).order_by('name')[:20],
+            'films':Film.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'tv':Television.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'games':VideoGame.objects.all().filter(title__icontains=title_contains).order_by('id')[:75],
+            'books':Book.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'webseries':WebSeries.objects.all().filter(title__icontains=title_contains).order_by('id')[:20],
+            'companies': Company.objects.all().filter(name__icontains=title_contains).order_by('id')[:20],
         }
     return render(request, 'media/searchResults.html', context)
 
@@ -927,7 +940,7 @@ def filmHome(request):
             genres.append(genre)
 
     context = {
-        'films': Film.objects.all(),
+        'highestRatedFilms': getHighestRated(Film, 100),
         'franchises':Franchise.objects.all(),
         'genres':genres,
         'seventies':Film.objects.all().filter(release__range=["1970-01-01", "1979-12-25"])[:30],
@@ -938,6 +951,7 @@ def filmHome(request):
 
 def tvHome(request):
     context = {
+        'highestRatedShows':getHighestRated(Television, 100),
         'shows': Television.objects.all(),
         'genres': Genre.objects.all(),
         'nineties': Television.objects.all().filter(release__range=["1990-01-01", "1999-12-25"]),
@@ -964,11 +978,17 @@ def gameHome(request):
         if genre.image:
             genres.append(genre)
 
+    franchises = []
+    others = []
+    for vgf in VideoGameVideoGameFranchiseSubcategoryMapping.objects.all():
+        if vgf.videoGameFranchiseSubcategory.parentFranchise not in franchises:
+            franchises.append(vgf.videoGameFranchiseSubcategory.parentFranchise)
+
     context = {
-        'topRated':calculateHighestRated(type=VideoGame, minRatings=1, quantity=12, reverse=True),
+        'topRated':getHighestRated(VideoGame, 20),
         'upcoming':getUpcomingTitles(f=False, tv=False, vg=True, b=False, ws=False),
         'consoles': Console.objects.all().order_by('-release'),
-        'franchises':VideoGameFranchise.objects.all()[:30],
+        'franchises':franchises,
         'genres': genres,
         'companies': gameCompanies,
     }
@@ -1024,15 +1044,15 @@ def contributeHome(request):
 
 def contributeMedia(request):
 
-    #filmForm = ContributeFilmForm(request.POST or None, initial={
-    #    'title':'', 'release':'', 'rating':'', 'synopsis':'', 'length':'',
-    #    'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    #})
+    filmForm = ContributeFilmForm(request.POST or None, request.FILES or None, initial={
+        'title':'', 'release':'', 'rating':'', 'synopsis':'', 'length':'',
+        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
+    })
 
-    #televisionForm = ContributeTelevisionForm(request.POST or None, initial={
-     #   'title':'', 'release':'', 'synopsis':'', 'seasons':'', 'episodes':'',
-     #   'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    #})
+    televisionForm = ContributeTelevisionForm(request.POST or None, request.FILES or None, initial={
+        'title':'', 'release':'', 'synopsis':'', 'seasons':'', 'episodes':'',
+        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
+    })
 
     forms = [filmForm, televisionForm]
 
@@ -1042,6 +1062,8 @@ def contributeMedia(request):
 
     if request.method == 'POST':
         if filmForm.is_valid():
+            new = filmForm.save(commit=False)
+            new.poster = request.FILES.get('poster')
             filmForm.save()
             messages.success(request, "Successfully added film")
             return http.HttpResponseRedirect('/contribute-media')
@@ -1092,8 +1114,16 @@ def franchiseHome(request):
     return render(request, 'media/franchisesHome.html', context)
 
 def videoGameFranchiseHome(request):
+
+    franchises = []
+    others = []
+    for vgf in VideoGameVideoGameFranchiseSubcategoryMapping.objects.all():
+        if vgf.videoGameFranchiseSubcategory.parentFranchise not in franchises:
+            franchises.append(vgf.videoGameFranchiseSubcategory.parentFranchise)
+
     context = {
-        'franchises': VideoGameFranchise.objects.all()
+        'franchises':franchises,
+        'others':VideoGameFranchise.objects.all()
     }
     return render(request, 'media/gameFranchiseHome.html', context)
 
@@ -1281,7 +1311,9 @@ class CompanyDetailView(generic.DetailView):
         for mapping in gameMappings:
             if mapping.company.id == self.object.id and mapping.videoGame not in games:
                     games.append(mapping.videoGame)
-        context['games'] = games
+        context['oldestGames'] = games[:50]
+        if len(games) > 50:
+            context['newestGames'] = games[-50:]
 
         context['books'] = BookCompanyMapping.objects.filter(company=self.object.id).order_by('book__release')
         context['webseries'] = WebSeriesCompanyMapping.objects.filter(company=self.object.id).order_by('webSeries__release')
@@ -1296,7 +1328,7 @@ class FranchiseDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        #Determine how many subcategories there are
+        #Retrieve all subcategories for this franchise
         subcategories = FranchiseSubcategory.objects.filter(parentFranchise=self.object.id).order_by('subCategoryOrder')
         context['subcategories'] = subcategories
 
@@ -1308,11 +1340,10 @@ class FranchiseDetailView(generic.DetailView):
                 SubCat_B = BookFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
                 SubCat_WS = WebSeriesFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
 
-                #Collect all media for that subcategory
-                completeSubCat = sorted(list(chain(SubCat_F, SubCat_TV, SubCat_VG, SubCat_B, SubCat_WS)), key=attrgetter('orderInFranchise'))
-
+                #Collect and sort all the media for that subcategory based on the 'orderInFranchise' field
+                completeSubCategory = sorted(list(chain(SubCat_F, SubCat_TV, SubCat_VG, SubCat_B, SubCat_WS)), key=attrgetter('orderInFranchise'))
                 #Dynamic context name for the subcategory in the template
-                context[subcategories[x].title] = completeSubCat
+                context[subcategories[x].title] = completeSubCategory
 
         franchiseFilms = FilmFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
         franchiseTelevision = TelevisionFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
@@ -1321,7 +1352,6 @@ class FranchiseDetailView(generic.DetailView):
         franchiseWebSeries = WebSeriesFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id)
 
         completeFranchise = list(chain(franchiseFilms, franchiseTelevision, franchiseVideoGames, franchiseBooks, franchiseWebSeries))
-
 
         franchiseActors = {}
         franchiseProducers = {}
@@ -1453,22 +1483,8 @@ class FilmDetailView(generic.UpdateView):
         return context
 
 
-class FilmCrewDetailView(generic.DetailView):
-    model = Film
+class FilmCrewDetailView(FilmDetailView):
     template_name = 'media/filmCrewDetail.html'
-    slug_field, slug_url_kwarg = "slug", "slug"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['genres'] = FilmGenreMapping.objects.filter(film=self.object.id)
-        context['cast'] = FilmPersonMapping.objects.filter(role=1, film=self.object.id).order_by('billing')
-        context['directors'] = FilmPersonMapping.objects.filter(role=2, film=self.object.id).order_by('billing')
-        context['writers'] = FilmPersonMapping.objects.filter(role=3, film=self.object.id).order_by('billing')
-        context['producers'] = FilmPersonMapping.objects.filter(role=6, film=self.object.id).order_by('billing')
-        context['distributors'] = FilmCompanyMapping.objects.filter(role=1, film=self.object.id)
-        context['productionCompanies'] = FilmCompanyMapping.objects.filter(role=2, film=self.object.id)
-        context['tags'] = FilmTagMapping.objects.filter(film=self.object.id)
-        return context
 
 
 class TVDetailView(generic.UpdateView):
@@ -1528,21 +1544,8 @@ class TVDetailView(generic.UpdateView):
         return context
 
 
-class TVCrewDetailView(generic.DetailView):
-    model = Television
+class TVCrewDetailView(TVDetailView):
     template_name = 'media/tvCrewDetail.html'
-    slug_field, slug_url_kwarg = "slug", "slug"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['genres'] = TelevisionGenreMapping.objects.filter(television=self.object.id).order_by('genre__title')
-        context['cast'] = TelevisionPersonMapping.objects.filter(role=1, television=self.object.id).order_by('billing')
-        context['showrunners'] = TelevisionPersonMapping.objects.filter(role=4, television=self.object.id)
-        context['writers'] = TelevisionPersonMapping.objects.filter(role=3, television=self.object.id)
-        context['producers'] = TelevisionPersonMapping.objects.filter(role=6, television=self.object.id).order_by('billing')
-        context['networks'] = TelevisionCompanyMapping.objects.filter(role=3, television=self.object.id)
-        context['productionCompanies'] = TelevisionCompanyMapping.objects.filter(role=2, television=self.object.id)
-        return context
 
 
 class VideoGameDetailView(generic.UpdateView):
@@ -1604,35 +1607,8 @@ class VideoGameDetailView(generic.UpdateView):
         return context
 
 
-class VideoGameCrewDetailView(generic.UpdateView):
-    model = VideoGame
+class VideoGameCrewDetailView(VideoGameDetailView):
     template_name = 'media/gameCrewDetail.html'
-    slug_field, slug_url_kwarg = "slug", "slug"
-    fields = []
-
-    def post(self, request, *args, **kwargs):
-        mediaPagePostRequests(self, request, *args, **kwargs)
-        return super(VideoGameCrewDetailView, self).post(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['genres'] = VideoGameGenreMapping.objects.filter(videoGame=self.object.id)
-        context['consoles'] = VideoGameConsoleMapping.objects.filter(videoGame=self.object.id).order_by('console__name')
-        context['developers'] = VideoGameCompanyMapping.objects.filter(role=4, videoGame=self.object.id)
-        context['publishers'] = VideoGameCompanyMapping.objects.filter(role=5, videoGame=self.object.id)
-        context['actors'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id)
-        context['directors'] = VideoGamePersonMapping.objects.filter(role=2, videogame=self.object.id)
-        context['writers'] = VideoGamePersonMapping.objects.filter(role=3, videogame=self.object.id)
-        context['producers'] = VideoGamePersonMapping.objects.filter(role=6, videogame=self.object.id)
-        context['cast'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id).order_by('billing')
-
-        franchises = []
-        for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
-            if x.videoGame.id == self.object.id:
-                franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
-        context['franchises'] = franchises
-
-        return context
 
 
 class BookDetailView(generic.UpdateView):
@@ -1760,9 +1736,9 @@ class GenreDetailView(generic.DetailView):
         context['fiftiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1950-01-01", "1959-12-25"])[:30]
         context['fortiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1940-01-01", "1949-12-25"])[:30]
         context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('-television__release')[:30]
-        context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:30]
-        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('book__release')[:30]
-        context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('webSeries__release')[:30]
+        context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('-videoGame__release')[:30]
+        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('-book__release')[:30]
+        context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('-webSeries__release')[:30]
         return context
 
 
@@ -1794,7 +1770,17 @@ class ConsoleDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['games'] = VideoGameConsoleMapping.objects.filter(console=self.object.id).order_by('videoGame__release')
+
+        featured = []
+        all = []
+        for g in VideoGameConsoleMapping.objects.filter(console=self.object.id).order_by('videoGame__release'):
+            if g.featured:
+                featured.append(g)
+            else:
+                all.append(g)
+
+        context['games'] = all[-100:]
+        context['featuredGames'] = featured
         context['versions'] = ConsoleVersion.objects.filter(console=self.object.id).order_by('release')
         return context
 

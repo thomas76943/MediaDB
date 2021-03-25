@@ -28,9 +28,11 @@
             <div class="scroller">
                 <ul class="hs full">
                     {% for game in projects %}
-                        <a href="/video-games/{{ game.videoGame.slug }}">
-                        <img class="item posterSmall" src="{{game.videoGame.poster.url}}" alt="{{ game.videoGame.title }}">
-                        </a>
+                        {% if game.videoGame.poster %}
+                            <a href="/video-games/{{ game.videoGame.slug }}">
+                            <img class="item posterSmall game" src="{{game.videoGame.poster.url}}" alt="{{ game.videoGame.title }}">
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>

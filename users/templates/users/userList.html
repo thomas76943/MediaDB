@@ -1,9 +1,8 @@
 {% extends "media/base.html" %}
 {% block title %}My List{% endblock title %}
-{% load crispy_forms_filters %}
 {% block content %}
 
-    <div class="container infoSection">
+    <div class="container profileSection">
         <h5 class="font-weight-bold border-bottom mb-0">{{ user.username }} - My List</h5><br>
 
         <ul class="auto-grid">
@@ -33,9 +32,9 @@
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/video-games/{{ vg.videoGame.slug }}">
                         {% if vg.videoGame in ratedVideoGames %}
-                            <img class="item posterSmall seen" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}"> Played
+                            <img class="item posterSmall game seen" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}"> Played
                         {% else %}
-                            <img class="item posterSmall" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}">
+                            <img class="item posterSmall game" src="{{vg.videoGame.poster.url}}" alt="{{vg.videoGame.title}}">
                         {% endif %}
                     </a>
                 </li>

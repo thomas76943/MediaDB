@@ -49,7 +49,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/films/{{ rating.film.slug }}">{{ rating.film.title }} ({{ rating.film.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -71,7 +71,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/tv/{{ rating.television.slug }}">{{ rating.television.title }} ({{ rating.television.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -86,14 +86,14 @@
                 {%  if rating.videoGame != NULL %}
                     <div class="media">
                         <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
-                            <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                            <img class="item posterSmall game" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
                         </a>
                         <div class="media-body" style="padding-left:15px">
                                 <h5 class="font-weight-bold">
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/video-games/{{ rating.videoGame.slug }}">{{ rating.videoGame.title }} ({{ rating.videoGame.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -115,7 +115,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/books/{{ rating.book.slug }}">{{ rating.book.title }} ({{ rating.book.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -137,7 +137,7 @@
                                     <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
                                     rated
                                     <a href="/web-series/{{ rating.webSeries.slug }}">{{ rating.webSeries.title }} ({{ rating.webSeries.getYear }})</a>
-                                    <div style="display: inline-block; z-index: 0" id="{{ rating.id }}-{{ rating.user.username }}"></div>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
                                 </h5>
                                 <p>
                                     on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
@@ -151,7 +151,7 @@
         <br><hr>
 
         <script>
-            $('#{{ rating.id }}-{{ rating.user.username }}').rateYo({
+            $('#{{ forloop.counter }}').rateYo({
                 rating:'{{ rating.rating }}',
                 starWidth:'20px',
                 numStars:5,
@@ -166,6 +166,10 @@
 
         {% endfor %}
 
+        </div>
+    {% else %}
+        <div class="container profileSection">
+            <h6 style="padding-top:10px">Follow Users to Generate a Personalised Activity Feed</h6>
         </div>
     {% endif %}
 

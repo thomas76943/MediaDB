@@ -62,9 +62,6 @@
     {% if actorRecommendations %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">Actor Scores</h5>
-            {% if actorScores %}
-                {{ actorScores }}
-            {% endif %}
             <div class="scroller">
                 <ul class="hs full">
                     {% for film, score in actorRecommendations.items %}
@@ -72,20 +69,14 @@
                             <a href="/films/{{ film.slug }}">
                                 <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
                                 <div class="content">
-                                    <h6 class = "font-weight-bold" >
-                                        <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
+                                    <h6 class = "font-weight-bold">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
                                         <div style="display: inline-block">{{ score }}</div>
                                         <script>
-                                            $('#{{film.slug}}').rateYo({
-                                                rating:'{% widthratio score 1 2 %}',
-                                                starWidth:'15px',
-                                                numStars:5,
-                                                minValue:0,
-                                                maxValue:10,
-                                                normalFill:'gray',
-                                                ratedFill:'orange',
-                                                halfStar:true,
-                                                readOnly:true,
+                                            $('#{{ forloop.counter }}').rateYo({
+                                                rating:'{% widthratio score 1 2 %}', starWidth:'15px',
+                                                numStars:5, minValue:0, maxValue:10,
+                                                normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
                                             })
                                         </script>
                                     </h6>
@@ -95,6 +86,9 @@
                     {% endfor %}
                 </ul>
             </div>
+            {% if actorScores %}
+                {{ actorScores }}
+            {% endif %}
         </div>
     {% endif %}
 

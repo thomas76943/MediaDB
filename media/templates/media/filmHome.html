@@ -70,6 +70,7 @@
         </a>
     </div>
 
+    <!-- Carousel Script -->
     <script>
         $('#c1').carousel({
           interval: 30000,
@@ -79,6 +80,36 @@
 
     <br>
 
+    <!-- Highest Rated Films -->
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Films<a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for film in highestRatedFilms %}
+                    <div class="bottomOverlay">
+                        <a href="/films/{{ film.media.slug }}">
+                            <img class="item posterSmall" src="{{film.media.poster.url}}" alt="{{film.media.title}}">
+                            <div class="content">
+                                <h6 class="font-weight-bold" >
+                                    <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    <div style="display: inline-block">{{ film.rating }}</div>
+                                    <script>
+                                        $('#{{forloop.counter}}').rateYo({
+                                            rating:'{% widthratio film.rating 1 2 %}',
+                                            starWidth:'15px', numStars:5, minValue:0, maxValue:10,
+                                            normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                                        })
+                                    </script>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Browse by Franchise -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">Browse by Franchise<a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
          <div class="scroller">
@@ -92,6 +123,7 @@
         </div>
     </div>
 
+    <!-- Genre/Franchise Box Padding -->
     <style>
         .item.box.genre {
             padding: 40px;
@@ -106,6 +138,7 @@
         }
     </style>
 
+    <!-- Browse by Genre -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre</h5>
          <div class="scroller">
@@ -122,6 +155,7 @@
          </div>
     </div>
 
+    <!-- 1970s -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">1970s Films</h5>
         <div class="scroller">
@@ -135,6 +169,7 @@
         </div>
     </div>
 
+    <!-- 1980s -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">1980s Films</h5>
         <div class="scroller">
@@ -148,6 +183,7 @@
         </div>
     </div>
 
+    <!-- 1990s -->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-1">1990s Films</h5>
         <div class="scroller">

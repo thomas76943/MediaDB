@@ -185,7 +185,7 @@ class VideoGame(models.Model):
             super(VideoGame, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return (self.title + " - " + str(self.release.year))
 
     def getYear(self):
         return self.release.year
@@ -306,8 +306,8 @@ class TelevisionGenreMapping(models.Model):
         verbose_name_plural = "Television - Genre Mappings"
 
 class VideoGameGenreMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    genre = models.ForeignKey(VideoGameGenre, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
+    genre = models.ForeignKey(VideoGameGenre, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.videoGame.title + " | " + self.genre.title)
@@ -364,9 +364,9 @@ class TelevisionCompanyMapping(models.Model):
         verbose_name_plural = "Television - Company Mappings"
 
 class VideoGameCompanyMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    role = models.ForeignKey(CompanyRole, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    role = models.ForeignKey(CompanyRole, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.company.name + " || " + self.videoGame.title + " || " + self.role.companyRoleName)
@@ -724,8 +724,9 @@ class ConsoleVersion(models.Model):
         verbose_name_plural = "Video Game Consoles - Versions"
 
 class VideoGameConsoleMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    console = models.ForeignKey(Console, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
+    console = models.ForeignKey(Console, on_delete=models.CASCADE)
+    featured = models.BooleanField(default=False)
 
     def __str__(self):
         return (self.videoGame.title + " | " + self.console.name)
@@ -1032,3 +1033,66 @@ class TelevisionTagMapping(models.Model):
     class Meta:
         verbose_name = "Television - Tag Mapping"
         verbose_name_plural = "Television - Tag Mappings"
+
+#-- Highest Rating Stores -------------------------------------------------------#
+class HighestRatedFilms(models.Model):
+    media = models.ForeignKey(Film, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1.0)
+    rank = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.media.title + " - " + str(self.rank))
+
+    class Meta:
+        verbose_name = "Highest Rated Film"
+        verbose_name_plural = "Highest Rated Films"
+
+class HighestRatedTelevision(models.Model):
+    media = models.ForeignKey(Television, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1.0)
+    rank = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.media.title + " - " + str(self.rank))
+
+    class Meta:
+        verbose_name = "Highest Rated Television"
+        verbose_name_plural = "Highest Rated Television"
+
+class HighestRatedVideoGames(models.Model):
+    media = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1.0)
+    rank = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.media.title + " - " + str(self.rank))
+
+    class Meta:
+        verbose_name = "Highest Rated Video Game"
+        verbose_name_plural = "Highest Rated Video Games"
+
+
+class HighestRatedBooks(models.Model):
+    media = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1.0)
+    rank = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.media.title + " - " + str(self.rank))
+
+    class Meta:
+        verbose_name = "Highest Rated Book"
+        verbose_name_plural = "Highest Rated Books"
+
+
+class HighestRatedWebSeries(models.Model):
+    media = models.ForeignKey(WebSeries, on_delete=models.CASCADE)
+    rating = models.FloatField(default=1.0)
+    rank = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.media.title + " - " + str(self.rank))
+
+    class Meta:
+        verbose_name = "Highest Rated Web Series"
+        verbose_name_plural = "Highest Rated Web Series"

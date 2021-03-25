@@ -8,7 +8,7 @@ class DateInput(forms.DateInput):
 class ContributePersonForm(forms.ModelForm):
     class Meta:
         model = Person
-        fields = ['firstName', 'surname', 'DoB', 'alive', 'DoD', 'bio']
+        fields = ['firstName', 'surname', 'DoB', 'DoD', 'bio']
         widgets = {
             'firstName':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
             'surname':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Surname'}),
@@ -20,18 +20,16 @@ class ContributePersonForm(forms.ModelForm):
 class ContributeFilmForm(forms.ModelForm):
     class Meta:
         model = Film
-        fields = ['title', 'release', 'rating', 'synopsis', 'length', 'budget',
-                  'boxOffice', 'trailerVideoPath']
-
+        fields = ['title', 'release', 'rating', 'synopsis', 'length', 'budget', 'boxOffice', 'poster', 'trailerVideoPath']
         widgets = {
             'title':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
-            'release':DateInput(),
+            'release':forms.DateInput(),
             'rating':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Rating'}),
-            'synopsis': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Synopsis'}),
-            'length': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Length (mins)'}),
-            'budget': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Budget'}),
-            'boxOffice': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Box Offce'}),
-            'trailerVideoPath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
+            'synopsis':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Synopsis'}),
+            'length':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Length (mins)'}),
+            'budget':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Budget'}),
+            'boxOffice':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Box Offce'}),
+            'trailerVideoPath':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
         }
 
 class ContributeTelevisionForm(forms.ModelForm):

@@ -80,7 +80,7 @@
     });
     </script>
 
-    <!-- Carousel and 5 Media Type Video Boxes -->
+    <!-- 5 Media Type Video Boxes -->
     <div class="container infoSection fullSection">
 
         <!-- 5 Media Video  Boxes -->
@@ -140,7 +140,7 @@
 
     </div>
 
-    <!-- To Do List -->
+    <!-- To Do List
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
             <br>Recommendation Algorithm<br><br>
@@ -170,7 +170,7 @@
             Add all CSS to stylesheet<br>
         </h5>
     </div>
-
+-->
     <div style="clear: both"><br></div>
 
     <!-- Full: Upcoming Media -->
@@ -242,7 +242,11 @@
     <!-- Left: Activity Feed -->
     {% if feed %}
         <div class="container infoSection leftScroll">
-            <h5 class="font-weight-bold border-bottom mb-0">Activity Feed<a style="float:right" href={% url 'activity-feed' %}>See All</a></h5>
+            {% if personal %}
+            <h5 class="font-weight-bold border-bottom mb-0">Recent Activity: Followed Users<a style="float:right" href={% url 'activity-feed' %}>See All</a></h5>
+            {% else %}
+            <h5 class="font-weight-bold border-bottom mb-0">Recent Activity: All Users</h5>
+            {% endif %}
                 <div class="scroller">
                     <ul class="hs full">
                         {% for rating in feed %}
@@ -269,7 +273,7 @@
                             {%  if rating.videoGame != NULL %}
                                 <div class="bottomOverlay">
                                     <a href="/video-games/{{ rating.videoGame.slug }}">
-                                        <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                        <img class="item posterSmall game" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
                                         <div class="content">
                                             <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
                                         </div>
@@ -326,17 +330,17 @@
         <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Films<a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
         <div class="scroller" >
             <ul class="hs full">
-                {% for film, rating in highestRatedFilms.items %}
+                {% for film in highestRatedFilms %}
                     <div class="bottomOverlay">
-                        <a href="/films/{{ film.slug }}">
-                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                        <a href="/films/{{ film.media.slug }}">
+                            <img class="item posterSmall" src="{{film.media.poster.url}}" alt="{{film.media.title}}">
                             <div class="content">
                                 <h6 class="font-weight-bold" >
-                                    <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
-                                    <div style="display: inline-block">{{ rating }}</div>
+                                    <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    <div style="display: inline-block">{{ film.rating }}</div>
                                     <script>
-                                        $('#{{film.slug}}').rateYo({
-                                            rating:'{% widthratio rating 1 2 %}',
+                                        $('#{{forloop.counter}}').rateYo({
+                                            rating:'{% widthratio film.rating 1 2 %}',
                                             starWidth:'15px', numStars:5, minValue:0, maxValue:10,
                                             normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
                                         })

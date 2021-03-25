@@ -93,7 +93,7 @@
                             {% endif %}
                             {%  if rating.videoGame != NULL %}
                                 <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
-                                    <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                    <img class="item posterSmall game" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
                                     <div class="content">
                                         <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
                                     </div>
@@ -169,7 +169,7 @@
                                 {%  if entry.videoGame != NULL %}
                                     <li id="entry_{{ entry.id }}" class="ui-state-default">
                                         <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
-                                        <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                        <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
                                         </a>
                                     </li>
                                 {% endif %}
@@ -224,83 +224,6 @@
             </div>
         </div>
     {% endif %}
-
-    <!-- Modal Styling
-    <style>
-
-        /* The Modal (background) */
-        .modal {
-          display: none; /* Hidden by default */
-          position: fixed; /* Stay in place */
-          z-index: 1; /* Sit on top */
-          padding-top: 200px; /* Location of the box */
-          left: 0;
-          top: 0;
-          width: 100%; /* Full width */
-          height: 100%; /* Full height */
-          overflow: auto; /* Enable scroll if needed */
-          background-color: rgb(0,0,0); /* Fallback color */
-          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        /* Modal Content */
-        .modal-content {
-          position: relative;
-          background-color: #fefefe;
-          margin: auto;
-          padding: 0;
-          border: 3px solid #888;
-          width: 50%;
-          max-width: 610px;
-          min-width: 330px;
-          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-          -webkit-animation-name: animatetop;
-          -webkit-animation-duration: 0.4s;
-          animation-name: animatetop;
-          animation-duration: 0.4s
-        }
-
-        div.container.profileSection.modalSection {
-            margin-bottom: 0;
-        }
-
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-          from {top:-300px; opacity:0}
-          to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-          from {top:-300px; opacity:0}
-          to {top:0; opacity:1}
-        }
-
-        /* The Close Button */
-        .close {
-        }
-
-        .close:hover,
-        .close:focus {
-          color: #000;
-          text-decoration: none;
-          cursor: pointer;
-        }
-
-        .modal-header {
-          padding: 2px 16px;
-          background-color: #04b877;
-          color: white;
-        }
-
-        .modal-body {padding: 2px 16px;}
-
-        .modal-footer {
-          padding: 2px 16px;
-          background-color: #10b310;
-          color: white;
-        }
-    </style>
-    -->
 
     <!-- The Modal -->
     <div id="newSectionModal" class="modal">

@@ -1,61 +1,56 @@
 {% extends "media/base.html" %}
 {% block content %}
 
-    <h3>Contribute</h3>
-    <hr>
+    <div class="container profileSection" style="max-width: 700px; margin: auto">
+        <h2 style="padding-top:5px">Contribute</h2>
+    </div>
+
+    <br>
 
     {% for form in forms %}
-        <h4>Add {{ form.Meta.model.Meta.verbose_name }}</h4>
-        <div style="width:60%; max-width:100%">
-            <form action="" method="post">
-                {% csrf_token %}
-                <fieldset>
-                    {% for field in form %}
-                        {{ field.label }}
-                    {% endfor %}
-                    {{ form.as_p }}
-                </fieldset>
-                <div class="formSuccess">
-                    <button type="submit" class="btn btn-warning">Add Film</button>
+        <div class="container profileSection" style="max-width: 700px; margin: auto">
 
+        <h4>Add {{ form.meta.model }}</h4>
+            <form style="display: inline-block" method="post">
+                {% csrf_token %}
+                    {% for field in form %}
+                        {% if field.label == "Release" %}
+                            <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
+                        {% elif field.label == "End" %}
+                            <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
+                        {% elif field.label == "Synopsis" %}
+                            <textarea class="form-control" rows="4" cols="50" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.label }}"  style="color: white"></textarea>
+                        {% elif field.label == "Poster" %}
+                            <input type="file" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white">
+
+                        {% else %}
+                            <input type="text" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
+
+                        {% endif %}
+
+
+
+                    {% endfor %}
+
+
+                <div class="formSuccess">
+                    <input class="btn btn-primary btn-raised" type="submit" value="Add Film" style="margin-top: 10px">
                     {% if messages %}
                         <br>
                         {% for message in messages %}
                             <div class="alert alert-success alert-dismissable">
-                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <button type="button" class="close" data-dismiss="alert"> &times;</button>
                                 <strong>{{ message }}</strong>
                             </div>
                         {% endfor %}
                     {% endif %}
+
                 </div>
+
             </form>
         </div>
         <br>
-        <hr>
+        </div>
     {% endfor %}
-
-    <h4>Add Television Series</h4>
-    <form>
-
-    </form>
-    <hr>
-
-    <h4>Add Video Game</h4>
-    <form>
-
-    </form>
-    <hr>
-
-    <h4>Add Book</h4>
-    <form>
-
-    </form>
-    <hr>
-
-    <h4>Add Web Series</h4>
-    <form>
-
-    </form>
-    <hr>
 
 {% endblock %}

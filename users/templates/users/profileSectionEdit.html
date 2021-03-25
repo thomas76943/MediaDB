@@ -82,7 +82,7 @@
                         <li id="entry_{{ entry.id }}" class="ui-state-default">
                             <div class="bottomOverlay">
                                 <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
-                                    <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                    <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
                                 </a>
                                 <div class="content">
                                    <button id="v-{{ entry.videoGame.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
@@ -174,37 +174,49 @@
         let filteredArr = []
 
         input.addEventListener('keyup', (e)=>{
-            results.innerHTML = ""
-            filteredArr = rdata.filter(item=> (item['title']).toLowerCase().includes(e.target.value.toLowerCase()) )
-            if (filteredArr.length > 0){
-                filteredArr.map(item=>{
-                    //Dynamically creating buttons for every search item
-                    results.innerHTML += `
-                        <button id="${item['slug']}" class="btn btn-primary btn-raised" style="background: none; border: none; color:white;">Add</button>
-                        <a href="/films/${item['slug']}"> ${item['title']}</a>
-                        <br><br>`
-                })
-
-                //Function to handle whichever button is pressed and to then make the AJAX POST request
-                $('#results').unbind().on('click', 'button', function(e)  {
-                    e.preventDefault()
-                    var mediaToAdd = $(this).attr('id');
-                    console.log("Clicked:", mediaToAdd)
-
-                    $.ajax({
-                        url: "/profile-section/{{ profileSection.slug }}",
-                        type: "POST",
-                        data: {
-                            'addMedia': mediaToAdd,
-                            'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        },
-                        success: setTimeout(function () {
-                            location.reload()
-                        }, 1000),
+            if (e.key !== "ArrowLeft") {
+                results.innerHTML = ""
+                filteredArr = rdata.filter(item => (item['title']).toLowerCase().includes(e.target.value.toLowerCase()))
+                if (filteredArr.length > 0) {
+                    filteredArr.map(item => {
+                        //Dynamically creating buttons for every search item
+                        results.innerHTML += `
+                            <button id="${item['slug']}" class="btn btn-primary btn-raised">Add</button>
+                            {% if profileSection.type == "Films" %}
+                            <a href="/films/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Television" %}
+                            <a href="/tv/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Video Games" %}
+                            <a href="/video-games/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Books" %}
+                            <a href="/books/${item['slug']}"> ${item['title']}</a>
+                            {% else %}
+                            <a href="/web-series/${item['slug']}"> ${item['title']}</a>
+                            {% endif %}
+                            <br><br>`
                     })
-                });
-            } else {
-                results.innerHTML = "No results"
+
+                    //Function to handle whichever button is pressed and to then make the AJAX POST request
+                    $('#results').unbind().on('click', 'button', function (e) {
+                        e.preventDefault()
+                        var mediaToAdd = $(this).attr('id');
+                        console.log("Clicked:", mediaToAdd)
+
+                        $.ajax({
+                            url: "/profile-section/{{ profileSection.slug }}",
+                            type: "POST",
+                            data: {
+                                'addMedia': mediaToAdd,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            },
+                            success: setTimeout(function () {
+                                location.reload()
+                            }, 1000),
+                        })
+                    });
+                } else {
+                    results.innerHTML = "No results"
+                }
             }
         })
     </script>

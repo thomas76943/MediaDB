@@ -22,19 +22,18 @@
                         <div class="scroller">
                             <ul class="hs full">
                                 {% for entry in var_url %}
-                                    <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
-                                    <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
-                                    </a>
+                                    {% if entry.videoGame.poster %}
+                                        <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                        <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                        </a>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
                 {% endif %}
-
             {% endwith %}
-
         {% endfor %}
     {% endif %}
-
 
 {% endblock %}

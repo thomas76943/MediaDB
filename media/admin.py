@@ -105,3 +105,11 @@ admin.site.register(WebSeriesAwardCreditMapping)
 admin.site.register(Tag)
 admin.site.register(FilmTagMapping)
 admin.site.register(TelevisionTagMapping)
+
+
+#Highest Rating Stores
+admin.site.register(HighestRatedFilms)
+admin.site.register(HighestRatedTelevision)
+admin.site.register(HighestRatedVideoGames)
+admin.site.register(HighestRatedBooks)
+admin.site.register(HighestRatedWebSeries)

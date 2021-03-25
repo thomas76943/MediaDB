@@ -14,6 +14,7 @@
         <div class="blur"></div>
     {% endif %}
 
+
     <div class="container titleSection">
 
         <form id="listForm">
@@ -31,12 +32,13 @@
                 <a style="padding-right:10px" href="/genre/{{ genre.genre.title }}"> {{ genre.genre.title }}</a>
             {% endfor %}
         {% endif %}
+
     </div>
 
     <br>
 
     <!-- If there is a poster or a trailer then create parent element for them -->
-    {% if film.poster != 'MissingIcon.png' or film.trailerVideoPath or averageRating %}
+    {% if film.poster or film.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
                 <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">

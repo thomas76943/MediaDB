@@ -21,6 +21,7 @@
             </div>
         </form>
 
+        ID: {{ videogame.id }}
         <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
@@ -36,7 +37,7 @@
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
                 {% if videogame.poster %}
-                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
+                    <img class="item detailPoster game" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
                 {% endif %}
                 {% if videogame.trailerVideoPath %}
                     <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

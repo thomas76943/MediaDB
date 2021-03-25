@@ -433,7 +433,6 @@
             var toggle;
             {% if inList == True %} toggle = "remove"
             {% else %} toggle = "add" {% endif %}
-
             $.ajax({
                 url:document.URL,
                 type: "POST",
@@ -441,7 +440,6 @@
                 success: setTimeout(function(){
                     $('#addListToggle').load(' #addListToggle', function (){$(this).children().unwrap()})
                 }, 500),
-
             });
         });
     </script>
@@ -463,22 +461,22 @@
             }
             return cookieValue;
         }
+        /*Get the CSRF Token*/
         const csrftoken = getCookie('csrftoken');
-
+        /*Fill the 5-star's default value if the user has already given a rating*/
         $('#rate').rateYo({
-            {% if userRating %} rating:'{{userRating}}',
-            {% else %} rating:'0', {% endif %}
+            {% if userRating %} rating:'{{userRating}}', {% else %} rating:'0', {% endif %}
             minValue:0, maxValue:10, halfStar:true,
             normalFill:'grey', ratedFill:'orange'
+        /*If the rating is changed, make an AJAX POST request*/
         }).on("rateyo.set", function (e, data) {
-            var newRating = data.rating/2
-            ratingDiv = document.getElementById("ratingDiv");
-
+            var newRating = data.rating
             $.ajax({
                 url:document.URL,
                 type: "POST",
                 data: { 'type': "rating", 'nr': newRating, 'csrfmiddlewaretoken': csrftoken },
                 success: setTimeout(function(){
+                    /*Refresh the 5-star rating input and the review button*/
                     $('#ratingDiv').load(' #ratingDiv', function (){$(this).children().unwrap()})
                     $('#reviewButtonContainer').load(' #reviewButtonContainer', function (){$(this).children().unwrap()})
                 }, 1000),
@@ -489,17 +487,19 @@
 
     <!-- Review Script -->
     <script>
+        /*Retrieve the review form*/
         var frm = $('#writeReview')
         frm.submit(function(e) {
-            e.preventDefault();
-            $.ajax({
+            e.preventDefault();     /*Prevent the page from reloading*/
+            $.ajax({                /*Make the AJAX POST request*/
                 url:document.URL,
                 type : "POST",
                 data : { 'type': "review", 'newReview': document.querySelector('#reviewTextArea').value, 'csrfmiddlewaretoken' : '{{ csrf_token }}', },
                 success: setTimeout(function(){
+                    /*Close the modal window containing the review text box*/
                     var modal = document.getElementById("writeReviewModal");
                     modal.style.display = "none";
-
+                    /* Refresh only the two buttons and the text area*/
                     $('#writeReviewButton').load(' #writeReviewButton', function (){$(this).children().unwrap()})
                     $('#reviewTextArea').load(' #reviewTextArea', function (){$(this).children().unwrap()})
                     $('#submitReview').load(' #submitReview', function (){$(this).children().unwrap()})
@@ -596,6 +596,15 @@
         .modal-body {padding: 2px 16px;}
 
     </style>
+
+    <!-- Fixed Game Posters Aspect Ratio Styling -->
+    <style>
+        .item.posterSmall.game {
+            object-fit: cover;
+            background-color: black;
+        }
+    </style>
+
 
     <!--jQuery first, then Popper.js, then Bootstrap JS
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

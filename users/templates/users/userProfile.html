@@ -5,7 +5,7 @@
 
     <div class="container profileSection">
         <div class="media">
-            {% if user.profile.image.url %}
+            {% if user.profile.image %}
                 <img class="item additionalImage" alt="profilePicture" src={{ user.profile.image.url }}>
             {% endif %}
             <div class="media-body" style="padding-left:15px">
@@ -40,20 +40,22 @@
 
                 {% for field in profileUpdateForm %}
                     <div class="form-group">
-                        <label class="bmd-label-floating" for="id_{{ field.name }}" style="color: #009999">{{ field.label }}</label>
+                        <label class="bmd-label-floating" for="id_{{ field.name }}" style="color: #009999">Change {{ field.label }}</label>
                         <div>
                             {% if field.label == "Bio" %}
                             <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.profile.bio }}" style="color: white">
                             {% else %}
-                            <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.profile.image.url }}"style="color: white">
+                                {% if user.profile.image %}
+                                    <input type="file" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.profile.image.url }}" style="color: white">
+                                {% else %}
+                                    <input type="file" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" style="color: white">
+                                {% endif %}
                             {% endif %}
                         </div>
                         <span class="bmd-help">Change your account {{ field.label }}</span>
                     </div>
                 {% endfor %}
-                <!--
-                {{ profileUpdateForm|crispy }}
-                -->
+
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-primary btn-raised" type="submit">
