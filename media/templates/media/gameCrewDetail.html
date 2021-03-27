@@ -45,7 +45,7 @@
         <div class="container infoSection">
             <h5 style="padding-top:5px">Released On:</h5>
             {% for console in consoles %}
-                <a style="padding-right:10px" href="/console/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
+                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
             {% endfor %}
         </div>
     {% endif %}

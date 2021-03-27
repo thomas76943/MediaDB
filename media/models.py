@@ -100,7 +100,7 @@ class Film(models.Model):
     poster = models.ImageField(upload_to='posters', blank=True)
     cover = models.ImageField(upload_to='coverImages', blank=True)
     trailerVideoPath = models.CharField(max_length=500, blank=True)
-    slug = models.SlugField(max_length=150, editable=True)
+    slug = models.SlugField(max_length=150, null=True, blank=True, editable=True)
 
     def save(self, *args, **kwargs):
         super().save()
@@ -587,7 +587,7 @@ class VideoGameFranchiseSubcategoryMapping(models.Model):
 
 
 class VideoGameVideoGameFranchiseSubcategoryMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     videoGameFranchiseSubcategory = models.ForeignKey(VideoGameFranchiseSubcategory, on_delete=models.PROTECT)
     orderInFranchise = models.IntegerField(default=1)
 

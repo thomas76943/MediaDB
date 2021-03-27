@@ -33,47 +33,50 @@
 
     <br>
 
-    {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if videogame.poster or videogame.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
+
                 {% if videogame.poster %}
-                    <img class="item detailPoster game" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
+                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
                 {% endif %}
+
                 {% if videogame.trailerVideoPath %}
-                    <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe class="trailer" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
 
-                <div class="col"">
-                    {% if averageRating %}
-                        <div class="container ratingBox" id="ratingDiv">
-                            <h5>Average Rating: </h5>
-                            <h4>{{ averageRatingText }}</h4>
-                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                        </div>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <div class="container ratingBox">
-                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                        </div>
-
-                        <div id="reviewButtonContainer">
-                            {% if userRating %}
-                                <div class="container ratingBox">
-                                    <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
-                                        {% if review %}
-                                            Edit Review
-                                        {% else %}
-                                            Write Review
-                                        {% endif %}
-                                    </button>
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
+                            {% if averageRating %}
+                                <div id="ratingDiv">
+                                    <h5>Average Rating: </h5>
+                                    <h4>{{ averageRatingText }}</h4>
+                                    <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                                </div>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">
+                                    {% csrf_token %}
+                                </div>
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
+                                            {% if review %}
+                                                Edit Review
+                                            {% else %}
+                                                Write Review
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         </div>
-
-                    {% endif %}
-                </div>
-
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
@@ -107,7 +110,7 @@
         <div class="container infoSection">
             <h5 style="padding-top:5px">Released On:</h5>
             {% for console in consoles %}
-                <a style="padding-right:10px" href="/console/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
+                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }} {{ console.id }}</a>
             {% endfor %}
         </div>
     {% endif %}

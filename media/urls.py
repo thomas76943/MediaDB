@@ -47,7 +47,8 @@ urlpatterns = [
     path('awards/show/<int:pk>', views.AwardsShowDetail.as_view(), name='media-awardsshow-detail'),
     path('awards/category/<int:pk>', views.AwardsCategoryDetail.as_view(), name='media-awardscategory-detail'),
 
-    path('console/<str:slug>', views.ConsoleDetailView.as_view(), name='media-console-detail'),
+    path('consoles/', views.consoleHome, name='media-console-home'),
+    path('consoles/<str:slug>', views.ConsoleDetailView.as_view(), name='media-console-detail'),
 
     path('contribute-media/', views.contributeMedia, name='contribute-media'),
 

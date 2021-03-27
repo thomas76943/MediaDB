@@ -43,48 +43,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
 
     <!--Custom CSS-->
-    <link rel="stylesheet" href="{% static 'media/customStylesheet.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'media/newstylesheet.css' %}" type="text/css">
     <link rel="shortcut icon" type="image/png" href="{% static 'media/favicon.png' %}"/>
 
 </head>
 
 <body style="margin-left:auto; margin-right:auto; background-color: #1f262d;color:white">
 
-    <style>
-        .posterSmall, .personSmall, .detailPoster, .personDetail, .additionalImage {
-            background: url(https://assets.materialup.com/uploads/e21b405b-4e2a-48dc-9181-625a37c1eae8/preview.gif) no-repeat scroll center center;
-            background-color: white;
-            background-size: 100% ;
-
-        }
-
-        a:hover, a:visited, a:link, a:active {
-            text-decoration: none;
-        }
-
-        /*
-        .container a:hover, .container a:visited, .container a:link, .container a:active {
-            text-decoration: none;
-        }
-        */
-
-
-    </style>
-
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top">
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa fa-bars"></i>
+            <i class="fa fa-bars fa-lg" style="padding:7px 0px 7px"></i>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent" style="max-width:1400px; margin-left:auto; margin-right:auto;">
             <ul class="navbar-nav mr-auto">
-                <a class="navbar-brand" href="{% url 'media-home' %}">
+                <a class="navbar-brand" style="padding-top:5px" href="{% url 'media-home' %}">
                     <img class="navbarLogo" src="{% static 'media/logoNew.png' %}" alt="noImage">
                 </a>
 
+                <style>
+                    .dropdown-menu::-webkit-scrollbar
+                    {
+                        width: 0; // Or display: none;
+                    }
+                    .dropdown-menu {
+                        height: 100%;
+                    }
+                </style>
+
                 <!-- BROWSE Megamenu -->
-                <li class="nav-item dropdown megamenu shadow-none" style="padding-top:2px" id="mega1">
+                <li class="nav-item dropdown megamenu shadow-none" style="padding-top:4px" id="mega1">
                     <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
                         BROWSE
                     </a>
@@ -106,7 +95,7 @@
                                 </h5>
                                 <hr>
                               <div class="row">
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'film-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon Film">
@@ -119,7 +108,7 @@
                                     <li class="nav-item"><a href="{% url 'media-franchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
                                   </ul>
                                 </div>
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'tv-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon Television">
@@ -132,7 +121,7 @@
                                     <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
                                   </ul>
                                 </div>
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'game-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon VideoGame">
@@ -142,11 +131,10 @@
                                   <ul class="list-unstyled">
                                     <li class="nav-item"><a href="{% url 'game-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
                                     <li class="nav-item"><a href="{% url 'media-videogamefranchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
-                                    <li class="nav-item"><a href="{% url 'game-home' %}" class="nav-link text-small pb-0 ">Consoles</a></li>
+                                    <li class="nav-item"><a href="{% url 'media-console-home' %}" class="nav-link text-small pb-0 ">Consoles</a></li>
                                   </ul>
                                 </div>
-
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'book-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon Book">
@@ -159,7 +147,7 @@
                                     <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
                                   </ul>
                                 </div>
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'web-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon WebSeries">
@@ -172,7 +160,7 @@
                                     <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
                                   </ul>
                                 </div>
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-sm-4 mb-4">
                                   <h5>
                                       <a href="{% url 'media-awards-home' %}" class="nav-link font-weight-bold text-uppercase">
                                           <img class="mediaIcon Awards">
@@ -198,7 +186,7 @@
                 </li>
 
                 <!-- CONTRIBUTE Megamenu -->
-                <li class="nav-item dropdown megamenu" style="padding-top:2px" >
+                <li class="nav-item dropdown megamenu" style="padding-top:4px" >
                     <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
                         Contribute
                     </a>
@@ -258,14 +246,9 @@
                     </div>
                 </li>
 
-                <!-- Data Button -->
-                <li class="nav-item" style="padding-top:2px" >
-                    <a href="{% url 'data-sources' %}" class="nav-link font-weight-bold text-uppercase">Data</a>
-                </li>
-
                 <!-- User Megamenu -->
                 {% if user.is_authenticated %}
-                    <li class="nav-item dropdown megamenu" style="padding-top:2px" >
+                    <li class="nav-item dropdown megamenu" style="padding-top:4px" >
                         <a id="megamneu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
                             {{user.username}}
                             {% if user.profile.image %}
@@ -313,83 +296,6 @@
 
         </div>
     </nav>
-
-    <!-- Genre/Franchise Box, Left/Right Scrollers, Carousel Width Style Fixes-->
-    <style>
-        .carousel {
-            width: 100%;
-        }
-        .item.box.genre {
-            padding: 40px;
-        }
-
-        div.fullScroll {
-            width: 100%;
-        }
-
-        div.leftScroll {
-            max-width: 49.7%;
-            float: left;
-        }
-
-        div.rightScroll {
-            max-width: 49.7%;
-            float: right;
-        }
-
-        @media screen and (max-width: 675px) {
-             .item.box.genre {
-                padding: 20px;
-            }
-            .lowerLabel {
-                display: none;
-            }
-
-            .leftScroll,
-            .rightScroll {
-                min-width: 100%;
-                max-width: 100%;
-            }
-        }
-    </style>
-
-    <!-- 5 Media Box Videos on Home Page -->
-    <style>
-        .grid-container {
-          display: grid;
-          grid-template-columns: 20% 20% 20% 20% 20%;
-          background-color: rgba(0,0,0,0);
-        }
-
-        .grid-item {
-          background-color: #323238;
-          font-size: 20px;
-          text-align: center;
-          margin:5px;
-        }
-
-        .grid-item.firstVid {
-            margin-left: 0;
-        }
-
-        .grid-item.lastVid {
-            margin-right: 0;
-        }
-
-        .grid-item video {
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            max-width: 20%;
-            max-height: 150px;
-            object-fit: cover;
-            overflow: hidden;
-            z-index: -2;
-            float:left
-        }
-
-    </style>
 
     <!-- Page Body Content -->
     <div style="max-width:1400px; margin-left:auto; margin-right:auto;">
@@ -532,85 +438,12 @@
     </script>
     {% endif %}
 
-    <!-- Modal Styling -->
     <style>
-
-        /* The Modal (background) */
-        .modal {
-          display: none; /* Hidden by default */
-          position: fixed; /* Stay in place */
-          z-index: 1; /* Sit on top */
-          padding-top: 200px; /* Location of the box */
-          left: 0;
-          top: 0;
-          width: 100%; /* Full width */
-          height: 100%; /* Full height */
-          overflow: auto; /* Enable scroll if needed */
-          background-color: rgb(0,0,0); /* Fallback color */
-          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        /* Modal Content */
-        .modal-content {
-          position: relative;
-          background-color: #fefefe;
-          margin: auto;
-          padding: 0;
-          border: 3px solid #888;
-          width: 50%;
-          max-width: 610px;
-          min-width: 330px;
-          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-          -webkit-animation-name: animatetop;
-          -webkit-animation-duration: 0.4s;
-          animation-name: animatetop;
-          animation-duration: 0.4s
-        }
-
-        div.container.profileSection.inModal {
-            margin-bottom: 0;
-        }
-
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-          from {top:-300px; opacity:0}
-          to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-          from {top:-300px; opacity:0}
-          to {top:0; opacity:1}
-        }
-
-        /* The Close Button */
-        .close {
-        }
-
-        .close:hover,
-        .close:focus {
-          color: #000;
-          text-decoration: none;
-          cursor: pointer;
-        }
-
-        .modal-body {padding: 2px 16px;}
-
-    </style>
-
-    <!-- Fixed Game Posters Aspect Ratio Styling -->
-    <style>
-        .item.posterSmall.game {
-            object-fit: cover;
-            background-color: black;
+        .grid-item {
+            border: solid white;
+            border-width: 1px;
         }
     </style>
-
-
-    <!--jQuery first, then Popper.js, then Bootstrap JS
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    -->
 
 </body>
 </html>

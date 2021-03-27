@@ -9,7 +9,6 @@
     {% endif %}
 
     <div class="container infoSection">
-        ID:{{ company.id }}
         <h2 style="padding-top: 5px">{{company.name}}</h2>
         {% if company.baseCountry %}
             <h5>Based in: {{ company.baseCountry }}</h5>
@@ -25,7 +24,7 @@
             <div class="scroller">
                 <ul class="hs full">
                     {% for console in consoles %}
-                        <a href="/console/{{ console.slug }}">
+                        <a href="/consoles/{{ console.slug }}">
                             <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
                             <div class="lowerLabel">
                                 <h7 class="font-weight-bold">{{ console.shortName }}</h7>

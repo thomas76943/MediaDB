@@ -135,11 +135,11 @@
 
     <!-- Browse Video Games by Console -->
     <div class="container infoSection rightScroll">
-        <h5 class="font-weight-bold border-bottom mb-0">Browse by Console</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Browse by Console<a style="float:right;" href="{% url 'media-console-home' %}">See All</a></h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for console in consoles %}
-                    <a href="/console/{{ console.slug }}">
+                    <a href="/consoles/{{ console.slug }}">
                         <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
                         <div class="lowerLabel">
                             <h7 class="font-weight-bold ">{{ console.shortName }}</h7>

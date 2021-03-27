@@ -14,9 +14,11 @@ import time
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.db.models import Q
+
 from .models import *
 from users.models import *
-from users.views import getFeed, getAllActivity
+
+from users import views
 
 from .forms import *
 from django.db.models import Count
@@ -27,6 +29,106 @@ from django.core.files import File
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models.functions import Length
 from .filters import *
+
+import pandas as pd
+import numpy as np
+from django_pandas.io import read_frame
+
+def dataSources(request):
+
+    #Using first 20k film ratings, SQL error with larger queryset
+    movies_df = read_frame(Film.objects.all(), fieldnames=['title', 'release'])
+    ratings_df = read_frame(FilmRating.objects.all()[:20000], fieldnames=['film', 'user', 'rating'])
+
+    #Combine into one dataframe
+    df = pd.merge(movies_df, ratings_df, left_on='title', right_on='film')
+
+    #Arrange/create fields for combined dataframe
+    combine_movie_rating = df.dropna(axis=0, subset=['title'])
+    movie_ratingCount = (combine_movie_rating.
+        groupby(by=['title'])['rating'].
+        count().
+        reset_index().
+        rename(columns={'rating': 'totalRatingCount'})[['title', 'totalRatingCount']] )
+
+    #Add field for total rating count per film
+    rating_with_totalRatingCount = combine_movie_rating.merge(movie_ratingCount, left_on='title', right_on='title',how='left')
+    #print(rating_with_totalRatingCount.head())
+
+    #Display rating stats
+    pd.set_option('display.float_format', lambda x: '%.3f' % x)
+    #print(movie_ratingCount['totalRatingCount'].describe())
+
+    #Querying result to filter out films with fewer than 25 ratings
+    popularity_threshold = 25
+    rating_popular_movie = rating_with_totalRatingCount.query('totalRatingCount >= @popularity_threshold')
+
+    #Pivot Matrix with Zeros to Indicate No Film-User Mapping (Indicates No Rating)
+    movie_features_df = rating_popular_movie.pivot_table(index='title', columns='user', values='rating').fillna(0)
+    print(movie_features_df.head())
+
+    from scipy.sparse import csr_matrix
+    from sklearn.neighbors import NearestNeighbors
+
+    # Converting New Matrix with Zeros into "Compressed Sparse Row" (CSR) Matrix (efficient arithmetic and row slicing, slow column slicing)
+    movie_features_df_matrix = csr_matrix(movie_features_df.values)
+    #Apply nearest neighbours using Euclidean Distance
+    model_knn = NearestNeighbors(metric='cosine', algorithm='brute')
+    model_knn.fit(movie_features_df_matrix)
+
+    query_index = np.random.choice(movie_features_df.shape[0])
+    print(query_index)
+
+    distances, indices = model_knn.kneighbors(movie_features_df.iloc[query_index, :].values.reshape(1, -1), n_neighbors=8)
+
+    for i in range(0, len(distances.flatten())):
+        if i == 0:
+            print('Recommendations for {0}:\n'.format(movie_features_df.index[query_index]))
+        else:
+            print('{0}: {1}, with distance of {2}:'.format(i, movie_features_df.index[indices.flatten()[i]],distances.flatten()[i]))
+
+
+
+
+
+
+
+
+
+
+    context = {}
+    return render(request, "media/dataSources.html", context)
+
+
+def getFeed(user, limit):
+    following = UserFollows.objects.filter(userA=user)
+    f = []
+
+    for account in following:
+        accountFilms = FilmRating.objects.filter(user=account.userB)
+        accountTV = TelevisionRating.objects.filter(user=account.userB)
+        accountVG = VideoGameRating.objects.filter(user=account.userB)
+        accountBooks = BookRating.objects.filter(user=account.userB)
+        accountWeb = WebSeriesRating.objects.filter(user=account.userB)
+        accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
+        for ar in accountRatings:
+            f.append(ar)
+
+    feed = sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
+    return feed, following
+
+def getAllActivity(limit):
+    f = []
+    for account in User.objects.all():
+        accountFilms = FilmRating.objects.filter(user=account)
+        accountTV = TelevisionRating.objects.filter(user=account)
+        accountVG = VideoGameRating.objects.filter(user=account)
+        accountBooks = BookRating.objects.filter(user=account)
+        accountWeb = WebSeriesRating.objects.filter(user=account)
+        accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
+        for ar in accountRatings:
+            f.append(ar)
+    return sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
 
 def addUsers():
     with open("D:/MediaDB Datasets/movielensSmall/users.csv", 'r') as users:
@@ -323,7 +425,7 @@ def getHighestRated(type, quantity):
         return HighestRatedBooks.objects.all().order_by('rank')[:quantity]
     return HighestRatedWebSeries.objects.all().order_by('rank')[:quantity]
 
-def calculateTopGrossing(quantity):
+def getTopGrossing(quantity):
     topGrossing = Film.objects.all().order_by('-boxOffice')[:quantity]
     filmGrossingDict = {}
 
@@ -338,7 +440,7 @@ def calculateTopGrossing(quantity):
 
     return filmGrossingDict
 
-def findDulplicateTitles():
+def getDulplicateTitles():
 
     #repeated_names = Application.objects.values('school_name', 'category').annotate(Count('id')).order_by().filter(
     #    id__count__gt=0)  # <--- gt 0 will get all the objects having occurred in DB i.e is greater than 0
@@ -438,10 +540,6 @@ def mediaPagePostRequests(self, request, *args, **kwargs):
 
     return super(FilmDetailView, self).post(request, *args, **kwargs)
 
-def dataSources(request):
-    context = {}
-    return render(request, "media/dataSources.html", context)
-
 def csvUpload(request):
     prompt = {
         'format':'Format should be Title, Release, Rating, Synopsis, Length, Budget, BoxOffice, PosterFilePath'
@@ -476,7 +574,7 @@ def csvUpload(request):
 
 def topRatedUnseen(user):
     userFilmRatings = FilmRating.objects.filter(user=user)
-    topRated = getHighestRated(Film, 250)
+    topRated = getHighestRated(Film, 500)
     seen = []
     unseen = []
     for rating in userFilmRatings:
@@ -486,38 +584,36 @@ def topRatedUnseen(user):
             unseen.append(tr)
     return unseen[:500]
 
-def actorScores(user):
+def peopleScores(user, personType):
+    #personTypes: 1 = Actors, 2 = Directors, 3 = Writers, 4 = Showrunner, 5 = Author, 6 = Producer, 7 = Designer
     userFilmRatings = FilmRating.objects.filter(user=user)
-    actorScores = {}
-    directorScores = {}
-    writerScores = {}
-    actorAverages = {}
+    peopleScoresDict = {}
+    peopleAveragesDict = {}
 
     for ufr in userFilmRatings:
         film = ufr.film
         rating = ufr.rating
-        people = FilmPersonMapping.objects.filter(film=film)
-        actors = people.filter(role=1)
-        directors = people.filter(role=2)
-        writers = people.filter(role=3)
+        allCrew = FilmPersonMapping.objects.filter(film=film)
+        people = allCrew.filter(role=personType)
 
-        if actors:
-            for a in actors:
-                actor = a.person.getFullName()
-                if actor not in actorScores:
-                    actorScores[actor] = []
-                    actorScores[actor].append(rating)
+        if people:
+            for p in people:
+                person = p.person
+                if person not in peopleScoresDict:
+                    peopleScoresDict[person] = []
+                    peopleScoresDict[person].append(rating)
                 else:
-                    actorScores[actor].append(rating)
+                    peopleScoresDict[person].append(rating)
 
-            for actorScore in actorScores:
-                sum = 0
-                for score in actorScores[actorScore]:
-                    sum += score
-                average = sum/len(actorScores[actorScore])
-                actorAverages[actorScore] = average
+            for personScore in peopleScoresDict:
+                if len(peopleScoresDict[personScore]) > 3:
+                    sum = 0
+                    for score in peopleScoresDict[personScore]:
+                        sum += score
+                    average = sum/len(peopleScoresDict[personScore])/2
+                    peopleAveragesDict[personScore] = float("{:.2f}".format(average))
 
-    return actorAverages
+    return peopleAveragesDict
 
 def genreScores(user):
     userFilmRatings = FilmRating.objects.filter(user=user)
@@ -575,21 +671,21 @@ def genreBasedRecommender(user):
 
     return recommendations, genresScores
 
-def actorBasedRecommender(user):
-    actorsScores = actorScores(user)
+def personBasedRecommender(user, personType):
+    personScores = peopleScores(user, personType)
     trUnseen = topRatedUnseen(user)
     filmScores = {}
 
     for unseen in trUnseen:
         score = 0
-        filmPeople = FilmPersonMapping.objects.filter(film=unseen.media)
-        filmActors = filmPeople.filter(role=1)
+        allFilmPeople = FilmPersonMapping.objects.filter(film=unseen.media)
+        filmPeople = allFilmPeople.filter(role=personType)
 
-        for actor in filmActors:
-            if actor.person.getFullName() in actorsScores:
-                score += actorsScores[actor.person.getFullName()]
-        if filmActors.count() > 1:
-            score = score / filmActors.count()
+        for person in filmPeople:
+            if person.person in personScores:
+                score += personScores[person.person]
+        if filmPeople.count() > 1:
+            score = score / filmPeople.count()
         score = score / 2
         filmScores[unseen.media] = "{:.1f}".format(score)
 
@@ -603,7 +699,10 @@ def actorBasedRecommender(user):
         film = next(iterator)[0]
         recommendations[film] = sort[film]
 
-    return recommendations, actorsScores
+    #Sort people by highest average scores
+    personSort = dict(sorted(personScores.items(), key=lambda item: item[1], reverse=True))
+
+    return recommendations, personSort
 
 def recommendationsTestingPage(request):
     context = {}
@@ -613,7 +712,7 @@ def recommendationsTestingPage(request):
         context['genreRecommendations'] = genreRecommendations
         context['genreScores'] = genreScores
 
-        actorRecommendations, actorScores = actorBasedRecommender(request.user)
+        actorRecommendations, actorScores = personBasedRecommender(request.user, 3)
         context['actorRecommendations'] = actorRecommendations
         context['actorScores'] = actorScores
 
@@ -657,15 +756,18 @@ def home(request):
         'webseries':WebSeries.objects.all()[:30],
         'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
         'highestRatedFilms':getHighestRated(Film, 30),
-        'topGrossing':calculateTopGrossing(16),
+        'topGrossing':getTopGrossing(16),
     }
 
-    feed, following = getFeed(request.user, 16)
-    if following.count() < 1 or not request.user.is_authenticated:
-        context['feed'] = getAllActivity(request.user, 16)
+    if request.user.is_authenticated:
+        feed, following = getFeed(request.user, 16)
+        if following.count() < 1:
+            context['feed'] = getAllActivity(16)
+        else:
+            context['feed'] = feed
+            context['personal'] = True
     else:
-        context['feed'] = feed
-        context['personal'] = True
+        context['feed'] = getAllActivity(16)
 
     return render(request, 'media/home.html', context)
 
@@ -714,7 +816,7 @@ def addVideoGameData():
             videoGames = []
             qs = VideoGame.objects.all()
             for vg in qs:
-                videoGames.append(vg.slug)
+                videoGames.append(vg.title)
 
             title = game['name']
 
@@ -728,10 +830,11 @@ def addVideoGameData():
             else:
                 dateConv = time.strftime('%Y-%m-%d', time.localtime(game['first_release_date']))
 
-            slug = slugify(title + "-" + str(dateConv))
+            #slug = slugify(title + "-" + str(dateConv))
 
-            #Making New Game
-            if slug not in videoGames:
+            if title in videoGames:
+                print("--- Skipped Game:", title, ". Duplicate Title ---")
+            else:
                 print("--- Adding Game:", title)
                 newGame = VideoGame()
                 newGame.title = title
@@ -739,7 +842,7 @@ def addVideoGameData():
                 newGame.save()
 
             #Getting Game (whether it is newly made or not)
-            getGame = VideoGame.objects.filter(slug=slug)[0]
+            getGame = VideoGame.objects.filter(title=title)[0]
 
             #Adding synopsis if there isn't one already
             if not getGame.synopsis:
@@ -850,6 +953,13 @@ def addVideoGameData():
 
         print("\n")
 
+def addBookData():
+    badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
+
+    with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
+        data = json.loads(f.read())
+
+
 def searchResults(request):
 
     #addVideoGameData()
@@ -861,20 +971,16 @@ def searchResults(request):
     #    print(str(f.rank) + " - " + f.media.title + " - " + str(f.rating))
 
     #noposters=[]
-    #for vg in Film.objects.all():
+    #for vg in VideoGame.objects.all():
     #    if bool(vg.poster) == False:
-    #        noposters.append(vg.id)
+    #        noposters.append(vg.title)
     #print(noposters)
 
-    #subcat = VideoGameFranchiseSubcategory.objects.get(pk=145)
-    #subcat2 = VideoGameFranchiseSubcategory.objects.get(pk=143)
-    #subcat3 = VideoGameFranchiseSubcategory.objects.get(pk=144)
+    #subcat = VideoGameFranchiseSubcategory.objects.get(pk=159)
 
-    #for g in VideoGame.objects.filter(release__range=["2000-01-01", "2020-12-25"]).order_by('release'):
-    #    if 'donkey kong' in g.title.lower():
-    #        if 'country' not in g.title.lower():
-    #            VideoGameVideoGameFranchiseSubcategoryMapping(videoGame=g, videoGameFranchiseSubcategory=subcat, orderInFranchise=1).save()
-
+    #for g in VideoGame.objects.filter(release__range=["1980-01-01", "2020-12-25"]).order_by('release'):
+    #    if 'metroid' in g.title.lower():
+    #        VideoGameVideoGameFranchiseSubcategoryMapping(videoGame=g, videoGameFranchiseSubcategory=subcat, orderInFranchise=1).save()
 
     title_contains = request.GET.get('q')
 
@@ -950,10 +1056,17 @@ def filmHome(request):
     return render(request, 'media/filmHome.html', context)
 
 def tvHome(request):
+
+    genres = []
+    g = Genre.objects.all()
+    for genre in g:
+        if genre.image:
+            genres.append(genre)
+
     context = {
         'highestRatedShows':getHighestRated(Television, 100),
         'shows': Television.objects.all(),
-        'genres': Genre.objects.all(),
+        'genres': genres,
         'nineties': Television.objects.all().filter(release__range=["1990-01-01", "1999-12-25"]),
         'naughties': Television.objects.all().filter(release__range=["2000-01-01", "2009-12-25"]),
         'tens': Television.objects.all().filter(release__range=["2010-01-01", "2019-12-25"]),
@@ -964,14 +1077,17 @@ def tvHome(request):
 def gameHome(request):
 
     gameCompanies = []
-    for vgcm in VideoGameCompanyMapping.objects.filter(role=4):
+
+    for vgcm in VideoGameCompanyMapping.objects.filter(role=4)[:50]:
         if vgcm.company not in gameCompanies:
             if vgcm.company.image:
                 gameCompanies.append(vgcm.company)
-    for vgcm in VideoGameCompanyMapping.objects.filter(role=5):
+
+    for vgcm in VideoGameCompanyMapping.objects.filter(role=5)[:50]:
         if vgcm.company not in gameCompanies:
             if vgcm.company.image:
                 gameCompanies.append(vgcm.company)
+
     genres = []
     g = VideoGameGenre.objects.all()
     for genre in g:
@@ -1763,6 +1879,24 @@ class VideoGameGenreDetailView(generic.DetailView):
         context['franchises'] = VideoGameFranchiseGenreMapping.objects.filter(genre=self.object.id)
         context['projects'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')
         return context
+
+
+def consoleHome(request):
+
+    consolesFeaturedGames = {}
+    sorted = {}
+    for map in VideoGameConsoleMapping.objects.all():
+        if map.featured:
+            if map.console not in consolesFeaturedGames:
+                consolesFeaturedGames[map.console] = []
+                consolesFeaturedGames[map.console].append(map.videoGame)
+            else:
+                consolesFeaturedGames[map.console].append(map.videoGame)
+
+    context = {
+        'consolesFeaturedGames':consolesFeaturedGames,
+    }
+    return render(request, "media/consoleHome.html", context)
 
 class ConsoleDetailView(generic.DetailView):
     model = Console

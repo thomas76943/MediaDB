@@ -1,0 +1,42 @@
+{% extends "media/base.html" %}
+{% block title %}Consoles{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <h2 style="padding-top:5px">Consoles</h2>
+    </div>
+
+
+    {% if consolesFeaturedGames %}
+        {% for console, games in consolesFeaturedGames.items %}
+            <div class="container">
+                <div class="row">
+
+                        <div class="container infoSection leftScroll" style="max-width: 19%; padding-top: 15px">
+                            <img class="item box white" src="{{console.image.url}}" alt="{{console.name}}">
+                            <div class="noBoxShadow" style="padding-top: 10px; padding-left: 5px">
+                                {{ console.name }} / {{ console.shortName }}<br>
+                                {{ console.release }}<br>
+                                {{ console.developer.name }}<br>
+                            </div>
+                        </div>
+
+                        <div class="container infoSection rightScroll" style="max-width: 81%">
+                            <h5 class="font-weight-bold border-bottom mb-0">{{ console.name }} - Featured Games <a style="float:right" href="/consoles/{{ console.slug }}">See Detail Page</a></h5>
+                            <div class="scroller">
+                                <ul class="hs full">
+                                    {% for videoGame in games %}
+                                        <a href="/video-games/{{ videoGame.slug }}">
+                                            <img class="item posterSmall game" src="{{ videoGame.poster.url }}" alt="{{ videoGame.title }}">
+                                        </a>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

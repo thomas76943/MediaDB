@@ -36,46 +36,89 @@
     </div>
 
     <br>
+    <!--
+    <style>
+        .container.ratingBox {
+            min-height: 65px;
+        }
+
+        .container.ratingBox.taller {
+            min-height: 110px;
+        }
+
+        @media screen and (max-width: 675px) {
+    .item.detailPoster {
+        width: 110px;
+        height: 165px;
+    }
+    .trailer {
+        height: 165px;
+        min-height: 165px;
+        max-height: 165px;
+        width:281px;
+        max-width: 281px;
+    }
+    .ratingCol {
+        max-width: 391px;
+        padding-right: 5px;
+    }
+    .ratingBox.taller {
+        height: 260px;
+    }
+        }
+
+    @media screen and (max-width: 450px) {
+        .cloud-tags {
+            display: none;
+        }
+    }
+        -->
+    </style>
 
     <!-- If there is a poster or a trailer then create parent element for them -->
     {% if film.poster or film.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">
+
+                {% if film.poster %}
+                    <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">
+                {% endif %}
+
                 {% if film.trailerVideoPath %}
                     <iframe class="trailer" src={{film.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
 
-                <div class="col">
-                    {% if averageRating %}
-                        <div class="container ratingBox" id="ratingDiv">
-                            <h5>Average Rating: </h5>
-                            <h4>{{ averageRatingText }}</h4>
-                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                        </div>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <div class="container ratingBox">
-                            <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                        </div>
-
-                        <div id="reviewButtonContainer">
-                            {% if userRating %}
-                                <div class="container ratingBox">
-                                    <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
-                                        {% if review %}
-                                            Edit Review
-                                        {% else %}
-                                            Write Review
-                                        {% endif %}
-                                    </button>
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
+                            {% if averageRating %}
+                                <div id="ratingDiv">
+                                    <h5>Average Rating: </h5>
+                                    <h4>{{ averageRatingText }}</h4>
+                                    <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                                </div>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">
+                                    {% csrf_token %}
+                                </div>
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
+                                            {% if review %}
+                                                Edit Review
+                                            {% else %}
+                                                Write Review
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         </div>
-
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}

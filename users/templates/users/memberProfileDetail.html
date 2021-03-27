@@ -55,7 +55,7 @@
                 </script>
                  -->
 
-                <h2 class="account-heading">{{memberProfile.username}}</h2>
+                <h2 class="account-heading">{{memberProfile.username}} <a class="font-weight-bold" style="padding-top:3px;float:right;font-size: 18px" href="/user/{{ memberProfile.username }}/stats">Stats</a> </h2>
                 <p class="text-secondary">{{ memberProfile.profile.bio }}</p>
                 Ratings:<br>
                 Films - {{ filmCount }}<br>

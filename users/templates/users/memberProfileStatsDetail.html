@@ -1,0 +1,79 @@
+{% extends "media/base.html" %}
+{% block title %}{{memberProfile.username}}{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <div class="media">
+            <img class="item additionalImage" alt="profilePicture" src={% if memberProfile.profile.image %}{{ memberProfile.profile.image.url }}{% else %}https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png{% endif %}>
+            <div class="media-body" style="padding-left:15px">
+                <h2 class="account-heading">{{memberProfile.username}}</h2>
+                <p class="text-secondary">{{ memberProfile.profile.bio }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container profileSection">
+        <a href="/user/{{ memberProfile.username }}">Back to Profile Page</a>
+    </div>
+
+    {% if actorScores %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">{{ memberProfile.profile.user.username }}'s Favourite Actors</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for person, score in actorScores.items %}
+                        <div class="bottomOverlay">
+                            <a href="/person/{{ person.slug }}">
+                                <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                            </a>
+                            <div class="content">
+                                <h6 class = "font-weight-bold" >{{ score }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if directorScores %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Favourite Directors</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for person, score in directorScores.items %}
+                        <div class="bottomOverlay">
+                            <a href="/person/{{ person.slug }}">
+                                <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                            </a>
+                            <div class="content">
+                                <h6 class = "font-weight-bold" >{{ score }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if writerScores %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Favourite Writers</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for person, score in writerScores.items %}
+                        <div class="bottomOverlay">
+                            <a href="/person/{{ person.slug }}">
+                                <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                            </a>
+                            <div class="content">
+                                <h6 class = "font-weight-bold" >{{ score }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -13,6 +13,9 @@ from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, ProfileS
 from media.models import *
 from users.models import *
 
+from media import views
+from media.views import genreBasedRecommender, personBasedRecommender, getFeed, getAllActivity
+
 from django import http
 from django.http import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
@@ -152,8 +155,6 @@ class memberProfile(generic.UpdateView):
 
         if self.request.user.is_authenticated:
             allFollowing = UserFollows.objects.filter(userA=self.request.user)
-            print(self.object)
-            print(allFollowing)
             isFollowing = False
             for following in allFollowing:
                 if following.userB == self.object:
@@ -197,8 +198,9 @@ class memberProfile(generic.UpdateView):
 
         return http.HttpResponseRedirect('/user/' + object.username)
 
-class memberProfileActivity(memberProfile):
-    template_name = 'users/memberProfileActivityDetail.html'
+
+class memberProfileStats(memberProfile):
+    template_name = 'users/memberProfileStatsDetail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -209,7 +211,28 @@ class memberProfileActivity(memberProfile):
         webSeriesRatings = WebSeriesRating.objects.filter(user=self.object.id)
         ratings = sorted(list(chain(filmRatings, televisionRatings, videoGameRatings, bookRatings, webSeriesRatings)), key=attrgetter('dateTime'), reverse=True)
         context['ratings'] = ratings
+
+        genreRecommendations, genreScores = genreBasedRecommender(self.object.id)
+        context['genreScores'] = {i: genreScores[i] for i in list(genreScores)[:20]}
+
+        actorRecommendations, personScores = personBasedRecommender(self.object.id, 1)
+        context['actorScores'] = {i: personScores[i] for i in list(personScores)[:20]}
+
+        directorRecommendations, directorScores = personBasedRecommender(self.object.id, 2)
+        context['directorScores'] = {i: directorScores[i] for i in list(directorScores)[:20]}
+
+        writerRecommendations, writerScores = personBasedRecommender(self.object.id, 3)
+        context['writerScores'] = {i: writerScores[i] for i in list(writerScores)[:20]}
+
+
+
+
         return context
+
+
+class memberProfileActivity(memberProfileStats):
+    template_name = 'users/memberProfileActivityDetail.html'
+
 
 class profileSection(generic.UpdateView):
     model = ProfileSection
@@ -350,38 +373,6 @@ class profileSection(generic.UpdateView):
             url = "/user/"+username
             return redirect(url)
 
-def getFeed(user, limit):
-    following = UserFollows.objects.filter(userA=user)
-    f = []
-
-    for account in following:
-        accountFilms = FilmRating.objects.filter(user=account.userB)
-        accountTV = TelevisionRating.objects.filter(user=account.userB)
-        accountVG = VideoGameRating.objects.filter(user=account.userB)
-        accountBooks = BookRating.objects.filter(user=account.userB)
-        accountWeb = WebSeriesRating.objects.filter(user=account.userB)
-        accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
-        for ar in accountRatings:
-            f.append(ar)
-
-    feed = sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
-    return feed, following
-
-
-def getAllActivity(user, limit):
-    f = []
-    for account in User.objects.all():
-        if user != account:
-            accountFilms = FilmRating.objects.filter(user=account)
-            accountTV = TelevisionRating.objects.filter(user=account)
-            accountVG = VideoGameRating.objects.filter(user=account)
-            accountBooks = BookRating.objects.filter(user=account)
-            accountWeb = WebSeriesRating.objects.filter(user=account)
-            accountRatings = list(chain(accountFilms, accountTV, accountVG, accountBooks, accountWeb))
-            for ar in accountRatings:
-                f.append(ar)
-    return sorted(f, key=attrgetter('dateTime'), reverse=True)[:limit]
-
 
 def activityFeed(request):
     context = {}
@@ -391,4 +382,5 @@ def activityFeed(request):
         context['following'] = following
 
     return render(request, 'users/feed.html', context)
+
 
