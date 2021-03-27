@@ -14,6 +14,8 @@ django-filter==2.2.0
 django-heroku==0.3.1
 django-import-export==2.3.0
 django-jquery==3.1.0
+django-mathfilters==1.0.0
+django-pandas==0.6.4
 django-storages==1.11.1
 djangorestframework==3.11.1
 et-xmlfile==1.0.1
@@ -23,9 +25,12 @@ gunicorn==20.0.4
 idna==2.9
 jdcal==1.4.1
 jmespath==0.10.0
+joblib==1.0.1
 MarkupPy==1.14
+numpy==1.20.1
 odfpy==1.4.1
 openpyxl==3.0.5
+pandas==1.2.3
 pathspec==0.5.9
 Pillow==8.0.0
 psycopg2==2.8.6
@@ -34,11 +39,15 @@ pytz==2019.3
 PyYAML==5.3.1
 requests==2.23.0
 s3transfer==0.3.4
+scikit-learn==0.24.1
+scipy==1.6.2
 semantic-version==2.5.0
 six==1.15.0
+sklearn==0.0
 sqlparse==0.3.0
 tablib==2.0.0
 termcolor==1.1.0
+threadpoolctl==2.1.0
 urllib3==1.25.8
 wcwidth==0.1.9
 whitenoise==5.0.1
