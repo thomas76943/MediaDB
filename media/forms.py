@@ -5,61 +5,112 @@ from users.models import *
 class DateInput(forms.DateInput):
     input_type = 'date'
 
-class ContributePersonForm(forms.ModelForm):
+
+class BaseMappingForm(forms.ModelForm):
     class Meta:
-        model = Person
-        fields = ['firstName', 'surname', 'DoB', 'DoD', 'bio']
-        widgets = {
-            'firstName':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
-            'surname':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Surname'}),
-            'DoB':DateInput(),
-            'DoD': DateInput(),
-            'bio':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bio'}),
-        }
+        model = FilmPersonMapping
+        fields = ['film', 'person', 'role', 'character', 'billing']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].empty_label = None
 
-class ContributeFilmForm(forms.ModelForm):
+class FilmGenreMappingForm(BaseMappingForm):
     class Meta:
-        model = Film
-        fields = ['title', 'release', 'rating', 'synopsis', 'length', 'budget', 'boxOffice', 'poster', 'trailerVideoPath']
-        widgets = {
-            'title':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
-            'release':forms.DateInput(),
-            'rating':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Rating'}),
-            'synopsis':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Synopsis'}),
-            'length':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Length (mins)'}),
-            'budget':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Budget'}),
-            'boxOffice':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Box Offce'}),
-            'trailerVideoPath':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
-        }
+        model = FilmGenreMapping
+        fields = ['film', 'genre']
 
-class ContributeTelevisionForm(forms.ModelForm):
+class FilmCompanyMappingForm(BaseMappingForm):
     class Meta:
-        model = Television
-        fields = ['title', 'ongoing', 'release', 'end', 'synopsis', 'seasons',
-                  'episodes', 'trailerVideoPath']
+        model = FilmCompanyMapping
+        fields = ['film', 'company', 'role']
 
-        widgets = {
-            'title':forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
-            'release':DateInput(),
-            'end': DateInput(),
-            'synopsis': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Synopsis'}),
-            'seasons': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Seasons'}),
-            'episodes': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Episodes'}),
-            'trailerVideoPath': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Trailer Video Path'}),
-        }
-
-class filmRatingForm(forms.Form):
+class FilmTagMappingForm(BaseMappingForm):
     class Meta:
-        model = FilmRating
-        fields = ['user', 'film', 'rating', 'review']
+        model = FilmTagMapping
+        fields = ['film', 'tag']
 
-        widgets = {
-            'rating':forms.FloatField()
-        }
-
-
-class FilmListForm(forms.ModelForm):
+class TelevisionPersonMappingForm(BaseMappingForm):
     class Meta:
-        model = UserListFilmMapping
-        fields = ['user','film']
+        model = TelevisionPersonMapping
+        fields = ['television', 'person', 'role', 'character', 'billing']
 
+class TelevisionGenreMappingForm(BaseMappingForm):
+    class Meta:
+        model = TelevisionGenreMapping
+        fields = ['television', 'genre']
+
+class TelevisionCompanyMappingForm(BaseMappingForm):
+    class Meta:
+        model = TelevisionCompanyMapping
+        fields = ['television', 'company', 'role']
+
+class TelevisionTagMappingForm(BaseMappingForm):
+    class Meta:
+        model = TelevisionTagMapping
+        fields = ['television', 'tag']
+
+class VideoGamePersonMappingForm(BaseMappingForm):
+    class Meta:
+        model = VideoGamePersonMapping
+        fields = ['videogame', 'person', 'role', 'character', 'billing']
+
+class VideoGameGenreMappingForm(BaseMappingForm):
+    class Meta:
+        model = VideoGameGenreMapping
+        fields = ['videoGame', 'genre']
+
+class VideoGameCompanyMappingForm(BaseMappingForm):
+    class Meta:
+        model = VideoGameCompanyMapping
+        fields = ['videoGame', 'company', 'role']
+
+class VideoGameTagMappingForm(BaseMappingForm):
+    class Meta:
+        model = VideoGameTagMapping
+        fields = ['videoGame', 'tag']
+
+class VideoGameConsoleMappingForm(BaseMappingForm):
+    class Meta:
+        model = VideoGameConsoleMapping
+        fields = ['videoGame', 'console']
+
+class BookPersonMappingForm(BaseMappingForm):
+    class Meta:
+        model = BookPersonMapping
+        fields = ['book', 'person', 'role']
+
+class BookGenreMappingForm(BaseMappingForm):
+    class Meta:
+        model = BookGenreMapping
+        fields = ['book', 'genre']
+
+class BookCompanyMappingForm(BaseMappingForm):
+    class Meta:
+        model = BookCompanyMapping
+        fields = ['book', 'company', 'role']
+
+class BookTagMappingForm(BaseMappingForm):
+    class Meta:
+        model = BookTagMapping
+        fields = ['book', 'tag']
+
+class WebSeriesPersonMappingForm(BaseMappingForm):
+    class Meta:
+        model = WebSeriesPersonMapping
+        fields = ['webSeries', 'person', 'role']
+
+class WebSeriesGenreMappingForm(BaseMappingForm):
+    class Meta:
+        model = WebSeriesGenreMapping
+        fields = ['webSeries', 'genre']
+
+class WebSeriesCompanyMappingForm(BaseMappingForm):
+    class Meta:
+        model = WebSeriesCompanyMapping
+        fields = ['webSeries', 'company', 'role']
+
+class WebSeriesTagMappingForm(BaseMappingForm):
+    class Meta:
+        model = WebSeriesTagMapping
+        fields = ['webSeries', 'tag']

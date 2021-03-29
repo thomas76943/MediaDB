@@ -21,6 +21,10 @@ from django.http import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 
+import pandas as pd
+import numpy as np
+from django_pandas.io import read_frame
+
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -199,19 +203,86 @@ class memberProfile(generic.UpdateView):
         return http.HttpResponseRedirect('/user/' + object.username)
 
 
-class memberProfileStats(memberProfile):
+class memberProfileActivity(memberProfile):
+    template_name = 'users/memberProfileActivityDetail.html'
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------#
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+
+def userRatingStats(mediaType, user):
+    if mediaType == 'Films':
+        df = read_frame(FilmRating.objects.filter(user=user), fieldnames=['film', 'rating'])
+    if mediaType == 'Television':
+        df = read_frame(TelevisionRating.objects.filter(user=user), fieldnames=['television', 'rating'])
+    if mediaType == 'Video Games':
+        df = read_frame(VideoGameRating.objects.filter(user=user), fieldnames=['videoGame', 'rating'])
+    if mediaType == 'Books':
+        df = read_frame(BookRating.objects.filter(user=user), fieldnames=['book', 'rating'])
+    if mediaType == 'Web Series':
+        df = read_frame(WebSeriesRating.objects.filter(user=user), fieldnames=['webSeries', 'rating'])
+
+    #pd.set_option('display.float_format', lambda x: '%.0f' % x)
+
+    fig, ax = plt.subplots(1, 1, figsize=(3,1.5))
+    ax.hist(df['rating'], rwidth=0.9)
+
+    ax.set_facecolor('#323238')
+
+    rects = ax.patches
+    labels = ['.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+    #for i in rects:
+    #    labels.append(int(i.get_height()))
+
+    largest = 0
+    for rect, label in zip(rects, labels):
+        height = rect.get_height()
+        if height > largest:
+            largest = height
+        #ax.text(rect.get_x() + rect.get_width() / 2, height-0.1, label, ha='center', va='top', color='white')
+        #ax.text(rect.get_x() + rect.get_width() / 2, height+0.01, label, ha='center', va='top', color='white')
+        rect.set_facecolor('#0CA06B')
+
+    for rect, label in zip(rects, labels):
+        if rect.get_height() < largest*0.1:
+            rect.set_height(largest*0.1)
+
+    buffer = BytesIO()
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.savefig(buffer, format='png', bbox_inches = 'tight', pad_inches = -0.1)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+
+    return { 'mediaType':mediaType,
+             'Number of Ratings':df['rating'].count(),
+             'Mean':str(df['rating'].mean())[:4],
+             'Mode Rating':str(df['rating'].mode())[3:-17],
+             'Rating Standard Deviation':str(df['rating'].std())[:4],
+             'hist':graphic }
+
+class memberProfileStats(memberProfileActivity):
     template_name = 'users/memberProfileStatsDetail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        filmRatings = FilmRating.objects.filter(user=self.object.id)
-        televisionRatings = TelevisionRating.objects.filter(user=self.object.id)
-        videoGameRatings = VideoGameRating.objects.filter(user=self.object.id)
-        bookRatings = BookRating.objects.filter(user=self.object.id)
-        webSeriesRatings = WebSeriesRating.objects.filter(user=self.object.id)
-        ratings = sorted(list(chain(filmRatings, televisionRatings, videoGameRatings, bookRatings, webSeriesRatings)), key=attrgetter('dateTime'), reverse=True)
-        context['ratings'] = ratings
 
+        context['stats'] = [userRatingStats('Films', self.object.id),
+                            userRatingStats('Television', self.object.id),
+                            userRatingStats('Video Games', self.object.id),
+                            userRatingStats('Books', self.object.id),
+                            userRatingStats('Web Series', self.object.id)]
+
+        #context['graphic'] = userRatingStats('Films', self.object.id)
+
+        """
         genreRecommendations, genreScores = genreBasedRecommender(self.object.id)
         context['genreScores'] = {i: genreScores[i] for i in list(genreScores)[:20]}
 
@@ -223,15 +294,10 @@ class memberProfileStats(memberProfile):
 
         writerRecommendations, writerScores = personBasedRecommender(self.object.id, 3)
         context['writerScores'] = {i: writerScores[i] for i in list(writerScores)[:20]}
-
-
-
+        """
 
         return context
 
-
-class memberProfileActivity(memberProfileStats):
-    template_name = 'users/memberProfileActivityDetail.html'
 
 
 class profileSection(generic.UpdateView):

@@ -16,6 +16,88 @@
         <a href="/user/{{ memberProfile.username }}">Back to Profile Page</a>
     </div>
 
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+          font-weight: bold;
+        }
+
+        td, th {
+          text-align: left;
+        }
+
+        .statsCol {
+            width: 45%;
+        }
+
+        .statsCol2 {
+            width: 45%
+        }
+
+        .rightScroll img {
+            display:block;
+            margin:auto;
+        }
+
+        @media screen and (max-width: 890px) {
+            .leftScroll,
+            .rightScroll {
+                min-width: 100%;
+                max-width: 100%;
+            }
+            .statsCol2 {
+                width: 15%;
+            }
+        }
+
+        @media screen and (max-width: 1400px) {
+            .rightScroll table {
+                margin:auto;
+            }
+            .statsCol2 {
+                width: 25%;
+            }
+        }
+    </style>
+
+    {% for statType in stats %}
+        <div class="container profileSection leftScroll" style="width: 65%; max-width: 65%">
+            <table cellspacing="0" cellpadding="0" style="border: none;">
+              <colgroup><col span="1" class="statsCol"><col span="1" class="statsCol2"></colgroup>
+              {% for key, stat in statType.items %}
+                  {% if key == 'mediaType' %}
+                      <tr><th colspan="2"><h5 class="font-weight-bold border-bottom mb-1">{{ stat }}</h5></th></tr>
+                  {% else %}
+                      {% if key != 'hist' %}
+                          <tr>
+                              <td>{{ key }}</td>
+                              {% if stat != 'nan' %}
+                              <td>{{ stat }}</td>
+                              {% else %}
+                              <td>Unavailable</td>
+                              {% endif %}
+                          </tr>
+                      {% endif %}
+                  {% endif %}
+              {% endfor %}
+            </table>
+        </div>
+
+        <div class="container profileSection rightScroll" style="width:35%;padding-top: 45px; padding-left: 20px">
+          {% for key, stat in statType.items %}
+              {% if key == 'hist' %}
+                  <img class="box hist" src="data:image/png;base64,{{ stat|safe }}">
+              {% endif %}
+          {% endfor %}
+        </div>
+
+        <div style="clear: both"><br></div>
+
+    {% endfor %}
+
+
     {% if actorScores %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">{{ memberProfile.profile.user.username }}'s Favourite Actors</h5>

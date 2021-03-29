@@ -140,32 +140,44 @@
 
     </div>
 
+    <!-- Search Bar on Home Screen on Mobile-->
+    <style>
+        .mobileShow{
+            height: 75px;
+            display: none;
+        }
+        @media screen and (max-width: 675px) {
+            .mobileShow{
+                display: inline-block;
+            }
+        }
+    </style>
+    <div class="container infoSection mobileShow">
+        <form id="searchForm" action="/search/" class="input-group input-group-lg">
+            <input class="form-control" type="search" name="q" placeholder="Search MediaDB...">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+
     <!--To Do List-->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
             <br>Recommendation Algorithm<br><br>
-            Datasets: Television, Video Games, Books, Web Series, Awards<br><br>
-            Store Highest Rated, Don't Calculate Every Time<br><br>
-
+            Datasets: Television, Books, Web Series, Awards<br><br>
             Features:<br>
-
-            Forms for Editing / Contributing<br>
-            Forms to apply tags to media<br>
-
+            Show friends who have watched/played/read media on detail pages<br>
+            Show reviews for media on detail pages<br>
             Browsing Grid Filter Forms<br><br>
 
             Fixes:<br>
             After game imports: add icons to new genres<br>
             After game imports: rename new genres<br>
-            After game imports: fix console names/shortnames<br>
-            After game imports: assign to franchises<br>
             After game imports: game genre slugs<br>
-            Rating box size when no poster/trailer<br>
-            Double Click Megamenus<br>
-            Fix Megamenus on Mobile<br>
+            Rating box size on mobile<br>
             Set up carousels on TV/Game/Web/Book Home Pages<br><br>
-            Add Genres to manually added media<br><br>
             Add all CSS to stylesheet<br>
+            Clean up settings files, nothing secure<br>
+            Move all to GitHub repo + nice README<br>
         </h5>
     </div>
 

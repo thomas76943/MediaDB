@@ -105,6 +105,9 @@ admin.site.register(WebSeriesAwardCreditMapping)
 admin.site.register(Tag)
 admin.site.register(FilmTagMapping)
 admin.site.register(TelevisionTagMapping)
+admin.site.register(VideoGameTagMapping)
+admin.site.register(BookTagMapping)
+admin.site.register(WebSeriesTagMapping)
 
 
 #Highest Rating Stores

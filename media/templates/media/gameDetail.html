@@ -21,7 +21,6 @@
             </div>
         </form>
 
-        ID: {{ videogame.id }}
         <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
@@ -110,7 +109,7 @@
         <div class="container infoSection">
             <h5 style="padding-top:5px">Released On:</h5>
             {% for console in consoles %}
-                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }} {{ console.id }}</a>
+                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
             {% endfor %}
         </div>
     {% endif %}
@@ -125,8 +124,12 @@
     {% if franchises %}
         <div class="container infoSection">
             <h5 style="padding-top:5px">Franchise:</h5>
-            {% for franchise in franchises %}
-                <a style="padding-right: 10px" href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a>
+            {% for key, value in franchises.items %}
+                {% if value == 'vgf' %}
+                <a style="padding-right: 10px" href="/video-game-franchises/{{ key.slug }}"> {{ key.title }} </a>
+                {% else %}
+                <a style="padding-right: 10px" href="/franchises/{{ key.slug }}"> {{ key.title }} </a>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

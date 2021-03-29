@@ -11,18 +11,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!--jQuery -->
+    <!--jQuery-->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
+    <!--jQuery Slim ----------- MIGHT GET RID OF THIS --------------------------------
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
 
     <!--Bootstrap 4.5.2-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <!--  ----------- MIGHT GET RID OF THIS --------------------------------
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 
-    <!--Font Awesome-->
+    <!--Font Awesome ---------------------MIGHHT GET RID OF THIS ---------------------
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    -->
 
     <!--Bootstrap Material Design-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
@@ -31,16 +33,20 @@
 
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
 
-    <!--Google Material Icons-->
+    <!--Google Material Icons -----------------MIGHT GET RID OF THIS ---------------------
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    -->
 
-    <!--Colorful Tags jQuery Plugin -->
+    <!--Colorful Tags jQuery Plugin-->
     <link rel="stylesheet" href="{% static 'media/prettytag.css' %}" type="text/css">
     <script src="{% static 'media/jquery.prettytag.js' %}"></script>
 
-    <!--Star Rating (RateYo) -->
+    <!--Star Rating (RateYo)-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+
+    <!-- Make Profile Sections Sortable -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <!--Custom CSS-->
     <link rel="stylesheet" href="{% static 'media/newstylesheet.css' %}" type="text/css">
@@ -50,251 +56,261 @@
 
 <body style="margin-left:auto; margin-right:auto; background-color: #1f262d;color:white">
 
+
     <nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top">
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fa fa-bars fa-lg" style="padding:7px 0px 7px"></i>
-        </button>
+        <div class="container noBoxShadow" style="padding-left:0; padding-right:0;max-width:1400px; margin-left:auto; margin-right:auto;">
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="max-width:1400px; margin-left:auto; margin-right:auto;">
-            <ul class="navbar-nav mr-auto">
-                <a class="navbar-brand" style="padding-top:5px" href="{% url 'media-home' %}">
-                    <img class="navbarLogo" src="{% static 'media/logoNew.png' %}" alt="noImage">
-                </a>
 
-                <style>
-                    .dropdown-menu::-webkit-scrollbar
-                    {
-                        width: 0; // Or display: none;
-                    }
-                    .dropdown-menu {
-                        height: 100%;
-                    }
-                </style>
+            <a class="navbar-brand" style="padding-top:5px" href="{% url 'media-home' %}">
+                <img class="navbarLogo" src="{% static 'media/logoNew.png' %}" alt="noImage">
+            </a>
 
-                <!-- BROWSE Megamenu -->
-                <li class="nav-item dropdown megamenu shadow-none" style="padding-top:4px" id="mega1">
-                    <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
-                        BROWSE
-                    </a>
-                    <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
-                      <div class="container noBoxShadow">
-                        <div class="row bg-dark rounded-0 m-0 shadow-sm">
-                          <div class="col-lg-7 col-xl-8" style="background-color: rgba(30,30,30,0.88)">
-                            <div class="p-4">
-                                <form id="searchForm" action="/search/" class="input-group input-group-lg">
-                                    <input class="form-control" type="search" name="q" placeholder="Search MediaDB...">
-                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                                </form>
-                                <hr>
-                                <h5>
-                                    <a href="{% url 'media-browse' %}" class="nav-link font-weight-bold text-uppercase">
-                                        <img class="mediaIcon Grid">
-                                        Browse All Media
-                                    </a>
-                                </h5>
-                                <hr>
-                              <div class="row">
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'film-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Film">
-                                          Films
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'media-top-rated' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-top-grossing' %}" class="nav-link text-small pb-0 ">Top Grossing</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-franchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'tv-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Television">
-                                          Television
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
-                                    <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
-                                    <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'game-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon VideoGame">
-                                          Video Games
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'game-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-videogamefranchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-console-home' %}" class="nav-link text-small pb-0 ">Consoles</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'book-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Book">
-                                          Books
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
-                                    <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
-                                    <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'web-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon WebSeries">
-                                          Web Series
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
-                                    <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
-                                    <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-sm-4 mb-4">
-                                  <h5>
-                                      <a href="{% url 'media-awards-home' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Awards">
-                                          Awards
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Shows</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Types</a></li>
-                                    <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Categories</a></li>
-                                  </ul>
-                                </div>
-                              </div>
-                            <hr>
-                            </div>
-                          </div>
-                          <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
-                               style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/aliens1.jpg) no-repeat; background-size: cover;">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                </li>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fa fa-bars fa-lg" style="padding:7px 0px 7px"></i>
+            </button>
 
-                <!-- CONTRIBUTE Megamenu -->
-                <li class="nav-item dropdown megamenu" style="padding-top:4px" >
-                    <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
-                        Contribute
-                    </a>
-                    <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
-                      <div class="container noBoxShadow">
-                        <div class="row bg-dark rounded-0 m-0 shadow-sm">
-                          <div class="col-lg-7 col-xl-8" style="background-color: rgba(30,30,30,0.88)">
-                            <div class="p-4">
-                              <hr>
-                              <div class="row">
-                                <div class="col-lg-6 mb-4">
-                                  <h5>
-                                      <a href="{% url 'contribute-media' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Contribute">
-                                          Contribute Media
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'contribute-person' %}" class="nav-link text-small pb-0 ">Contribute Person</a></li>
-                                    <li class="nav-item"><a href="{% url 'contribute-media' %}" class="nav-link text-small pb-0 ">Contribute Media</a></li>
-                                    <li class="nav-item"><a href="{% url 'contribute-company' %}" class="nav-link text-small pb-0 ">Contribute Company</a></li>
-                                    <li class="nav-item"><a href="{% url 'contribute-role' %}" class="nav-link text-small pb-0 ">Contribute Role</a></li>
-                                    <li class="nav-item"><a href="{% url 'contribute-other' %}" class="nav-link text-small pb-0 ">Contribute Other</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-lg-6 mb-4">
-                                  <h5>
-                                      <a href="{% url 'csv-upload' %}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Upload">
-                                          Upload CSV
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'csv-upload' %}" class="nav-link text-small pb-0 ">CSV Data Upload</a></li>
-                                  </ul>
-                                </div>
-                                <div class="col-lg-6 mb-4">
-                                  <h5>
-                                      <a href="/admin" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon Admin">
-                                          Administrator Access
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="/admin" class="nav-link text-small pb-0 ">Login</a></li>
-                                  </ul>
-                                </div>
-                              </div>
-                              <hr>
-                            </div>
-                          </div>
-                          <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
-                               style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/posters/exorcist1.png) no-repeat; background-size: cover;">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                </li>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-                <!-- User Megamenu -->
-                {% if user.is_authenticated %}
-                    <li class="nav-item dropdown megamenu" style="padding-top:4px" >
-                        <a id="megamneu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
-                            {{user.username}}
-                            {% if user.profile.image %}
-                                <img class="rounded-circle" style="margin-left: 6px" src="{{user.profile.image.url}}" height="22" alt=""/>
-                            {% endif %}
+                <ul class="navbar-nav mr-auto">
+
+                    <style>
+                        .dropdown-menu::-webkit-scrollbar
+                        {
+                            width: 0; // Or display: none;
+                        }
+                        .dropdown-menu {
+                            height: 100%;
+                        }
+                        @media screen and (max-width: 675px) {
+                            .subMenuHide {
+                                display: none;
+                            }
+                            .rightHide {
+                                display: none;
+                            }
+                            div.col-sm-4 mb-3 {
+                                margin-bottom: 0!important;
+                            }
+                        }
+                    </style>
+
+                    <!--BROWSE Megamenu-->
+                    <li class="nav-item dropdown megamenu shadow-none" style="padding-top:4px" data-target="mega1">
+                        <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
+                            BROWSE
                         </a>
-                        <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
+                        <div id="mega1" aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
                           <div class="container noBoxShadow">
                             <div class="row bg-dark rounded-0 m-0 shadow-sm">
-                              <div class="col" style="padding:20px; background-color: rgba(30,30,30,0.88)">
-                                  <hr>
-                                  <h5>
-                                      <a href="/user/{{ user.username }}" class="nav-link font-weight-bold text-uppercase">
-                                          <img class="mediaIcon User">
-                                          View Profile
-                                      </a>
-                                  </h5>
-                                  <ul class="list-unstyled">
-                                    <li class="nav-item"><a href="{% url 'userProfile' %}" class="nav-link text-small pb-0 ">Edit Profile</a></li>
-                                    <li class="nav-item"><a href="/user/{{ user.username }}/activity" class="nav-link text-small pb-0 ">My Ratings/Reviews</a></li>
-                                    <li class="nav-item"><a href="{% url 'user-List' %}" class="nav-link text-small pb-0 ">My List</a></li>
-                                    <li class="nav-item"><a href="{% url 'contribute-role' %}" class="nav-link text-small pb-0 ">My Edits</a></li>
-                                    <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link text-small pb-0 ">Logout</a></li>
-                                  </ul>
-                                  <hr>
+                              <div class="col-lg-7 col-xl-8" style="background-color: rgba(30,30,30,0.88)">
+                                <div class="p-3">
+                                    <div class="subMenuHide">
+                                        <form id="searchForm" action="/search/" class="input-group input-group-lg">
+                                            <input class="form-control" type="search" name="q" placeholder="Search MediaDB...">
+                                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                                        </form>
+                                    </div>
+                                    <hr class="subMenuHide">
+                                    <h5>
+                                        <a href="{% url 'media-browse' %}" class="nav-link font-weight-bold text-uppercase">
+                                            <img class="mediaIcon Grid">
+                                            Browse All Media
+                                        </a>
+                                    </h5>
+                                    <hr class="subMenuHide">
+                                  <div class="row">
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'film-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Film">
+                                              Films
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'media-top-rated' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-top-grossing' %}" class="nav-link text-small pb-0 ">Top Grossing</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-franchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'tv-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Television">
+                                              Television
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
+                                        <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
+                                        <li class="nav-item"><a href="{% url 'tv-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'game-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon VideoGame">
+                                              Video Games
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'game-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-videogamefranchise-home' %}" class="nav-link text-small pb-0 ">Franchises</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-console-home' %}" class="nav-link text-small pb-0 ">Consoles</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'book-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Book">
+                                              Books
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
+                                        <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
+                                        <li class="nav-item"><a href="{% url 'book-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'web-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon WebSeries">
+                                              Web Series
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Highest Rated</a></li>
+                                        <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Most Popular</a></li>
+                                        <li class="nav-item"><a href="{% url 'web-home' %}" class="nav-link text-small pb-0 ">Latest</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-sm-4 mb-3">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'media-awards-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Awards">
+                                              Awards
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Shows</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Types</a></li>
+                                        <li class="nav-item"><a href="{% url 'media-awards-home' %}" class="nav-link text-small pb-0 ">Categories</a></li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                <hr class="subMenuHide">
+                                </div>
+                              </div>
+                              <div class="col-lg-5 col-xl-4 px-0 d-none d-lg-block"
+                                   style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/aliens1.jpg) no-repeat; background-size: cover;">
                               </div>
                             </div>
                           </div>
                         </div>
                     </li>
-                {% else %}
-                    <li class="nav-item" style="padding-top:2px"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'login' %}">Login</a></li>
-                    <li class="nav-item" style="padding-top:2px"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'register' %}">Register</a></li>
-                {% endif %}
 
-            </ul>
+                    <!-- CONTRIBUTE Megamenu-->
+                    <li class="nav-item dropdown megamenu" style="padding-top:4px" >
+                        <a id="megamenu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
+                            Contribute
+                        </a>
+                        <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
+                          <div class="container noBoxShadow">
+                            <div class="row bg-dark rounded-0 m-0 shadow-sm">
+                              <div class="col-lg-7 col-xl-8" style="background-color: rgba(30,30,30,0.88)">
+                                <div class="p-3">
+                                  <hr class="subMenuHide">
+                                  <div class="row">
+                                    <div class="col-lg-8 mb-2">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="{% url 'contribute-home' %}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Contribute">
+                                              Contribute
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="{% url 'contribute-home' %}" class="nav-link text-small pb-0 ">Contribute Home</a></li>
+                                        <li class="nav-item"><a href="{% url 'contribute-person' %}" class="nav-link text-small pb-0 ">Contribute Person</a></li>
+                                        <li class="nav-item"><a href="{% url 'contribute-company' %}" class="nav-link text-small pb-0 ">Contribute Company</a></li>
+                                      </ul>
+                                    </div>
+                                    <div class="col-lg-8 mb-2">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="/admin" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon Admin">
+                                              Admin Access
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled subMenuHide">
+                                        <li class="nav-item"><a href="/admin" class="nav-link text-small pb-0 ">Login</a></li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                  <hr class="subMenuHide">
+                                </div>
+                              </div>
+                              <div class="col-lg-6 col-xl-4 px-0 d-none d-lg-block"
+                                   style="background: center center url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/posters/exorcist1.png) no-repeat; background-size: cover;">
+                              </div>
+                          </div>
+                        </div>
+                        </div>
+                    </li>
 
-            <!-- Right-Hand Nav Bar -->
-            <ul class="navbar-nav">
-                <form id="searchForm" action="/search/" class="info form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search MediaDB...">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
-            </ul>
+                    <!-- User Megamenu-->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown megamenu" style="padding-top:4px" >
+                            <a id="megamneu" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle font-weight-bold text-uppercase">
+                                {{user.username}}
+                                {% if user.profile.image %}
+                                    <img class="rounded-circle" style="margin-left: 6px" src="{{user.profile.image.url}}" height="22" alt=""/>
+                                {% endif %}
+                            </a>
+                            <div aria-labelledby="megamenu" class="dropdown-menu border-0 p-0 m-0">
+                              <div class="container noBoxShadow">
+                                <div class="row bg-dark rounded-0 m-0 shadow-sm">
+                                  <div class="col" style="padding:20px; background-color: rgba(30,30,30,0.88)">
+                                      <hr class="subMenuHide">
+                                      <h5 style="margin-bottom: 0">
+                                          <a href="/user/{{ user.username }}" class="nav-link font-weight-bold text-uppercase">
+                                              <img class="mediaIcon User">
+                                              View Profile
+                                          </a>
+                                      </h5>
+                                      <ul class="list-unstyled">
+                                        <li class="nav-item"><a href="{% url 'userProfile' %}" class="nav-link text-small pb-0 ">Edit Profile</a></li>
+                                        <li class="nav-item"><a href="/user/{{ user.username }}/activity" class="nav-link text-small pb-0 ">My Ratings/Reviews</a></li>
+                                        <li class="nav-item"><a href="{% url 'user-List' %}" class="nav-link text-small pb-0 ">My List</a></li>
+                                        <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link text-small pb-0 ">Logout</a></li>
+                                      </ul>
+                                      <hr class="subMenuHide">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item" style="padding-top:2px"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item" style="padding-top:2px"><a class="nav-link font-weight-bold text-uppercase" href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+
+
+                </ul>
+
+                <!-- Right-Hand Nav Bar-->
+                <ul class="navbar-nav rightHide">
+                    <form id="searchForm" action="/search/" class="info form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search MediaDB...">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                </ul>
+
+
+            </div>
 
         </div>
+
     </nav>
 
     <!-- Page Body Content -->
@@ -332,6 +348,8 @@
             });
         }
     </script>
+
+
 
     <!-- List Toggle Script -->
     <script>

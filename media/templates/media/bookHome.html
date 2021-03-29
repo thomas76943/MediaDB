@@ -6,20 +6,11 @@
         <h2 style="padding-top: 7px;">Books - Home</h2>
     </div>
 
-    <h3>All Books:</h3>
     {% for book in books %}
         <hr>
         <a href="/books/{{ book.slug }}">{{ book.title }} | {{ book.getYear }}</a>
     {% endfor %}
 
     <hr>
-
-    <!-- Films Without Genres Checker-->
-    {% for film in nogenres %}
-
-        {{ film.title }} {{ film.release }}<br>
-
-    {% endfor %}
-
 
 {% endblock %}

@@ -437,8 +437,8 @@ class TelevisionPersonMapping(models.Model):
         verbose_name_plural = "Television - Person Mappings"
 
 class VideoGamePersonMapping(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-    videogame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    videogame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
@@ -537,7 +537,7 @@ class VideoGameFranchise(models.Model):
         verbose_name_plural = "Video Game Franchises"
 
 class VideoGameFranchiseSubcategory(models.Model):
-    parentFranchise = models.ForeignKey(VideoGameFranchise, on_delete=models.PROTECT)
+    parentFranchise = models.ForeignKey(VideoGameFranchise, on_delete=models.CASCADE)
     title = models.CharField(max_length=500, default='NoVideoGameFranchiseSubCategoryNameSpecified')
     subCategoryOrder = models.IntegerField(default=1)
 
@@ -574,8 +574,8 @@ class TelevisionFranchiseSubcategoryMapping(models.Model):
 
 
 class VideoGameFranchiseSubcategoryMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
-    franchiseSubcategory = models.ForeignKey(FranchiseSubcategory, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
+    franchiseSubcategory = models.ForeignKey(FranchiseSubcategory, on_delete=models.CASCADE)
     orderInFranchise = models.IntegerField(default=1)
 
     def __str__(self):
@@ -588,7 +588,7 @@ class VideoGameFranchiseSubcategoryMapping(models.Model):
 
 class VideoGameVideoGameFranchiseSubcategoryMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
-    videoGameFranchiseSubcategory = models.ForeignKey(VideoGameFranchiseSubcategory, on_delete=models.PROTECT)
+    videoGameFranchiseSubcategory = models.ForeignKey(VideoGameFranchiseSubcategory, on_delete=models.CASCADE)
     orderInFranchise = models.IntegerField(default=1)
 
     def __str__(self):
@@ -802,7 +802,7 @@ class TelevisionAwardMapping(models.Model):
         verbose_name_plural = "Television - Awards"
 
 class VideoGameAwardMapping(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     awardsShow = models.ForeignKey(AwardsShow, on_delete=models.PROTECT, default='')
     category = models.ForeignKey(AwardsCategories, on_delete=models.PROTECT, null=True)
     win = models.BooleanField(default=False)
@@ -871,7 +871,7 @@ class TelevisionAwardCreditMapping(models.Model):
         verbose_name_plural = "Television - Award Credit Mappings"
 
 class VideoGameAwardCreditMapping(models.Model):
-    VideoGameAwardMapping = models.ForeignKey(VideoGameAwardMapping, on_delete=models.PROTECT, default='')
+    VideoGameAwardMapping = models.ForeignKey(VideoGameAwardMapping, on_delete=models.CASCADE, default='')
     Person = models.ForeignKey(Person, on_delete=models.PROTECT, default='', blank=True, null=True)
     Company = models.ForeignKey(Company, on_delete=models.PROTECT, default='', blank=True, null=True)
 
@@ -962,7 +962,7 @@ class TelevisionImages(models.Model):
         verbose_name_plural = "Television - Additional Images"
 
 class VideoGameImages(models.Model):
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     image = models.ImageField(default='MissingIcon.png', upload_to='extraImages', blank=True)
 
     def __str__(self):
@@ -1033,6 +1033,40 @@ class TelevisionTagMapping(models.Model):
     class Meta:
         verbose_name = "Television - Tag Mapping"
         verbose_name_plural = "Television - Tag Mappings"
+
+
+class VideoGameTagMapping(models.Model):
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return (self.tag.name + " - " + self.videoGame.title)
+
+    class Meta:
+        verbose_name = "Video Game - Tag Mapping"
+        verbose_name_plural = "Video Game - Tag Mappings"
+
+class BookTagMapping(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return (self.tag.name + " - " + self.book.title)
+
+    class Meta:
+        verbose_name = "Book - Tag Mapping"
+        verbose_name_plural = "Book - Tag Mappings"
+
+class WebSeriesTagMapping(models.Model):
+    webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return (self.tag.name + " - " + self.webSeries.title)
+
+    class Meta:
+        verbose_name = "Web Series - Tag Mapping"
+        verbose_name_plural = "Web Series - Tag Mappings"
 
 #-- Highest Rating Stores -------------------------------------------------------#
 class HighestRatedFilms(models.Model):

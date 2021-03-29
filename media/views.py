@@ -11,6 +11,7 @@ from django.contrib import messages
 from datetime import datetime, date
 import time
 
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.db.models import Q
@@ -89,13 +90,6 @@ def dataSources(request):
 
 
 
-
-
-
-
-
-
-
     context = {}
     return render(request, "media/dataSources.html", context)
 
@@ -161,7 +155,7 @@ def addFilmRatings():
 
     knownIDs = {}
 
-    badCharsTitles = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '@']
+    badCharsTitles = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', ]
     badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@']
 
     for row in ratingsData:
@@ -795,7 +789,6 @@ def calendar(request):
 
     context = {
         'num':num,
-        'counts':findDulplicateTitles(),
         'people':months
     }
     return render (request, 'media/calendar.html', context)
@@ -954,7 +947,7 @@ def addVideoGameData():
         print("\n")
 
 def addBookData():
-    badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
+    badCharsTitles = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', ]
 
     with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
         data = json.loads(f.read())
@@ -976,11 +969,10 @@ def searchResults(request):
     #        noposters.append(vg.title)
     #print(noposters)
 
-    #subcat = VideoGameFranchiseSubcategory.objects.get(pk=159)
-
-    #for g in VideoGame.objects.filter(release__range=["1980-01-01", "2020-12-25"]).order_by('release'):
-    #    if 'metroid' in g.title.lower():
-    #        VideoGameVideoGameFranchiseSubcategoryMapping(videoGame=g, videoGameFranchiseSubcategory=subcat, orderInFranchise=1).save()
+    #subcat = VideoGameFranchiseSubcategory.objects.get(pk=212)
+    #for g in VideoGame.objects.filter(release__range=["1980-01-01", "2021-12-25"]).order_by('release'):
+    #    if 'dragon ball' in g.title.lower():
+    #            VideoGameVideoGameFranchiseSubcategoryMapping(videoGame=g, franchiseSubcategory=subcat, orderInFranchise=1).save()
 
     title_contains = request.GET.get('q')
 
@@ -1104,7 +1096,7 @@ def gameHome(request):
         'topRated':getHighestRated(VideoGame, 20),
         'upcoming':getUpcomingTitles(f=False, tv=False, vg=True, b=False, ws=False),
         'consoles': Console.objects.all().order_by('-release'),
-        'franchises':franchises,
+        'franchises':franchises[:50],
         'genres': genres,
         'companies': gameCompanies,
     }
@@ -1112,18 +1104,6 @@ def gameHome(request):
 
 def bookHome(request):
 
-    genreCounts = {}
-    noGenres = []
-
-    for v in Film.objects.all():
-        genreCounts[v] = 0
-
-    for map in FilmGenreMapping.objects.all():
-        genreCounts[map.film] += 1
-
-    for v in genreCounts:
-        if genreCounts[v] == 0:
-            noGenres.append(v)
     """
     for ng in noGenres:
         action = VideoGameGenre.objects.filter(id=1)[0]
@@ -1145,7 +1125,6 @@ def bookHome(request):
     """
     context = {
         'books':Book.objects.all(),
-        'nogenres':noGenres,
     }
     return render(request, 'media/bookHome.html', context)
 
@@ -1155,66 +1134,125 @@ def webHome(request):
     }
     return render(request, 'media/webHome.html', context)
 
+
 def contributeHome(request):
-    return render(request, 'media/contributeMedia.html')
+    return render(request, 'media/contributeHome.html')
 
-def contributeMedia(request):
 
-    filmForm = ContributeFilmForm(request.POST or None, request.FILES or None, initial={
-        'title':'', 'release':'', 'rating':'', 'synopsis':'', 'length':'',
-        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    })
+class contributeBase(generic.CreateView):
+    model = Film
+    fields = '__all__'
+    template_name = 'media/contributeBase.html'
 
-    televisionForm = ContributeTelevisionForm(request.POST or None, request.FILES or None, initial={
-        'title':'', 'release':'', 'synopsis':'', 'seasons':'', 'episodes':'',
-        'budget':'', 'boxOffice':'', 'posterFilePath':'', 'trailerVideoPath':''
-    })
+    def get_success_url(self):
+        return reverse('contribute-home')
 
-    forms = [filmForm, televisionForm]
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.save()
+        return http.HttpResponseRedirect(reverse('contribute-home'))
 
-    context = {
-        'forms':forms,
-    }
+class contributeTelevision(contributeBase):
+    model = Television
+class contributeVideoGame(contributeBase):
+    model = VideoGame
+class contributeBook(contributeBase):
+    model = Book
+class contributeWebSeries(contributeBase):
+    model = WebSeries
+class contributePerson(contributeBase):
+    model = Person
+class contributeCompany(contributeBase):
+    model = Company
+class contributeFilmPerson(contributeBase):
+    model = FilmPersonMapping
+    fields = None
+    form_class = BaseMappingForm
+class contributeFilmGenre(contributeBase):
+    model = FilmGenreMapping
+    fields = None
+    form_class = FilmGenreMappingForm
+class contributeFilmCompany(contributeBase):
+    model = FilmCompanyMapping
+    fields = None
+    form_class = FilmCompanyMappingForm
+class contributeFilmTag(contributeBase):
+    model = FilmTagMapping
+    fields = None
+    form_class = FilmTagMappingForm
+class contributeTelevisionPerson(contributeBase):
+    model = TelevisionPersonMapping
+    fields = None
+    form_class = TelevisionPersonMappingForm
+class contributeTelevisionGenre(contributeBase):
+    model = TelevisionGenreMapping
+    fields = None
+    form_class = TelevisionGenreMappingForm
+class contributeTelevisionCompany(contributeBase):
+    model = TelevisionCompanyMapping
+    fields = None
+    form_class = TelevisionCompanyMappingForm
+class contributeTelevisionTag(contributeBase):
+    model = TelevisionTagMapping
+    fields = None
+    form_class = TelevisionTagMappingForm
+class contributeVideoGamePerson(contributeBase):
+    model = VideoGamePersonMapping
+    fields = None
+    form_class = VideoGamePersonMappingForm
+class contributeVideoGameGenre(contributeBase):
+    model = VideoGameGenreMapping
+    fields = None
+    form_class = VideoGameGenreMappingForm
+class contributeVideoGameCompany(contributeBase):
+    model = VideoGameCompanyMapping
+    fields = None
+    form_class = VideoGameCompanyMappingForm
+class contributeVideoGameTag(contributeBase):
+    model = VideoGameTagMapping
+    fields = None
+    form_class = VideoGameTagMappingForm
+class contributeVideoGameConsole(contributeBase):
+    model = VideoGameConsoleMapping
+    fields = None
+    form_class = VideoGameConsoleMappingForm
+class contributeBookPerson(contributeBase):
+    model = BookPersonMapping
+    fields = None
+    form_class = BookPersonMappingForm
+class contributeBookGenre(contributeBase):
+    model = BookGenreMapping
+    fields = None
+    form_class = BookGenreMappingForm
+class contributeBookCompany(contributeBase):
+    model = BookCompanyMapping
+    fields = None
+    form_class = BookCompanyMappingForm
+class contributeBookTag(contributeBase):
+    model = BookTagMapping
+    fields = None
+    form_class = BookTagMappingForm
+class contributeWebSeriesPerson(contributeBase):
+    model = WebSeriesPersonMapping
+    fields = None
+    form_class = WebSeriesPersonMappingForm
+class contributeWebSeriesGenre(contributeBase):
+    model = WebSeriesGenreMapping
+    fields = None
+    form_class = WebSeriesGenreMappingForm
+class contributeWebSeriesCompany(contributeBase):
+    model = WebSeriesCompanyMapping
+    fields = None
+    form_class = WebSeriesCompanyMappingForm
+class contributeWebSeriesTag(contributeBase):
+    model = WebSeriesTagMapping
+    fields = None
+    form_class = WebSeriesTagMappingForm
 
-    if request.method == 'POST':
-        if filmForm.is_valid():
-            new = filmForm.save(commit=False)
-            new.poster = request.FILES.get('poster')
-            filmForm.save()
-            messages.success(request, "Successfully added film")
-            return http.HttpResponseRedirect('/contribute-media')
-        if televisionForm.is_valid():
-            televisionForm.save()
-            messages.success(request, "Successfully added Television")
-            return http.HttpResponseRedirect('/contribute-media')
 
-    return render(request, 'media/contributeMedia.html', context)
 
-def contributePerson(request):
-    initialValues = {
-        'firstName': '', 'surname':'', 'Bio':'', 'DoB':'', 'DoD':'',
-    }
-    form = ContributePersonForm(request.POST or None, initial=initialValues)
-    context = {
-        'form':form
-    }
 
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Successfully added person")
-            return http.HttpResponseRedirect('/contribute-person')
 
-    return render(request, 'media/contributePerson.html', context)
-
-def contributeRole(request):
-    return render(request, 'media/contributeRole.html')
-
-def contributeCompany(request):
-    return render(request, 'media/contributeCompany.html')
-
-def contributeOther(request):
-    return render(request, 'media/contributeOther.html')
 
 def AwardsHome(request):
     context = {
@@ -1239,7 +1277,6 @@ def videoGameFranchiseHome(request):
 
     context = {
         'franchises':franchises,
-        'others':VideoGameFranchise.objects.all()
     }
     return render(request, 'media/gameFranchiseHome.html', context)
 
@@ -1421,15 +1458,15 @@ class CompanyDetailView(generic.DetailView):
         context['films'] = FilmCompanyMapping.objects.filter(company=self.object.id).order_by('film__release')
         context['television'] = TelevisionCompanyMapping.objects.filter(company=self.object.id).order_by('television__release')
 
-        gameMappings = VideoGameCompanyMapping.objects.all().order_by('videoGame__release')
-        games = []
+        games=[]
+        for id in VideoGameCompanyMapping.objects.filter(company_id=self.object.id).order_by('videoGame__release').values_list('videoGame', flat=True).distinct():
+            games.append(VideoGame.objects.filter(pk=id).first())
+        context['oldestGames'] = games[:100]
 
-        for mapping in gameMappings:
-            if mapping.company.id == self.object.id and mapping.videoGame not in games:
-                    games.append(mapping.videoGame)
-        context['oldestGames'] = games[:50]
-        if len(games) > 50:
-            context['newestGames'] = games[-50:]
+        games=[]
+        for id in VideoGameCompanyMapping.objects.filter(company_id=self.object.id).order_by('-videoGame__release').values_list('videoGame', flat=True).distinct():
+            games.append(VideoGame.objects.filter(pk=id).first())
+        context['newestGames'] = games[:100]
 
         context['books'] = BookCompanyMapping.objects.filter(company=self.object.id).order_by('book__release')
         context['webseries'] = WebSeriesCompanyMapping.objects.filter(company=self.object.id).order_by('webSeries__release')
@@ -1473,6 +1510,7 @@ class FranchiseDetailView(generic.DetailView):
         franchiseProducers = {}
 
         for media in completeFranchise:
+            crew = None
             if hasattr(media,'film'):
                 crew = FilmPersonMapping.objects.filter(film=media.film)
             if hasattr(media,'television'):
@@ -1484,19 +1522,20 @@ class FranchiseDetailView(generic.DetailView):
             if hasattr(media,'webseries'):
                 crew = WebSeriesPersonMapping.objects.filter(webSeries=media.webSeries)
 
-            cast = crew.filter(role=1)
-            for mapping in cast:
-                if mapping.person not in franchiseActors:
-                    franchiseActors[mapping.person] = 1
-                else:
-                    franchiseActors[mapping.person] += 1
+            if crew != None:
+                cast = crew.filter(role=1)
+                for mapping in cast:
+                    if mapping.person not in franchiseActors:
+                        franchiseActors[mapping.person] = 1
+                    else:
+                        franchiseActors[mapping.person] += 1
 
-            producers = crew.filter(role=6)
-            for mapping in producers:
-                if mapping.person not in franchiseProducers:
-                    franchiseProducers[mapping.person] = 1
-                else:
-                    franchiseProducers[mapping.person] += 1
+                producers = crew.filter(role=6)
+                for mapping in producers:
+                    if mapping.person not in franchiseProducers:
+                        franchiseProducers[mapping.person] = 1
+                    else:
+                        franchiseProducers[mapping.person] += 1
 
         actorTuples = dict(sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True))
         #sortedActors = {k: v for k,v in actorTuples}
@@ -1687,10 +1726,13 @@ class VideoGameDetailView(generic.UpdateView):
         context['producers'] = VideoGamePersonMapping.objects.filter(role=6, videogame=self.object.id)
         context['cast'] = VideoGamePersonMapping.objects.filter(role=1, videogame=self.object.id).order_by('billing')
 
-        franchises = []
+        franchises = {}
         for x in VideoGameVideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
             if x.videoGame.id == self.object.id:
-                franchises.append(x.videoGameFranchiseSubcategory.parentFranchise)
+                franchises[x.videoGameFranchiseSubcategory.parentFranchise] = 'vgf'
+        for x in VideoGameFranchiseSubcategoryMapping.objects.filter(videoGame=self.object.id):
+            if x.videoGame.id == self.object.id:
+                franchises[x.franchiseSubcategory.parentFranchise] = 'f'
         context['franchises'] = franchises
 
         ratings = VideoGameRating.objects.filter(videoGame=self.object.id)
@@ -1877,7 +1919,7 @@ class VideoGameGenreDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['franchises'] = VideoGameFranchiseGenreMapping.objects.filter(genre=self.object.id)
-        context['projects'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')
+        context['projects'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:100]
         return context
 
 
