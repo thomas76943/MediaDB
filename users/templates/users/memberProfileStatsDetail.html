@@ -73,7 +73,7 @@
                       {% if key != 'hist' %}
                           <tr>
                               <td>{{ key }}</td>
-                              {% if stat != 'nan' %}
+                              {% if stat != 'nan' and stat != 'ies([' and stat != '0' %}
                               <td>{{ stat }}</td>
                               {% else %}
                               <td>Unavailable</td>

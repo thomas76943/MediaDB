@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from PIL import Image
 from django.utils.datetime_safe import datetime
 from django.utils.text import slugify
-
 from media.models import Film, Television, VideoGame, Book, WebSeries
 
+#---User Profile, User Follows, Profile Sections-----------------------------------------------------------------------#
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile_pics', null=True)
@@ -14,15 +14,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username + " Profile"
-
-    #def save(self, *args, **kwargs):
-        #super().save()
-        #if self.image != None:
-        #    img = Image.open(self.image.name)
-        #    if img.height > 300 or img.width > 300:
-        #        output_size = (300,300)
-        #        img.thumbnail(output_size)
-        #        img.save(self.image.name)
 
 class UserFollows(models.Model):
     userA = models.ForeignKey(User, on_delete=models.PROTECT, related_name='userA')
@@ -42,6 +33,7 @@ class ProfileSection(models.Model):
     order = models.IntegerField(default=1)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
+    #Overwrite save method to populate slugfield based on profile section's name and the user who created it
     def save(self, *args, **kwargs):
         super().save()
         if not self.slug:
@@ -51,6 +43,7 @@ class ProfileSection(models.Model):
     def __str__(self):
         return self.profile.user.username + " - " + self.sectionName
 
+#---Profile Section Mappings-------------------------------------------------------------------------------------------#
 class ProfileSectionFilmMapping(models.Model):
     film = models.ForeignKey(Film, on_delete=models.CASCADE)
     profileSection = models.ForeignKey(ProfileSection, on_delete=models.CASCADE)
@@ -111,9 +104,10 @@ class ProfileSectionWebSeriesMapping(models.Model):
         verbose_name = "Profile Section - Web Series Mapping"
         verbose_name_plural = "Profile Sections - Web Series Mappings"
 
+#---Rating Mappings----------------------------------------------------------------------------------------------------#
 class FilmRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    film = models.ForeignKey(Film, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    film = models.ForeignKey(Film, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
     review = models.CharField(max_length=1000, default="", blank=True)
     dateTime = models.DateTimeField(default=datetime.now)
@@ -125,10 +119,9 @@ class FilmRating(models.Model):
         verbose_name = "Film - Rating"
         verbose_name_plural = "Films - Ratings"
 
-
 class TelevisionRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    television = models.ForeignKey(Television, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    television = models.ForeignKey(Television, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
     review = models.CharField(max_length=1000, default="", blank=True)
     dateTime = models.DateTimeField(default=datetime.now)
@@ -140,10 +133,9 @@ class TelevisionRating(models.Model):
         verbose_name = "Television - Rating"
         verbose_name_plural = "Television - Ratings"
 
-
 class VideoGameRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
     review = models.CharField(max_length=1000, default="", blank=True)
     dateTime = models.DateTimeField(default=datetime.now)
@@ -155,10 +147,9 @@ class VideoGameRating(models.Model):
         verbose_name = "Video Game - Rating"
         verbose_name_plural = "Video Games - Ratings"
 
-
 class BookRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
     review = models.CharField(max_length=1000, default="", blank=True)
     dateTime = models.DateTimeField(default=datetime.now)
@@ -170,10 +161,9 @@ class BookRating(models.Model):
         verbose_name = "Book - Rating"
         verbose_name_plural = "Books - Ratings"
 
-
 class WebSeriesRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    webSeries = models.ForeignKey(WebSeries, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
     review = models.CharField(max_length=1000, default="", blank=True)
     dateTime = models.DateTimeField(default=datetime.now)
@@ -185,10 +175,10 @@ class WebSeriesRating(models.Model):
         verbose_name = "Web Series - Rating"
         verbose_name_plural = "Web Series - Ratings"
 
-
+#---List Mappings------------------------------------------------------------------------------------------------------#
 class UserListFilmMapping(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    film = models.ForeignKey(Film, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    film = models.ForeignKey(Film, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " - " + self.film.title
@@ -197,10 +187,9 @@ class UserListFilmMapping(models.Model):
         verbose_name = "User List - Film Mapping"
         verbose_name_plural = "User List - Film Mappings"
 
-
 class UserListTelevisionMapping(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    television = models.ForeignKey(Television, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    television = models.ForeignKey(Television, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " - " + self.television.title
@@ -209,10 +198,9 @@ class UserListTelevisionMapping(models.Model):
         verbose_name = "User List - Television Mapping"
         verbose_name_plural = "User List - Television Mappings"
 
-
 class UserListVideoGameMapping(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " - " + self.videoGame.title
@@ -221,10 +209,9 @@ class UserListVideoGameMapping(models.Model):
         verbose_name = "User List - Video Game Mapping"
         verbose_name_plural = "User List - Video Game Mappings"
 
-
 class UserListBookMapping(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " - " + self.book.title
@@ -233,10 +220,9 @@ class UserListBookMapping(models.Model):
         verbose_name = "User List - Book Mapping"
         verbose_name_plural = "User List - Book Mappings"
 
-
 class UserListWebSeriesMapping(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    webSeries = models.ForeignKey(WebSeries, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username + " - " + self.webSeries.title
@@ -244,3 +230,26 @@ class UserListWebSeriesMapping(models.Model):
     class Meta:
         verbose_name = "User List - Web Series Mapping"
         verbose_name_plural = "User List - Web Series Mappings"
+
+#------ Film Recommendation and User Similarity Stores-----------------------------------------------------------------#
+class FilmRecommendations(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    films = models.TextField(max_length=250, default="")
+
+    def __str__(self):
+        return (self.user.username + " - " + str(self.films))
+
+    class Meta:
+        verbose_name = "User - Film Recommendation"
+        verbose_name_plural = "User - Film Recommendations"
+
+class UserUserSimilarities(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    users = models.TextField(max_length=250, default="")
+
+    def __str__(self):
+        return (self.user.username + " - " + str(self.users))
+
+    class Meta:
+        verbose_name = "User - User Similarity"
+        verbose_name_plural = "User - User Similarities"

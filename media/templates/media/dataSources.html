@@ -24,5 +24,18 @@
         <h6>Images: omdb-api (from IMDb)</h6>
     </div>
 
+    <div class="container profileSection">
+    {% for key, values in collaborative.items %}
+        <br><br>Key: {{ key }}<br>
+        {% for value in values %}
+            {% if value not in seen %}
+                {{ forloop.counter }}{{ value.title }}<br>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+
+    </div>
+
 
 {% endblock %}

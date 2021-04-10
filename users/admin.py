@@ -23,3 +23,7 @@ admin.site.register(UserListTelevisionMapping)
 admin.site.register(UserListVideoGameMapping)
 admin.site.register(UserListBookMapping)
 admin.site.register(UserListWebSeriesMapping)
+
+
+admin.site.register(FilmRecommendations)
+admin.site.register(UserUserSimilarities)

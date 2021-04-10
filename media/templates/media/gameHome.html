@@ -122,7 +122,7 @@
         <div class="scroller">
             <ul class="hs full">
                 {% for genre in genres %}
-                    <a href="/video-game-genre/{{ genre.id }}">
+                    <a href="/video-game-genre/{{ genre.slug }}">
                         <img class="item box white genre" src="{{genre.image.url}}" alt="|">
                         <div class="lowerLabel">
                             <h7 class="font-weight-bold">{{ genre.title }}</h7>

@@ -132,7 +132,7 @@
          <div class="scroller">
             <ul class="hs full">
                 {% for genre in genres %}
-                    <a href="/genre/{{ genre.title }}">
+                    <a href="/genre/{{ genre.slug }}">
                         <img class="item box genre" src="{{ genre.image.url }}" alt="|">
                         <div class="lowerLabel">
                             <h7 class="font-weight-bold">{{ genre.title }}</h7>

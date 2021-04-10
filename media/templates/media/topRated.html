@@ -5,24 +5,20 @@
         <h2 style="padding-top: 7px">Highest Rated Films</h2>
     </div>
 
-    {% for film, rating in topRated.items %}
+    {% for film in topRated %}
         <div class="container infoSection">
             <div class="media">
-                <a class="item smallImage" href="/films/{{ film.slug }}">
-                    <img class="item smallImage" src="{{film.poster.url}}" alt="{{film.title}}">
+                <a class="item smallImage" href="/films/{{ film.media.slug }}">
+                    <img class="item smallImage" src="{{film.media.poster.url}}" alt="{{film.media.title}}">
                 </a>
                 <div class="media-body" style="padding-left:15px">
-                    <a href="/films/{{ film.slug }}">
+                    <a href="/films/{{ film.media.slug }}">
                         <h5 class="font-weight-bold border-bottom mb-0">
-                            {{ film.title }} ({{ film.getYear }})
-                            <div style="float:right">
-                                <div class="ratingStars medium" style="--rating: 5;"></div>
-                                {{ rating }}
-                            </div>
+                            {{ film.media.title }} ({{ film.media.getYear }}) - {{ film.rating }}
                         </h5>
                     </a>
-                    {% if film.synopsis %}
-                        {{ film.synopsis }}
+                    {% if film.media.synopsis %}
+                        {{ film.media.synopsis }}
                     {% endif %}
                 </div>
             </div>

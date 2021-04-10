@@ -1,0 +1,120 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/recommender">Back</a></h6>
+    </div>
+
+    <!-- Main Collaborative Filtering Results -->
+    {% if collaborativeFiltering %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Collaborative Filtering</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film in collaborativeFiltering %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Main Content-Based Filtering Results -->
+    {% if contentBasedFiltering %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Content-Based Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film in contentBasedFiltering %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Content-Based Filtering Genre Results -->
+    {% if genreRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Genre-Based Recommendations</h5>
+            {% if genreScores %}
+                {{ genreScores }}
+            {% endif %}
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in genreRecommendations.items %}
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Content-Based Filtering Actor Results -->
+    {% if actorRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Actor-Based Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in actorRecommendations.items %}
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if actorScores %}
+                {{ actorScores }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Content-Based Filtering Director Results -->
+    {% if directorRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Director-Based Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in directorRecommendations.items %}
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if directorScores %}
+                {{ directorScores }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Content-Based Filtering Writer Results -->
+    {% if writerRecommendations %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Writer-Based Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film, score in writerRecommendations.items %}
+                            <a href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if writerScores %}
+                {{ writerScores }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+{% endblock %}

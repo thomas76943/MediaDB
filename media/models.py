@@ -19,16 +19,13 @@ class Person(models.Model):
     def __str__(self):
         return (self.firstName + " " + self.surname)
 
+    #Method to Get the person's full name
     def getFullName(self):
         return (self.firstName + " " + self.surname)
 
+    #Overwritten save method to populate the slugfield based on the name and DoB of the person
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.image.name)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.image.name)
         if not self.slug:
             if self.DoB:
                 self.slug = slugify(self.getFullName() + "-" + str(self.DoB.year))
@@ -40,7 +37,6 @@ class Person(models.Model):
         verbose_name = "Person"
         verbose_name_plural = "People"
 
-
 class PersonRole(models.Model):
     role = models.CharField(max_length=500, default='NoRoleNameSpecified')
 
@@ -51,7 +47,7 @@ class PersonRole(models.Model):
         verbose_name = "Person - Role Type"
         verbose_name_plural = "People - Role Types"
 
-#---Companies----------------------------------------------------------------------------------------------------------#
+#---Companies and Roles------------------------------------------------------------------------------------------------#
 class Company(models.Model):
     name = models.CharField(max_length=500, default='NoFilmStudioNameSpecified')
     baseCountry = models.CharField(max_length=500, blank=True)
@@ -62,21 +58,16 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Company"
-        verbose_name_plural = "Companies"
-
+    #Overwritten save method to populate the slugfield based on the company's name
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.image.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.name)
         super(Company, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = "Company"
+        verbose_name_plural = "Companies"
 
 class CompanyRole(models.Model):
     companyRoleName = models.CharField(max_length=500, default='NoCompanyRoleNameSpecified')
@@ -88,7 +79,7 @@ class CompanyRole(models.Model):
         verbose_name = "Company - Role Type"
         verbose_name_plural = "Companies - Role Types"
 
-#---Media Type: Film---------------------------------------------------------#
+#---Media Types: Film, Television, Video Games, Books, Web Series------------------------------------------------------#
 class Film(models.Model):
     title = models.CharField(max_length=150, default='NoFilmTitleSpecified')
     release = models.DateField(default=timezone.now)
@@ -102,14 +93,9 @@ class Film(models.Model):
     trailerVideoPath = models.CharField(max_length=500, blank=True)
     slug = models.SlugField(max_length=150, null=True, blank=True, editable=True)
 
+    #Overwritten save method to populate the slugfield based on the film's title and release date
     def save(self, *args, **kwargs):
         super().save()
-        #if self.poster:
-        #    img = Image.open(self.poster.path)
-        #    if img.height > 600 or img.width > 600:
-        #        output_size = (600,600)
-        #        img.thumbnail(output_size)
-        #        img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(Film, self).save(*args, **kwargs)
@@ -117,6 +103,7 @@ class Film(models.Model):
     def __str__(self):
         return self.title
 
+    #Gets the year of the film's release
     def getYear(self):
         return self.release.year
 
@@ -140,13 +127,9 @@ class Television(models.Model):
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
+    #Overwritten save method to populate the slugfield based on the television series' title and release date
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.poster.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(Television, self).save(*args, **kwargs)
@@ -154,9 +137,11 @@ class Television(models.Model):
     def __str__(self):
         return self.title
 
+    #Gets the start year of the television series
     def getYear(self):
         return self.release.year
 
+    #Gets the end year of the television series
     def getEndYear(self):
         return self.end.year
 
@@ -173,13 +158,9 @@ class VideoGame(models.Model):
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
+    #Overwritten save method to populate the slugfield based on the game's title and release date
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.poster.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
             super(VideoGame, self).save(*args, **kwargs)
@@ -187,6 +168,7 @@ class VideoGame(models.Model):
     def __str__(self):
         return (self.title + " - " + str(self.release.year))
 
+    #Gets the release year of the video game
     def getYear(self):
         return self.release.year
 
@@ -202,13 +184,9 @@ class Book(models.Model):
     cover = models.ImageField(default='', upload_to='bookCoverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
+    #Overwritten save method to populate the slugfield based on the book's title and release date
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.image.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600, 600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
             super(Book, self).save(*args, **kwargs)
@@ -216,6 +194,7 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    #Gets the book's release year
     def getYear(self):
         return self.release.year
 
@@ -236,13 +215,9 @@ class WebSeries(models.Model):
     cover = models.ImageField(default='', upload_to='coverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
 
+    #Overwritten save method to populate the slugfield based on the web series' title and release date
     def save(self, *args, **kwargs):
         super().save()
-        #img = Image.open(self.poster.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.poster.path)
         if not self.slug:
             self.slug = slugify(self.title + "-" + str(self.release))
         super(WebSeries, self).save(*args, **kwargs)
@@ -250,9 +225,11 @@ class WebSeries(models.Model):
     def __str__(self):
         return self.title
 
+    #Gets the web series' start year
     def getYear(self):
         return self.release.year
 
+    #Gets the web series' end year
     def getEndYear(self):
         return self.end.year
 
@@ -260,13 +237,20 @@ class WebSeries(models.Model):
         verbose_name = "Web Series"
         verbose_name_plural = "Web Series"
 
-#---Genre Mappings-------------------------------------------------------#
+#---Genres and Genre Mappings------------------------------------------------------------------------------------------#
 class Genre(models.Model):
     title = models.CharField(max_length=500, default='NoGenreSpecified')
     image = models.ImageField(blank=True, default='', upload_to='icons')
+    slug = models.SlugField(max_length=150, blank=True, editable=True, default='')
 
     def __str__(self):
         return self.title
+
+    #Overwritten save method to populate the slugfield based on the genre name
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(Genre, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Genre - Standard"
@@ -275,9 +259,16 @@ class Genre(models.Model):
 class VideoGameGenre(models.Model):
     title = models.CharField(max_length=500, default='NoVideoGameGenreSpecified')
     image = models.ImageField(blank=True, default='', upload_to='icons')
+    slug = models.SlugField(max_length=150, blank=True, editable=True, default='')
 
     def __str__(self):
         return self.title
+
+    #Overwritten save method to populate the slugfield based on the genre name
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(VideoGameGenre, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Genre - Video Game"
@@ -338,7 +329,7 @@ class WebSeriesGenreMapping(models.Model):
         verbose_name = "Web Series - Genre Mapping"
         verbose_name_plural = "Web Series - Genre Mappings"
 
-#---Company Mappings----------------------------------------------------------------------------------------------------#
+#---Company Mappings---------------------------------------------------------------------------------------------------#
 class FilmCompanyMapping(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
@@ -399,8 +390,7 @@ class WebSeriesCompanyMapping(models.Model):
         verbose_name = "Web Series - Company Mapping"
         verbose_name_plural = "Web Series - Company Mappings"
 
-
-#---Film-Person Mappings-------------------------------------------------------#
+#---Media-Person Mappings----------------------------------------------------------------------------------------------#
 class FilmPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
@@ -485,7 +475,7 @@ class WebSeriesPersonMapping(models.Model):
         verbose_name = "Web Series - Person Mapping"
         verbose_name_plural = "Web Series - Person Mappings"
 
-#---Franchises---------------------------------------------------------------------------------------------------------#
+#---Franchises and Media-FranchiseSubcategory Mappings-----------------------------------------------------------------#
 class Franchise(models.Model):
     title = models.CharField(max_length=500, default='NoFranchiseNameSpecified')
     image = models.ImageField(blank=True, upload_to='franchises')
@@ -572,7 +562,6 @@ class TelevisionFranchiseSubcategoryMapping(models.Model):
         verbose_name = "Television - Franchise  Subcategory Mapping"
         verbose_name_plural = "Television - Franchise  Subcategory Mappings"
 
-
 class VideoGameFranchiseSubcategoryMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     franchiseSubcategory = models.ForeignKey(FranchiseSubcategory, on_delete=models.CASCADE)
@@ -584,7 +573,6 @@ class VideoGameFranchiseSubcategoryMapping(models.Model):
     class Meta:
         verbose_name = "Video Games - Franchise  Subcategory Mapping"
         verbose_name_plural = "Video Games - Franchise  Subcategory Mappings"
-
 
 class VideoGameVideoGameFranchiseSubcategoryMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
@@ -622,8 +610,7 @@ class WebSeriesFranchiseSubcategoryMapping(models.Model):
         verbose_name = "Web Series - Franchise  Subcategory Mapping"
         verbose_name_plural = "Web Series - Franchise  Subcategory Mappings"
 
-
-#---Franchise-Genre Mappings---------------------------------------------------------------------------------------------------------#
+#---Franchise-Genre Mappings-------------------------------------------------------------------------------------------#
 class FranchiseGenreMapping(models.Model):
     franchise = models.ForeignKey(Franchise, on_delete=models.PROTECT)
     genre = models.ForeignKey(Genre, on_delete=models.PROTECT)
@@ -646,7 +633,7 @@ class VideoGameFranchiseGenreMapping(models.Model):
         verbose_name = "Video Game Franchises - Genre Mapping"
         verbose_name_plural = "Video Game Franchises - Genre Mappings"
 
-#---Company-Franchise Mappings---------------------------------------------------------------------------------------------------------#
+#---Company-Franchise Mappings-----------------------------------------------------------------------------------------#
 class FranchiseCompanyMapping(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT, default='')
     franchise = models.ForeignKey(Franchise, on_delete=models.PROTECT, default='')
@@ -669,8 +656,7 @@ class VideoGameFranchiseCompanyMapping(models.Model):
         verbose_name = "Company - Video Game Franchise Mapping"
         verbose_name_plural = "Companies - Video Game Franchise Mappings"
 
-
-#---Video Game Consoles and Mappings---------------------------------------------------------------------------------------------------------#
+#---Video Game Consoles and Mappings-----------------------------------------------------------------------------------#
 class Console(models.Model):
     name = models.CharField(max_length=500, default='NoConsoleNameSpecified')
     shortName = models.CharField(max_length=500, default='NoShortConsoleNameSpecified')
@@ -679,14 +665,9 @@ class Console(models.Model):
     slug = models.SlugField(max_length=150, blank=True, editable=True, default='')
     image = models.ImageField(blank=True, upload_to='consoles')
 
+    #Overwritten save method to populate the slugfield based on the console's name
     def save(self, *args, **kwargs):
         super().save()
-        #if self.image:
-        #    img = Image.open(self.image.path)
-        #    if img.height > 600 or img.width > 600:
-        #        output_size = (600, 600)
-        #        img.thumbnail(output_size)
-        #        img.save(self.image.path)
         if not self.slug:
             self.slug = slugify(self.shortName)
         super(Console, self).save(*args, **kwargs)
@@ -698,23 +679,12 @@ class Console(models.Model):
         verbose_name = "Video Game Console"
         verbose_name_plural = "Video Game Consoles"
 
-
 class ConsoleVersion(models.Model):
     name = models.CharField(max_length=500, default='NoConsoleNameSpecified')
     shortName = models.CharField(max_length=500, default='None')
     console = models.ForeignKey(Console, on_delete=models.PROTECT)
     release = models.DateField(default=timezone.now)
     image = models.ImageField(blank=True, upload_to='consoles')
-
-    def save(self, *args, **kwargs):
-        super().save()
-        if self.image:
-            img = Image.open(self.image.path)
-            if img.height > 600 or img.width > 600:
-                output_size = (600, 600)
-                img.thumbnail(output_size)
-                img.save(self.image.path)
-        super(ConsoleVersion, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -735,9 +705,7 @@ class VideoGameConsoleMapping(models.Model):
         verbose_name = "Video Games - Console Mapping"
         verbose_name_plural = "Video Games - Console Mappings"
 
-
-#---Awards---------------------------------------------------------------------------------------------------------#
-
+#---Awards-------------------------------------------------------------------------------------------------------------#
 class AwardType(models.Model):
     name = models.CharField(max_length=50, default='')
 
@@ -773,8 +741,7 @@ class AwardsCategories(models.Model):
         verbose_name = "Awards - Category"
         verbose_name_plural = "Awards - Categories"
 
-#---Media Awards Mappings---------------------------------------------------------------------------------------------------------#
-
+#---Media Awards Mappings----------------------------------------------------------------------------------------------#
 class FilmAwardMapping(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
     awardsShow = models.ForeignKey(AwardsShow, on_delete=models.PROTECT, default='')
@@ -840,8 +807,7 @@ class WebSeriesAwardMapping(models.Model):
         verbose_name = "Web Series - Award"
         verbose_name_plural = "Web Series - Awards"
 
-# ---Award Credit Mappings---------------------------------------------------------------------------------------------------------#
-
+# ---Award Credit Mappings---------------------------------------------------------------------------------------------#
 class FilmAwardCreditMapping(models.Model):
     FilmAwardMapping = models.ForeignKey(FilmAwardMapping, on_delete=models.PROTECT, default='')
     Person = models.ForeignKey(Person, on_delete=models.PROTECT, blank=True, null=True)
@@ -849,9 +815,13 @@ class FilmAwardCreditMapping(models.Model):
 
     def __str__(self):
         if self.Person:
-            return (self.FilmAwardMapping.film.title + " | " + self.FilmAwardMapping.awardsShow.name + " | " + self.Person.getFullName())
+            return (self.FilmAwardMapping.film.title
+                    + " | " + self.FilmAwardMapping.awardsShow.name
+                    + " | " + self.Person.getFullName())
         if self.Company:
-            return (self.FilmAwardMapping.film.title + " | " + self.FilmAwardMapping.awardsShow.name + " | " + self.Company.name)
+            return (self.FilmAwardMapping.film.title
+                    + " | " + self.FilmAwardMapping.awardsShow.name
+                    + " | " + self.Company.name)
 
 
     class Meta:
@@ -906,8 +876,7 @@ class WebSeriesAwardCreditMapping(models.Model):
         verbose_name = "Web Series - Award Credit Mapping"
         verbose_name_plural = "Web Series - Award Credit Mappings"
 
-# ---Additional Image Mappings---------------------------------------------------------------------------------------------------------#
-
+# ---Additional Image Mappings-----------------------------------------------------------------------------------------#
 class MiscImages(models.Model):
     awardsShow = models.ForeignKey(AwardsShow, on_delete=models.PROTECT, null=True)
     image = models.ImageField(default='MissingIcon.png', upload_to='miscImages', blank=True)
@@ -930,14 +899,6 @@ class PersonImages(models.Model):
     class Meta:
         verbose_name = "Person - Additional Image"
         verbose_name_plural = "People - Additional Images"
-
-    def save(self, *args, **kwargs):
-        super().save()
-        #img = Image.open(self.image.path)
-        #if img.height > 600 or img.width > 600:
-        #    output_size = (600,600)
-        #    img.thumbnail(output_size)
-        #    img.save(self.image.path)
 
 class FilmImages(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
@@ -994,10 +955,14 @@ class WebSeriesImages(models.Model):
         verbose_name = "Web Series - Additional Image"
         verbose_name_plural = "Web Series - Additional Images"
 
-
-# ---Media Tags and Mappings---------------------------------------------------------------------------------------------------------#
+# ---Media Tags and Mappings-------------------------------------------------------------------------------------------#
 class Tag(models.Model):
     name = models.CharField(max_length=50, default='', primary_key=True)
+
+    #Overwritten save method to populate the slugfield based on the tag's name
+    def save(self, *args, **kwargs):
+        self.name = slugify(self.name)
+        super(Tag, self).save(*args, **kwargs)
 
     def __str__(self):
         return (self.name)
@@ -1005,11 +970,6 @@ class Tag(models.Model):
     class Meta:
         verbose_name = "Tag"
         verbose_name_plural = "Tags"
-
-    def save(self, *args, **kwargs):
-        self.name = slugify(self.name)
-        super(Tag, self).save(*args, **kwargs)
-
 
 class FilmTagMapping(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
@@ -1022,7 +982,6 @@ class FilmTagMapping(models.Model):
         verbose_name = "Film - Tag Mapping"
         verbose_name_plural = "Films - Tag Mappings"
 
-
 class TelevisionTagMapping(models.Model):
     television = models.ForeignKey(Television, on_delete=models.PROTECT)
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
@@ -1033,7 +992,6 @@ class TelevisionTagMapping(models.Model):
     class Meta:
         verbose_name = "Television - Tag Mapping"
         verbose_name_plural = "Television - Tag Mappings"
-
 
 class VideoGameTagMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.PROTECT)
@@ -1068,7 +1026,7 @@ class WebSeriesTagMapping(models.Model):
         verbose_name = "Web Series - Tag Mapping"
         verbose_name_plural = "Web Series - Tag Mappings"
 
-#-- Highest Rating Stores -------------------------------------------------------#
+#-- Highest Rating Stores ---------------------------------------------------------------------------------------------#
 class HighestRatedFilms(models.Model):
     media = models.ForeignKey(Film, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
@@ -1105,7 +1063,6 @@ class HighestRatedVideoGames(models.Model):
         verbose_name = "Highest Rated Video Game"
         verbose_name_plural = "Highest Rated Video Games"
 
-
 class HighestRatedBooks(models.Model):
     media = models.ForeignKey(Book, on_delete=models.CASCADE)
     rating = models.FloatField(default=1.0)
@@ -1117,7 +1074,6 @@ class HighestRatedBooks(models.Model):
     class Meta:
         verbose_name = "Highest Rated Book"
         verbose_name_plural = "Highest Rated Books"
-
 
 class HighestRatedWebSeries(models.Model):
     media = models.ForeignKey(WebSeries, on_delete=models.CASCADE)

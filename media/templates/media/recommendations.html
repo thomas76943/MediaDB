@@ -2,93 +2,65 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2 style="padding-top: 7px;">Recommendations Testing</h2>
+        <h6 style="padding-top:10px"><a href="/">Back to Home Page</a></h6>
     </div>
 
-    {% if recommendationsV1 %}
+    <!-- Hybrid Collaborative and Content-Based Filtering Recommendation Results -->
+    <div class="container infoSection">
+        <h2 style="padding-top: 4px;">
+            Recommendations
+            <div style="float: right">
+                <form action="/recommender/" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Generate" id="generateRecommendationsButton" class="btn btn-primary btn-raised">
+                </form>
+            </div>
+        </h2>
+    </div>
+
+    <div class="container infoSection">
+        Users are considered peers of one another if<br>
+        they have rated at least 5 of the same films<br><br>
+        Ratings will not personalised until one of these peers is found
+    </div>
+
+    {% if contentBasedFiltering %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold border-bottom mb-0">Highest-Rated Films Not Seen</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Hybrid Recommendations</h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for film in recommendationsV1 %}
-                        <a href="/films/{{ film.slug }}">
-                        <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                        </a>
+                    {% for film in contentBasedFiltering %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         </div>
     {% endif %}
 
-    {% if genreRecommendations %}
+    {% if results %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold border-bottom mb-0">Genre Scores</h5>
-            {% if genreScores %}
-                {{ genreScores }}
-            {% endif %}
+            <h5 class="font-weight-bold border-bottom mb-0">Hybrid-Filtering Recommendations</h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for film, score in genreRecommendations.items %}
-                        <div class="bottomOverlay">
-                            <a href="/films/{{ film.slug }}">
+                    {% for film in results %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
                                 <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                                <div class="content">
-                                    <h6 class = "font-weight-bold" >
-                                        <div class="below" style="display: inline-block" id="{{ film.slug }}"></div>
-                                        <div style="display: inline-block">{{ score }}</div>
-                                        <script>
-                                            $('#{{film.slug}}').rateYo({
-                                                rating:'{% widthratio score 1 2 %}',
-                                                starWidth:'15px',
-                                                numStars:5,
-                                                minValue:0,
-                                                maxValue:10,
-                                                normalFill:'gray',
-                                                ratedFill:'orange',
-                                                halfStar:true,
-                                                readOnly:true,
-                                            })
-                                        </script>
-                                    </h6>
-                                </div>
                             </a>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         </div>
     {% endif %}
 
-    {% if actorRecommendations %}
+    {% if results %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold border-bottom mb-0">Actor Scores</h5>
-            <div class="scroller">
-                <ul class="hs full">
-                    {% for film, score in actorRecommendations.items %}
-                        <div class="bottomOverlay">
-                            <a href="/films/{{ film.slug }}">
-                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                                <div class="content">
-                                    <h6 class = "font-weight-bold">
-                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
-                                        <div style="display: inline-block">{{ score }}</div>
-                                        <script>
-                                            $('#{{ forloop.counter }}').rateYo({
-                                                rating:'{% widthratio score 1 2 %}', starWidth:'15px',
-                                                numStars:5, minValue:0, maxValue:10,
-                                                normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
-                                            })
-                                        </script>
-                                    </h6>
-                                </div>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% if actorScores %}
-                {{ actorScores }}
-            {% endif %}
+            <h6 style="padding-top:10px"><a href="/recommender/detail">See Detailed Breakdown</a></h6>
         </div>
     {% endif %}
 

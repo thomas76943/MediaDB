@@ -154,7 +154,7 @@
     </style>
     <div class="container infoSection mobileShow">
         <form id="searchForm" action="/search/" class="input-group input-group-lg">
-            <input class="form-control" type="search" name="q" placeholder="Search MediaDB...">
+            <input class="form-control" type="search" name="q" placeholder="Search MediaDB..." style="color: white">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
     </div>
@@ -162,17 +162,11 @@
     <!--To Do List-->
     <div class="container infoSection">
         <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
-            <br>Recommendation Algorithm<br><br>
-            Datasets: Television, Books, Web Series, Awards<br><br>
-            Features:<br>
-            Show friends who have watched/played/read media on detail pages<br>
-            Show reviews for media on detail pages<br>
+            <br>Features:<br>
             Browsing Grid Filter Forms<br><br>
-
             Fixes:<br>
-            After game imports: add icons to new genres<br>
-            After game imports: rename new genres<br>
-            After game imports: game genre slugs<br>
+            Rating/review buttons first time not appearing<br>
+            all media in profile section live search<br>
             Rating box size on mobile<br>
             Set up carousels on TV/Game/Web/Book Home Pages<br><br>
             Add all CSS to stylesheet<br>
@@ -180,6 +174,34 @@
             Move all to GitHub repo + nice README<br>
         </h5>
     </div>
+
+    <div style="clear: both"></div>
+
+
+    <!-- Full: Recommendations -->
+    {% if ratingMessage or generateMessage or recommendations %}
+        <div style="clear: both"><br></div>
+        <div class="container infoSection fullScroll">
+            {% if ratingMessage %}
+                <h5 class="font-weight-bold" style="padding-top: 7px">{{ ratingMessage }}</h5>
+            {% elif generateMessage %}
+                <h5 class="font-weight-bold" style="padding-top: 7px"><a href={% url 'recommender' %}>{{ generateMessage }}</a></h5>
+            {% elif recommendations %}
+                <h5 class="font-weight-bold border-bottom mb-0">Film Recommendations<a style="float:right" href={% url 'recommender' %}>See All</a></h5>
+                <div class="scroller">
+                    <ul class="hs full">
+                        {% for film in recommendations %}
+                            {% if film not in seenFilms %}
+                                <a class="item" href="/films/{{ film.slug }}">
+                                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 
     <div style="clear: both"><br></div>
 
@@ -248,6 +270,7 @@
     </div>
 
     <div style="clear: both"><br></div>
+
 
     <!-- Left: Activity Feed -->
     {% if feed %}

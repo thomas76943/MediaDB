@@ -7,7 +7,7 @@
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
             {% for genre in genres %}
-                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
             {% endfor %}
         {% endif %}
     </div>

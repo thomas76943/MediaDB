@@ -45,8 +45,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
 
-    <!-- Make Profile Sections Sortable -->
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Make Profile Sections Sortable - Import Script if Profile Page belongs to user -->
+    {% if user.username == memberProfile.profile.user.username or user.username == profileSection.profile.user.username %}
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    {% endif %}
 
     <!--Custom CSS-->
     <link rel="stylesheet" href="{% static 'media/newstylesheet.css' %}" type="text/css">
@@ -61,13 +63,13 @@
 
         <div class="container noBoxShadow" style="padding-left:0; padding-right:0;max-width:1400px; margin-left:auto; margin-right:auto;">
 
-
             <a class="navbar-brand" style="padding-top:5px" href="{% url 'media-home' %}">
                 <img class="navbarLogo" src="{% static 'media/logoNew.png' %}" alt="noImage">
             </a>
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa fa-bars fa-lg" style="padding:7px 0px 7px"></i>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -348,8 +350,6 @@
             });
         }
     </script>
-
-
 
     <!-- List Toggle Script -->
     <script>
