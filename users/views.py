@@ -159,23 +159,21 @@ class memberProfile(generic.UpdateView):
         context['profileSections'] = profileSections
 
         if profileSections != None:
-            #For each profile sectoin
             for x in range(profileSections.count()):
-                #Retrieve the films, television, games, books or webseries that may make up that profile section
-                profileSectionFilms = ProfileSectionFilmMapping.objects.filter(profileSection__profile__user=self.object.id).filter(profileSection__sectionName=profileSections[x].sectionName)
-                profileSectionTelevision = ProfileSectionTelevisionMapping.objects.filter(profileSection__profile__user=self.object.id).filter(profileSection__sectionName=profileSections[x].sectionName)
-                profileSectionVideoGames = ProfileSectionVideoGameMapping.objects.filter(profileSection__profile__user=self.object.id).filter(profileSection__sectionName=profileSections[x].sectionName)
-                profileSectionBooks = ProfileSectionBookMapping.objects.filter(profileSection__profile__user=self.object.id).filter(profileSection__sectionName=profileSections[x].sectionName)
-                profileSectionWebSeries = ProfileSectionWebSeriesMapping.objects.filter(profileSection__profile__user=self.object.id).filter(profileSection__sectionName=profileSections[x].sectionName)
+                #Retrieve the Films, Television, Games, Books or web Series that make up the profile section
+                films = ProfileSectionFilmMapping.objects.filter(profileSection__profile__user=self.object.id)\
+                    .filter(profileSection__sectionName=profileSections[x].sectionName)
+                television = ProfileSectionTelevisionMapping.objects.filter(profileSection__profile__user=self.object.id)\
+                    .filter(profileSection__sectionName=profileSections[x].sectionName)
+                videoGames = ProfileSectionVideoGameMapping.objects.filter(profileSection__profile__user=self.object.id)\
+                    .filter(profileSection__sectionName=profileSections[x].sectionName)
+                books = ProfileSectionBookMapping.objects.filter(profileSection__profile__user=self.object.id)\
+                    .filter(profileSection__sectionName=profileSections[x].sectionName)
+                webSeries = ProfileSectionWebSeriesMapping.objects.filter(profileSection__profile__user=self.object.id)\
+                    .filter(profileSection__sectionName=profileSections[x].sectionName)
 
-                #Compile these media items into the full profile section
-                completeProfileSection = sorted(list(chain(profileSectionFilms,
-                                                           profileSectionTelevision,
-                                                           profileSectionVideoGames,
-                                                           profileSectionBooks,
-                                                           profileSectionWebSeries)), key=attrgetter('orderInSection'))
-
-                #Dynamically pass the number of the profile section to the template
+                #Compile these media items into the full profile section and pass to the context
+                completeProfileSection = sorted(list(chain(films, television, videoGames,books, webSeries)), key=attrgetter('orderInSection'))
                 context[profileSections[x].sectionName] = completeProfileSection
 
         #Pass the form to create a new profile section to the template
@@ -296,8 +294,10 @@ class profileSection(generic.UpdateView):
             if object.type == "Films":
                 getFilm = Film.objects.filter(slug=mediaSlug)[0]
                 sectionLength = 0
+                #Retrieve the number of items (length) of the profile section
                 for psfm in ProfileSectionFilmMapping.objects.filter(profileSection=object):
                     sectionLength += 1
+                #Save this new mapping record, specifying its 'orderInSection' to be the length of the section + 1 (the new end)
                 newMap = ProfileSectionFilmMapping(film=getFilm, profileSection=object, orderInSection=sectionLength+1)
                 newMap.save()
 

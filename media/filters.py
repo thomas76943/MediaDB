@@ -17,7 +17,38 @@ class filmFilter(django_filters.FilterSet):
             'title','rating','release'
         ]
 
-class mediaFilter(django_filters.FilterSet):
+class televisionFilter(django_filters.FilterSet):
+
     date = DateFilter(field_name="release", lookup_expr="gte", label="Release After")
+    class Meta:
+        model = Television
+        fields = [
+            'release'
+        ]
 
+class videoGameFilter(django_filters.FilterSet):
 
+    date = DateFilter(field_name="release", lookup_expr="gte", label="Release After")
+    class Meta:
+        model = VideoGame
+        fields = [
+            'release'
+        ]
+
+class bookFilter(django_filters.FilterSet):
+
+    date = DateFilter(field_name="release", lookup_expr="gte", label="Release After")
+    class Meta:
+        model = Book
+        fields = [
+            'release'
+        ]
+
+class webSeriesFilter(django_filters.FilterSet):
+
+    date = DateFilter(field_name="release", lookup_expr="gte", label="Release After")
+    class Meta:
+        model = WebSeries
+        fields = [
+            'release'
+        ]

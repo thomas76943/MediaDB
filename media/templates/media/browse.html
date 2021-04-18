@@ -10,86 +10,175 @@
             -webkit-box-shadow: none;
             box-shadow: none;
         }
+        .dropdownOption {
+            background-color: #404040;
+            font-size: 15px;
+            width: 100px;
+            text-overflow: ellipsis;
+            word-break: break-word;
+            max-width: 80px;
+        }
+        select,
+        option.selected {
+          width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
     </style>
+
+    {% if mediaType %}
+        <div class="container infoSection">
+            <h6 style="padding-top:10px"><a href="/browse/">Back</a></h6>
+        </div>
+    {% endif %}
 
     <!-- Filter Forms -->
     <div class="container infoSection">
-        <h2 style="padding-top: 7px;">Browse Media</h2>
-        <form method="get">
-            <div class="form-inline">
-                {% for field in filteredFilms.form %}
-                    {% if field.label == "Title" %}
-                        <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.label }}" style="color: white">
-                    {% elif field.label == "Rating" %}
-                        <div class="form-group col-md-2 col-lg-2" style="max-width: 125px">
-                            <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
-                                {% for choice in field %}
-                                    {{ choice }}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    {% elif field.label == "Release After" %}
-                        <div class="form-group col-md-2 col-lg-2">
-                            <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="Release">
-                        </div>
-                        <script>
-                            $(function(){
-                               $("#id_{{ field.name }}")
-                            });
-                        </script>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <input class="btn btn-primary btn-raised" type="submit" value="Filter" style="margin-top: 10px">
+        {% if mediaType %}
+            <h2 style="padding-top: 7px;">Browse {{ mediaType }}</h2>
+            <form method="get">
+                <div class="form">
+                    {% for field in filtered.form %}
+                        {% if field.label == "Title" %}
+                            <!--<input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.label }}" style="color: white; padding-right: 10px">-->
+                        {% elif field.label == "Rating" %}
+                            <div class="form-group col-md-2 col-lg-2">
+                                <div class="form-group">
+                                    <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                                    <select class="form-control shadow-none" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white; text-overflow: ellipsis !important;">
+                                        {% for v, t in field.field.choices %}
+                                            <option class="dropdownOption" style="width: 80px; max-width: 80px!important; text-overflow: ellipsis!important;" value="{{ v }}">{{ t }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% elif field.label == "Release After" %}
+                            <div class="form-group col-md-2 col-lg-2">
+                                <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="Release" style="color: white">
+                            </div>
+                            <script>
+                                $(function(){
+                                   $("#id_{{ field.name }}")
+                                });
+                            </script>
+                        {% endif %}
+                    {% endfor %}
+                    <input class="btn btn-primary btn-raised" type="submit" value="Filter" style="margin-top: 10px; margin-left: 15px">
+                </div>
+            </form>
+        {% else %}
+            <!-- Generic Browsing Grid Page for all Media Items -->
 
-        </form>
+            <h2 style="padding-top: 7px;">Choose a Media Type</h2>
+
+            <div class="grid-container" style="padding-top:10px">
+
+              <div class="grid-item firstVid" style="border: none;">
+                <a class="grid-item" href="/browse/films" style="border: none;">
+                    <img class="mediaIcon Film">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/tv" style="border: none;">
+                    <img class="mediaIcon Television">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/video-games" style="border: none;">
+                    <img class="mediaIcon VideoGame">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/books" style="border: none;">
+                    <img class="mediaIcon Book">
+                </a>
+              </div>
+
+              <div class="grid-item lastVid bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/web-series" style="border: none;">
+                    <img class="mediaIcon WebSeries">
+                </a>
+              </div>
+
+            </div>
+
+        {% endif %}
+
     </div>
 
     <!-- Grid and Pagination -->
     <div class="container profileSection">
+        <hr>
         <ul class="auto-grid" style="padding-top: 10px">
             {% for media in mediaPageObject %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    {% with media|classname as modelclass %}
+                {% if media.poster or media.image %}
+                    <li class="module" style="list-style-type: none; white-space: normal">
+                        {% with media|classname as modelclass %}
 
-                        {% if modelclass == "Film" %}
-                            <a href="/films/{{ media.slug }}">
-                                {% if media in seenFilms %}
-                                    <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
-                                Seen
-                                {% else %}
-                                    <img class="item posterSmall loading" src="{{media.poster.url}}" alt="{{media.title}}">
-                                {% endif %}
-                            </a>
+                            {% if modelclass == "Film" %}
+                                <a href="/films/{{ media.slug }}">
+                                    {% if media in seenFilms %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall loading" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
 
-                        {% elif modelclass == "Television" %}
-                            <a href="/tv/{{ media.slug }}">
-                                <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
-                            </a>
+                            {% elif modelclass == "Television" %}
+                                <a href="/tv/{{ media.slug }}">
+                                    {% if media in seenTelevision %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
 
-                        {% elif modelclass == "VideoGame" %}
-                            <a href="/video-games/{{ media.slug }}">
-                                <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
-                            </a>
+                            {% elif modelclass == "VideoGame" %}
+                                <a href="/video-games/{{ media.slug }}">
+                                    {% if media in seenVideoGames %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Played
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
 
-                        {% elif modelclass == "Book" %}
-                            <a href="/books/{{ media.slug }}">
-                                <img class="item posterSmall" src="{{media.image.url}}" alt="{{media.title}}">
-                            </a>
+                            {% elif modelclass == "Book" %}
+                                <a href="/books/{{ media.slug }}">
+                                    {% if media in seenBooks %}
+                                        <img class="item posterSmall seen" src="{{media.image.url}}" alt="{{media.title}}">
+                                        Read
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.image.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
 
-                        {% elif modelclass == "WebSeries" %}
-                            <a href="/web-series/{{ media.slug }}">
-                                <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
-                            </a>
+                            {% elif modelclass == "WebSeries" %}
+                                <a href="/web-series/{{ media.slug }}">
+                                    {% if media in seenWebSeries %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
 
-                        {% elif modelclass == "Person" %}
-                            <a href="/person/{{ media.slug }}">
-                                <img class="item personSmall" src="{{media.image.url}}" alt="{{media.getFullName}}">
-                            </a>
+                            {% elif modelclass == "Person" %}
+                                <a href="/person/{{ media.slug }}">
+                                    <img class="item personSmall" src="{{media.image.url}}" alt="{{media.getFullName}}">
+                                </a>
 
-                        {% endif %}
-                    {% endwith %}
-                </li>
+                            {% endif %}
+                        {% endwith %}
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
 
@@ -120,7 +209,7 @@
             }
         </style>
 
-        <br><hr>
+        <hr>
         <div style="margin: auto; width: 20%">
             <nav class="here" aria-label="Pagination Indicators">
                   <ul class="pagination justify-content-center">

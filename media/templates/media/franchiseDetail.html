@@ -56,35 +56,39 @@
 
     {% if subcategories %}
         {% for subcategory in subcategories %}
-            {% with var=subcategory.title %}                                                                        <!-- Temporary variable var                  -->
-            {% dynamicVariableValue var as var_url %}                                                               <!-- Apply custom tag                   -->
+            {% with var=subcategory.title %}
+            {% dynamicVariableValue var as var_url %}
                 {% if var_url %}
                     <div class="container infoSection">
                         <h5 class="font-weight-bold border-bottom mb-0">{{ subcategory.title }}</h5>
                         <div class="scroller">
                             <ul class="hs full">
-                                {% for entry in var_url %}                                                          <!-- Iterate through subcategory               -->
+                                {% for entry in var_url %}
                                     {%  if entry.film != NULL %}
                                         <a class="item" href="/films/{{ entry.film.slug }}">
                                             <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
                                         </a>
-                                    {% endif %}        <!-- Render if entry is a film              -->
+                                    {% endif %}
                                     {%  if entry.television != NULL %}
                                         <a class="item" href="/tv/{{ entry.television.slug }}">
                                         <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
                                         </a>
-                                    {% endif %}  <!-- Render if entry is a tv series          -->
+                                    {% endif %}
                                     {%  if entry.videoGame != NULL %}
                                         <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
                                             <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
                                         </a>
-                                    {% endif %}   <!-- Render if entry is a video game       -->
+                                    {% endif %}
                                     {%  if entry.book != NULL %}
-                                        <a class="item posterSmall" style="background:url({{entry.book.image.url}})" href="/books/{{ entry.book.slug }}"></a>
-                                    {% endif %}        <!-- Render if entry is a book           -->
+                                        <a class="item" href="/books/{{ entry.book.slug }}">
+                                            <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                        </a>
+                                    {% endif %}
                                     {%  if entry.webseries != NULL %}
-                                        <a class="item posterSmall" style="background:url({{entry.webseries.poster.url}})" href="/webseries/{{ entry.webseries.slug }}"></a>
-                                    {% endif %}   <!-- Render if entry is a web series          -->
+                                        <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                            <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                        </a>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>

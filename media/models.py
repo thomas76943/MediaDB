@@ -178,8 +178,10 @@ class VideoGame(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=500, default='NoBookTitleSpecified')
-    release = models.DateField(default=timezone.now)
-    synopsis = models.CharField(max_length=500, default='', blank=True)
+    release = models.CharField(max_length=10, default='2000')
+    synopsis = models.CharField(max_length=500, blank=True)
+    isbn = models.CharField(max_length=20, blank=True)
+    pages = models.IntegerField(default=100, blank=True)
     image = models.ImageField(default='', upload_to='bookImages', blank=True)
     cover = models.ImageField(default='', upload_to='bookCoverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
@@ -192,11 +194,7 @@ class Book(models.Model):
             super(Book, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
-
-    #Gets the book's release year
-    def getYear(self):
-        return self.release.year
+        return self.title + " - " + self.release
 
     class Meta:
         verbose_name = "Books"
@@ -274,6 +272,24 @@ class VideoGameGenre(models.Model):
         verbose_name = "Genre - Video Game"
         verbose_name_plural = "Genres - Video Games"
 
+class BookGenre(models.Model):
+    title = models.CharField(max_length=500, default='NoBookSpecified')
+    image = models.ImageField(blank=True, default='', upload_to='icons')
+    slug = models.SlugField(max_length=150, blank=True, editable=True, default='')
+
+    def __str__(self):
+        return self.title
+
+    #Overwritten save method to populate the slugfield based on the genre name
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(BookGenre, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Genre - Book"
+        verbose_name_plural = "Genres - Books"
+
 class FilmGenreMapping(models.Model):
     film = models.ForeignKey(Film, on_delete=models.PROTECT)
     genre = models.ForeignKey(Genre, on_delete=models.PROTECT)
@@ -308,8 +324,8 @@ class VideoGameGenreMapping(models.Model):
         verbose_name_plural = "Video Games - Genre Mappings"
 
 class BookGenreMapping(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.PROTECT)
-    genre = models.ForeignKey(Genre, on_delete=models.PROTECT)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    genre = models.ForeignKey(BookGenre, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.book.title + " | " + self.genre.title)
@@ -317,6 +333,7 @@ class BookGenreMapping(models.Model):
     class Meta:
         verbose_name = "Books - Genre Mapping"
         verbose_name_plural = "Books - Genre Mappings"
+
 
 class WebSeriesGenreMapping(models.Model):
     webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
@@ -392,9 +409,9 @@ class WebSeriesCompanyMapping(models.Model):
 
 #---Media-Person Mappings----------------------------------------------------------------------------------------------#
 class FilmPersonMapping(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-    film = models.ForeignKey(Film, on_delete=models.PROTECT)
-    role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    film = models.ForeignKey(Film, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 
@@ -409,9 +426,9 @@ class FilmPersonMapping(models.Model):
         verbose_name_plural = "Films - Person Mappings"
 
 class TelevisionPersonMapping(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-    television = models.ForeignKey(Television, on_delete=models.PROTECT)
-    role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    television = models.ForeignKey(Television, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
     episodes = models.IntegerField
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
@@ -429,7 +446,7 @@ class TelevisionPersonMapping(models.Model):
 class VideoGamePersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     videogame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
-    role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 
@@ -444,9 +461,9 @@ class VideoGamePersonMapping(models.Model):
         verbose_name_plural = "Video Games - Person Mappings"
 
 class BookPersonMapping(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-    book = models.ForeignKey(Book, on_delete=models.PROTECT)
-    role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.person.firstName + " " + self.person.surname + " || " + self.book.title + " || " + self.role.role)
@@ -459,9 +476,9 @@ class BookPersonMapping(models.Model):
         verbose_name_plural = "Books - Person Mappings"
 
 class WebSeriesPersonMapping(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-    webSeries = models.ForeignKey(WebSeries, on_delete=models.PROTECT)
-    role = models.ForeignKey(PersonRole, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    webSeries = models.ForeignKey(WebSeries, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 

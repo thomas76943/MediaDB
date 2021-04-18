@@ -26,7 +26,7 @@
 
         {% if genres %}
             {% for genre in genres %}
-                <a style="padding-right:10px" href="/genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
+                <a style="padding-right:10px" href="/book-genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
             {% endfor %}
         {% endif %}
 
@@ -34,29 +34,33 @@
 
     <br>
 
-    <!-- If there is a poster or a trailer then create parent element for them -->
-    {% if book.image != 'MissingIcon.png' or averageRating %}
+    <!-- If there is an image or ratings create parent element for them -->
+    {% if book.image or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                <img class="item detailPoster" style="float:left" src="{{book.image.url}}" alt="{{book.title}}">
 
-                    <div class="col">
-                        {% if averageRating %}
-                            <div class="container ratingBox" id="ratingDiv">
-                                <h5>Average Rating: </h5>
-                                <h4>{{ averageRatingText }}</h4>
-                                <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                            </div>
-                        {% endif %}
+                {% if book.image %}
+                    <img class="item detailPoster" style="float:left" src="{{book.image.url}}" alt="{{book.title}}">
+                {% endif %}
 
-                        {% if user.is_authenticated %}
-                            <div class="container ratingBox">
-                                <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                            </div>
-
-                            <div id="reviewButtonContainer">
-                                {% if userRating %}
-                                    <div class="container ratingBox">
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
+                            {% if averageRating %}
+                                <div id="ratingDiv">
+                                    <h5>Average Rating: </h5>
+                                    <h4>{{ averageRatingText }}</h4>
+                                    <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                                </div>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">
+                                    {% csrf_token %}
+                                </div>
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
                                         <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
                                             {% if review %}
                                                 Edit Review
@@ -64,12 +68,12 @@
                                                 Write Review
                                             {% endif %}
                                         </button>
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
@@ -77,7 +81,7 @@
 
      {% if authors %}
         <div class="container infoSection">
-            <h5 style="padding-top:5px"> Written by:</h5>
+            <h5 style="padding-top:5px">Written by:</h5>
             {% for author in authors %}
                 <a style="padding-right:10px" href="/person/{{ author.person.slug }}"> {{ author.getPerson }}</a>
             {% endfor %}
@@ -90,6 +94,15 @@
             <h6>{{ book.synopsis }}</h6>
         </div>
     {% endif %}
+
+    {% if book.isbn %}
+        <div class="container infoSection">
+            <h5 style="padding-top:5px">ISBN:</h5>
+            <h6>{{ book.isbn }}</h6>
+        </div>
+    {% endif %}
+
+
 
     {% if publishers %}
         <div class="container infoSection">

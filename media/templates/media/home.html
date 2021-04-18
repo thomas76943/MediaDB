@@ -2,6 +2,15 @@
 {% load media_tags %}
 {% block content %}
 
+    <!--To Do List
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
+            Fixes:<br>
+            Rating/review buttons first time not appearing<br>
+            Move all to GitHub repo + nice README<br>
+            Remove commented out code
+        </h5>
+    </div>-->
     <!--Carousel-->
     <div id="c1" class="carousel slide" style="padding-top:5px" data-ride="carousel">
 
@@ -75,7 +84,7 @@
     <!--Carousel Script-->
     <script>
     $('#c1').carousel({
-      interval: 30000,
+      interval: 10000,
       cycle: true
     });
     </script>
@@ -97,7 +106,7 @@
           </div>
 
           <div class="grid-item bottomOverlay">
-            <a href="/films/">
+            <a href="/tv/">
                 <video autoplay loop muted style="z-index: -3">
                     <source src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/videos/westworld+clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                     Video not supported.
@@ -152,6 +161,7 @@
             }
         }
     </style>
+
     <div class="container infoSection mobileShow">
         <form id="searchForm" action="/search/" class="input-group input-group-lg">
             <input class="form-control" type="search" name="q" placeholder="Search MediaDB..." style="color: white">
@@ -159,24 +169,7 @@
         </form>
     </div>
 
-    <!--To Do List-->
-    <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-0">To Do List</h5>
-            <br>Features:<br>
-            Browsing Grid Filter Forms<br><br>
-            Fixes:<br>
-            Rating/review buttons first time not appearing<br>
-            all media in profile section live search<br>
-            Rating box size on mobile<br>
-            Set up carousels on TV/Game/Web/Book Home Pages<br><br>
-            Add all CSS to stylesheet<br>
-            Clean up settings files, nothing secure<br>
-            Move all to GitHub repo + nice README<br>
-        </h5>
-    </div>
-
     <div style="clear: both"></div>
-
 
     <!-- Full: Recommendations -->
     {% if ratingMessage or generateMessage or recommendations %}
@@ -251,7 +244,6 @@
                                     <h6 class = "font-weight-bold" >{{ entry.release }}</h6>
                                 </div>
                             </div>
-
                         {% endif %}
                         {%  if modelclass == "WebSeries" %}
                             <div class="bottomOverlay">
@@ -270,7 +262,6 @@
     </div>
 
     <div style="clear: both"><br></div>
-
 
     <!-- Left: Activity Feed -->
     {% if feed %}

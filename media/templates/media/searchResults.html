@@ -160,7 +160,7 @@
 
     {% if peopleOther %}
         <div class="container profileSection">
-            <h5>People (Other):</h5>
+            <h5>People:</h5>
             {% for person in peopleOther %}
                 <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }}</a><br>
             {% endfor %}
@@ -169,11 +169,21 @@
 
     {% if companiesOthers %}
         <div class="container profileSection">
-            <h5>Companies (Other):</h5>
+            <h5>Companies:</h5>
             {% for company in companiesOthers %}
                 <a href="/company/{{ company.slug }}"> {{ company.name }}</a><br>
             {% endfor %}
         </div>
     {% endif %}
+
+    {% if users %}
+        <div class="container profileSection">
+            <h5>Users:</h5>
+            {% for user in users %}
+                <a href="/user/{{ user.username }}"> {{ user.username }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
 
 {% endblock %}

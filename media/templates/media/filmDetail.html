@@ -25,7 +25,6 @@
             </div>
         </form>
 
-        {{ temp }}
         <h2>{{film.title}}</h2>
         <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
         {% if genres %}
@@ -73,12 +72,13 @@
             display: none;
         }
     }
-        -->
+
     </style>
+    -->
 
     <!-- If there is a poster or a trailer then create parent element for them -->
     {% if film.poster or film.trailerVideoPath or averageRating %}
-        <div class="container posterTrailerContainer">
+        <div class="container posterTrailerContainer" id="testrefresh">
             <div class="row" style="padding: 10px">
 
                 {% if film.poster %}

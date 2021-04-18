@@ -8,11 +8,18 @@ urlpatterns = [
 
     #Miscellaneous Pages
     path('search/', views.searchResults, name='media-search'),
-    path('browse/', views.browse, name='media-browse'),
     path('data/', views.dataSources, name="data-sources"),
     path('calendar/', views.calendar, name="calendar"),
     path('top-grossing/', views.topGrossing, name='media-top-grossing'),
     path('top-rated/', views.topRated, name='media-top-rated'),
+
+    #Browsing Grid Pages
+    path('browse/', views.browse, name='media-browse'),
+    path('browse/films/', views.BrowsingGridFilms.as_view(), name='media-film-browse'),
+    path('browse/tv/', views.BrowsingGridTV.as_view(), name='media-tv-browse'),
+    path('browse/video-games/', views.BrowsingGridVideoGames.as_view(), name='media-tv-browse'),
+    path('browse/books/', views.BrowsingGridBooks.as_view(), name='media-tv-browse'),
+    path('browse/web-series/', views.BrowsingGridWebSeries.as_view(), name='media-tv-browse'),
 
     #People
     path('person/<str:slug>', views.PersonDetailView.as_view(), name='media-person-detail'),
@@ -54,6 +61,7 @@ urlpatterns = [
     #Genres
     path('genre/<str:slug>', views.GenreDetailView.as_view(), name='media-genre-detail'),
     path('video-game-genre/<str:slug>', views.VideoGameGenreDetailView.as_view(), name='media-gamegenre-detail'),
+    path('book-genre/<str:slug>', views.BookGenreDetailView.as_view(), name='media-bookgenre-detail'),
 
     #Tags
     path('tag/<str:pk>', views.TagDetailView.as_view(), name='media-tag-detail'),

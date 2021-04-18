@@ -24,6 +24,7 @@ admin.site.register(WebSeries)
 #Genre Types
 admin.site.register(Genre)
 admin.site.register(VideoGameGenre)
+admin.site.register(BookGenre)
 
 #Genre Mappings
 admin.site.register(FilmGenreMapping)

@@ -67,6 +67,14 @@ def calculateUserUserSimilarities(userA):
         uus.users = idStore
         uus.save()
 
+
+
+
+
+
+
+
+
 #Retrieves a user's like-minded peers from the database
 #Parameters - user: the active user
 #Returns    - similarities: the 20 most similar users
@@ -112,6 +120,8 @@ def getSeen(user, mediaType):
             if rating.webSeries not in seen:
                 seen.append(rating.webSeries)
     return seen
+
+
 
 #Performs collaborative filtering film recommendation for the given user
 #Parameters - user: the active user
@@ -192,6 +202,9 @@ def collaborativeFiltering(user):
                         collaborativeResults.append(Film.objects.get(slug=slug))
 
     return collaborativeResults
+
+
+
 
 #Retrieves a particular user's feed based on the profiles they follow
 #Parameters - user: the user whose feed is to be found
@@ -469,6 +482,381 @@ def addFilmRatings():
 
                         #eg   Film     HighestRatedFilms   50       100       True
 
+#Temporary
+def addVideoGameData():
+    badCharsTitles = ['/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
+    badCharsOther = ['/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
+
+
+    with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
+        data = json.loads(f.read())
+
+    for franchise in data:
+        print("--------- Found:", franchise['name'], "-----------------------------")
+
+        if 'games' not in franchise:
+            continue
+
+        for game in franchise['games']:
+            videoGames = []
+            qs = VideoGame.objects.all()
+            for vg in qs:
+                videoGames.append(vg.title)
+
+            title = game['name']
+
+            if any(badChar in title for badChar in badCharsTitles):
+                print("--- Skipped Game:", title, ". Invalid Characters")
+                continue
+
+            if 'first_release_date' not in game:
+                print("--- Skipped Game:", title, ". Requires Release Date" )
+                continue
+            else:
+                dateConv = time.strftime('%Y-%m-%d', time.localtime(game['first_release_date']))
+
+            #slug = slugify(title + "-" + str(dateConv))
+
+            if title in videoGames:
+                print("--- Skipped Game:", title, ". Duplicate Title ---")
+            else:
+                print("--- Adding Game:", title)
+                newGame = VideoGame()
+                newGame.title = title
+                newGame.release = dateConv
+                newGame.save()
+
+            #Getting Game (whether it is newly made or not)
+            getGame = VideoGame.objects.filter(title=title)[0]
+
+            #Adding synopsis if there isn't one already
+            if not getGame.synopsis:
+                if 'summary' in game:
+                    if len(game['summary']) < 1000:
+                        print("Adding synopsis")
+                        getGame.synopsis = game['summary']
+                        getGame.save()
+
+            #Adding poster if there isn't one already
+            if bool(getGame.poster) == False:
+                print("No Poster on this object")
+                if 'cover' in game:
+                    print("Adding poster")
+                    coverURL = game['cover']['url']
+                    img = coverURL.rsplit('/', 1)[-1]
+                    newURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + img
+
+                    img_data = requests.get(newURL).content
+                    img_name = slugify(title + "-" + str(dateConv)) + ".jpg"
+                    with open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, 'wb') as handler:
+                        handler.write(img_data)
+
+                    getGame.poster.save(img_name, File(open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, "rb")))
+                    getGame.save()
+
+            if 'genres' in game:
+                print("Adding genres")
+                for genre in game['genres']:
+                    getGameGenres = []
+                    for gg in VideoGameGenreMapping.objects.filter(videoGame=getGame):
+                        getGameGenres.append(gg.genre.title)
+                    if genre['name'] not in getGameGenres:
+                        #Make List of All Video Game Genres
+                        allGameGenres = []
+                        qs = VideoGameGenre.objects.all()
+                        for vgg in qs:
+                            allGameGenres.append(vgg.title)
+
+                        #Create New Genre If Required
+                        if genre['name'] not in allGameGenres:
+                            newGameGenre = VideoGameGenre(title=genre['name'])
+                            newGameGenre.save()
+
+                        #Get Genre (whether it is old or has just been made)
+                        getGenre = VideoGameGenre.objects.filter(title=genre['name'])[0]
+
+                        #Make Mapping
+                        gameGenreMap = VideoGameGenreMapping(videoGame=getGame, genre=getGenre)
+                        gameGenreMap.save()
+
+            if 'platforms' in game:
+                print("Adding platforms")
+                for platform in game['platforms']:
+                    getGamePlatforms = []
+                    for gp in VideoGameConsoleMapping.objects.filter(videoGame=getGame):
+                        getGamePlatforms.append(gp.console.name)
+                    if platform['name'] not in getGamePlatforms:
+                        # Make List of All Video Game Genres
+                        allGamePlatforms = []
+                        qs = Console.objects.all()
+                        for c in qs:
+                            allGamePlatforms.append(c.name)
+                            allGamePlatforms.append(c.shortName)
+
+                        # Skip this console if it does not exist in the database
+                        if platform['name'] not in allGamePlatforms:
+                            continue
+
+                        # Get console
+                        if Console.objects.filter(name=platform['name']) != None:
+                            getConsole = Console.objects.filter(name=platform['name'])[0]
+                        else:
+                            getConsole = Console.objects.filter(shortName=platform['name'])[0]
+
+                        # Make Mapping
+                        gameConsoleMap = VideoGameConsoleMapping(videoGame=getGame, console=getConsole)
+                        gameConsoleMap.save()
+
+            if 'involved_companies' in game:
+                print("Adding companies")
+                for company in game['involved_companies']:
+                    getGameCompanies = []
+                    for gc in VideoGameCompanyMapping.objects.filter(videoGame=getGame):
+                        getGameCompanies.append(gc.company.name)
+                    if company['company']['name'] not in getGameCompanies:
+                        allGameCompanies = []
+                        qs = Company.objects.all()
+                        for c in qs:
+                            allGameCompanies.append(c.name)
+
+                        #Create new company if required
+                        if company['company']['name'] not in allGameCompanies:
+                            newCompany = Company(name=company['company']['name'])
+                            newCompany.save()
+
+                        #Get Company
+                        getCompany = Company.objects.filter(name=company['company']['name'])[0]
+
+                        if company['developer'] == True:
+                            getDevRole = CompanyRole.objects.filter(id=4)[0]
+                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getDevRole)
+                            gameCompanyMap.save()
+                        if company['publisher'] == True:
+                            getPubRole = CompanyRole.objects.filter(id=5)[0]
+                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getPubRole)
+                            gameCompanyMap.save()
+
+        print("\n")
+
+#Temporary
+def addBookData():
+
+    badCharsTitles = ['/', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+    badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+
+    #with open("D:\MediaDB Datasets\books2\goodreads._books.csv", "r", encoding="utf8") as f:
+    #    data = json.loads(f.read())
+
+    bookFile = open("D:/MediaDB Datasets/books2/goodreads_books.csv", "rt", encoding='utf-8')
+    bookData = csv.reader(bookFile)
+
+    for row in bookData:
+
+        bookTitles = []
+        for book in Book.objects.all():
+            bookTitles.append(book.title)
+
+        peopleNames = []
+        for p in Person.objects.all():
+            peopleNames.append(p.getFullName())
+
+        title = row[0]
+        isbn = row[1]
+        desc = row[2]
+        image = row[3]
+        authorsRaw = row[4]
+        pages = row[5]
+        fulldate = row[6]
+        publishers = row[7]
+        genreA = row[8]
+        genreB = row[9]
+        genreC = row[10]
+
+        if len(title) > 0:
+            if any(badChar in title for badChar in badCharsTitles):
+                print("Skipped Book: ", title + " - bad title format")
+                continue
+
+        if len(fulldate) > 0:
+            if '-' in str(fulldate):
+                print("Skipped Book: ", title + " - bad date format")
+                continue
+            else:
+                year = fulldate[-4:]
+
+        if title not in bookTitles:
+            newbook = Book(title=title)
+            newbook.release = year
+            newbook.save()
+
+        getBook = Book.objects.filter(title=title).first()
+
+        if len(isbn) > 0:
+            getBook.isbn = isbn
+
+        if len(desc) > 0:
+            if any(badChar in desc for badChar in badCharsTitles):
+                print("--------------------------------------------------------------------------------------")
+                print("Skipped description: ", title)
+            else:
+                getBook.synopsis = desc
+
+        if len(pages) > 0:
+            if int(pages) > 0:
+                getBook.pages = int(pages)
+
+
+        if len(authorsRaw) > 0:
+            authorsSplit = authorsRaw.split(',')
+
+            for author in authorsSplit:
+
+                if author[0] == " ":
+                    author = author[1:]
+
+                firstLastNames = re.sub(r" ?\([^)]+\)", "", author)
+
+                if firstLastNames == "N/A":
+                    continue
+
+                if any(badChar in firstLastNames for badChar in badCharsPeople):
+                    print("--------------------------------------------------------------------------------------")
+                    print("Skipped Person: ", firstLastNames)
+                    continue
+
+                if firstLastNames not in peopleNames:
+                    print("Adding new person:", firstLastNames)
+                    newPerson = Person()
+                    firstLastNames = firstLastNames.split()
+                    newPerson.firstName = firstLastNames[0]
+                    if len(firstLastNames) > 1:
+                        combinedSurname = ""
+                        for name in firstLastNames[1:]:
+                            combinedSurname += name + " "
+                        newPerson.surname = combinedSurname[:-1]
+                    newPerson.save()
+                    thisAuthor = newPerson
+                else:
+                    print("Getting Existing Author: ", firstLastNames)
+                    firstLastNames = firstLastNames.split(" ", 1) #Only Separating First Name Out
+                    thisAuthor = Person.objects.filter(firstName=firstLastNames[0], surname=firstLastNames[1])[0]
+
+                authorRole = PersonRole.objects.filter(id=5)[0]
+
+                #If mapping doesn't already exist
+                query = BookPersonMapping.objects.filter(person=thisAuthor, book=getBook, role=authorRole)
+                if not query:
+                    bpm = BookPersonMapping(person=thisAuthor, book=getBook, role=authorRole)
+                    bpm.save()
+                else:
+                    print(thisAuthor.getFullName(), "is already tied to", getBook, "in this role")
+
+
+        if len(image) > 1:
+            img_data = requests.get(image).content
+            img_name = slugify(title + "-" + str(year) + ".jpg")
+            with open("D:/MediaDB Datasets/bookPostersTemp/" + img_name, 'wb') as handler:
+                handler.write(img_data)
+            getBook.image.save(img_name, File(open("D:/MediaDB Datasets/bookPostersTemp/" + img_name, "rb")))
+
+
+        if len(genreA) > 0:
+            if genreA[0] == " ":
+                genreA = genreA[1:]
+            genreTitles = []
+            for g in BookGenre.objects.all():
+                genreTitles.append(g.title)
+            if any(badChar in genreA for badChar in badCharsTitles):
+                print("Skipped Genre: ", genreA)
+            else:
+                genreA = genreA.rpartition(" ")[0]
+                if genreA not in genreTitles:
+                    print(genreA)
+                    newGenre = BookGenre(title=genreA)
+                    newGenre.save()
+                    genreTitles.append(newGenre)
+
+                getGenre = BookGenre.objects.filter(title=genreA)[0]
+                bgm = BookGenreMapping.objects.filter(book=getBook, genre=getGenre)
+                if bgm:
+                    print("This book already has this genre:", getGenre)
+                else:
+                    bgm = BookGenreMapping(book=getBook, genre=getGenre)
+                    bgm.save()
+
+        if len(genreB) > 0:
+            if genreB[0] == " ":
+                genreB = genreB[1:]
+            genreTitles = []
+            for g in BookGenre.objects.all():
+                genreTitles.append(g.title)
+            if any(badChar in genreB for badChar in badCharsTitles):
+                print("Skipped Genre: ", genreB)
+            else:
+                genreB = genreB.rpartition(" ")[0]
+                if genreB not in genreTitles:
+                    newGenre = BookGenre(title=genreB)
+                    newGenre.save()
+                    genreTitles.append(newGenre)
+
+                getGenre = BookGenre.objects.filter(title=genreB)[0]
+                bgm = BookGenreMapping.objects.filter(book=getBook, genre=getGenre)
+                if bgm:
+                    print("This book already has this genre:", getGenre)
+                else:
+                    bgm = BookGenreMapping(book=getBook, genre=getGenre)
+                    bgm.save()
+
+        if len(genreC) > 0:
+            if genreC[0] == " ":
+                genreC = genreC[1:]
+            genreTitles = []
+            for g in BookGenre.objects.all():
+                genreTitles.append(g.title)
+            if any(badChar in genreC for badChar in badCharsTitles):
+                print("Skipped Genre: ", genreC)
+            else:
+                genreC = genreC.rpartition(" ")[0]
+                if genreC not in genreTitles:
+                    newGenre = BookGenre(title=genreC)
+                    newGenre.save()
+                    genreTitles.append(newGenre)
+
+                getGenre = BookGenre.objects.filter(title=genreC)[0]
+                bgm = BookGenreMapping.objects.filter(book=getBook, genre=getGenre)
+                if bgm:
+                    print("This book already has this genre:", getGenre)
+                else:
+                    bgm = BookGenreMapping(book=getBook, genre=getGenre)
+                    bgm.save()
+
+        if len(publishers) > 0:
+            companyTitles = []
+            for c in Company.objects.all():
+                companyTitles.append(c.name)
+
+            publishersSplit = publishers.split(',')
+            for publisher in publishersSplit:
+                if any(badChar in publisher for badChar in badCharsTitles):
+                    print("Skipped Publisher: ", publisher)
+                else:
+                    if publisher not in companyTitles:
+                        newcomp = Company(name=publisher)
+                        newcomp.save()
+
+                    getcompany = Company.objects.filter(name=publisher).first()
+                    publisherRole = CompanyRole.objects.filter(id=5)[0]
+
+                    # If mapping doesn't already exist
+                    query = BookCompanyMapping.objects.filter(company=getcompany, book=getBook, role=publisherRole)
+                    if not query:
+                        bcm = BookCompanyMapping(company=getcompany, book=getBook, role=publisherRole)
+                        bcm.save()
+                    else:
+                        print(getcompany.name, "is already tied to", getBook, "in this role")
+
+        getBook.save()
+
 #Recalculates the highest-rated items of a particular media type
 #Parameters - mediaType - the database table corresponding to the type of media for which the highest-rated items should be found (eg Films, Books etc)
 #           - highestRatingType - the database table where the results should be stored
@@ -690,9 +1078,9 @@ def getUpcomingTitles(f, tv, vg, b, ws):
                 upcoming.append(videoGame)
 
     if b:
-        for book in Book.objects.filter(release__year=datetime.datetime.now().year)[:50]:
-            if book.release > date.today():
-                upcoming.append(book)
+        for book in Book.objects.filter(release=datetime.datetime.now().year)[:50]:
+            #if book.release > date.today():
+            upcoming.append(book)
 
     if ws:
         for webSeries in WebSeries.objects.filter(release__year=datetime.datetime.now().year)[:50]:
@@ -1013,7 +1401,6 @@ def recommendationsDetail(request):
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the home.html file with the contents of the context dictionary
 def home(request):
-
     #Information to be displayed on the website's home page is gathered in the context dictionary
     context = {
         'upcoming':getUpcomingTitles(f=True, tv=True, vg=True, b=True, ws=True),
@@ -1092,171 +1479,12 @@ def calendar(request):
 def dataSources(request):
     return render(request, "media/dataSources.html", {})
 
-#Temporary
-def addVideoGameData():
-    badCharsTitles = ['?', '/', '#', '"', '<', '>', '[', ']', '{', '}', '@']
-
-    with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
-        data = json.loads(f.read())
-
-    for franchise in data:
-        print("--------- Found:", franchise['name'], "-----------------------------")
-
-        if 'games' not in franchise:
-            continue
-
-        for game in franchise['games']:
-            videoGames = []
-            qs = VideoGame.objects.all()
-            for vg in qs:
-                videoGames.append(vg.title)
-
-            title = game['name']
-
-            if any(badChar in title for badChar in badCharsTitles):
-                print("--- Skipped Game:", title, ". Invalid Characters")
-                continue
-
-            if 'first_release_date' not in game:
-                print("--- Skipped Game:", title, ". Requires Release Date" )
-                continue
-            else:
-                dateConv = time.strftime('%Y-%m-%d', time.localtime(game['first_release_date']))
-
-            #slug = slugify(title + "-" + str(dateConv))
-
-            if title in videoGames:
-                print("--- Skipped Game:", title, ". Duplicate Title ---")
-            else:
-                print("--- Adding Game:", title)
-                newGame = VideoGame()
-                newGame.title = title
-                newGame.release = dateConv
-                newGame.save()
-
-            #Getting Game (whether it is newly made or not)
-            getGame = VideoGame.objects.filter(title=title)[0]
-
-            #Adding synopsis if there isn't one already
-            if not getGame.synopsis:
-                if 'summary' in game:
-                    if len(game['summary']) < 1000:
-                        print("Adding synopsis")
-                        getGame.synopsis = game['summary']
-                        getGame.save()
-
-            #Adding poster if there isn't one already
-            if bool(getGame.poster) == False:
-                print("No Poster on this object")
-                if 'cover' in game:
-                    print("Adding poster")
-                    coverURL = game['cover']['url']
-                    img = coverURL.rsplit('/', 1)[-1]
-                    newURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/" + img
-
-                    img_data = requests.get(newURL).content
-                    img_name = slugify(title + "-" + str(dateConv)) + ".jpg"
-                    with open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, 'wb') as handler:
-                        handler.write(img_data)
-
-                    getGame.poster.save(img_name, File(open("D:/MediaDB Datasets/gamePostersTemp/" + img_name, "rb")))
-                    getGame.save()
-
-            if 'genres' in game:
-                print("Adding genres")
-                for genre in game['genres']:
-                    getGameGenres = []
-                    for gg in VideoGameGenreMapping.objects.filter(videoGame=getGame):
-                        getGameGenres.append(gg.genre.title)
-                    if genre['name'] not in getGameGenres:
-                        #Make List of All Video Game Genres
-                        allGameGenres = []
-                        qs = VideoGameGenre.objects.all()
-                        for vgg in qs:
-                            allGameGenres.append(vgg.title)
-
-                        #Create New Genre If Required
-                        if genre['name'] not in allGameGenres:
-                            newGameGenre = VideoGameGenre(title=genre['name'])
-                            newGameGenre.save()
-
-                        #Get Genre (whether it is old or has just been made)
-                        getGenre = VideoGameGenre.objects.filter(title=genre['name'])[0]
-
-                        #Make Mapping
-                        gameGenreMap = VideoGameGenreMapping(videoGame=getGame, genre=getGenre)
-                        gameGenreMap.save()
-
-            if 'platforms' in game:
-                print("Adding platforms")
-                for platform in game['platforms']:
-                    getGamePlatforms = []
-                    for gp in VideoGameConsoleMapping.objects.filter(videoGame=getGame):
-                        getGamePlatforms.append(gp.console.name)
-                    if platform['name'] not in getGamePlatforms:
-                        # Make List of All Video Game Genres
-                        allGamePlatforms = []
-                        qs = Console.objects.all()
-                        for c in qs:
-                            allGamePlatforms.append(c.name)
-                            allGamePlatforms.append(c.shortName)
-
-                        # Skip this console if it does not exist in the database
-                        if platform['name'] not in allGamePlatforms:
-                            continue
-
-                        # Get console
-                        if Console.objects.filter(name=platform['name']) != None:
-                            getConsole = Console.objects.filter(name=platform['name'])[0]
-                        else:
-                            getConsole = Console.objects.filter(shortName=platform['name'])[0]
-
-                        # Make Mapping
-                        gameConsoleMap = VideoGameConsoleMapping(videoGame=getGame, console=getConsole)
-                        gameConsoleMap.save()
-
-            if 'involved_companies' in game:
-                print("Adding companies")
-                for company in game['involved_companies']:
-                    getGameCompanies = []
-                    for gc in VideoGameCompanyMapping.objects.filter(videoGame=getGame):
-                        getGameCompanies.append(gc.company.name)
-                    if company['company']['name'] not in getGameCompanies:
-                        allGameCompanies = []
-                        qs = Company.objects.all()
-                        for c in qs:
-                            allGameCompanies.append(c.name)
-
-                        #Create new company if required
-                        if company['company']['name'] not in allGameCompanies:
-                            newCompany = Company(name=company['company']['name'])
-                            newCompany.save()
-
-                        #Get Company
-                        getCompany = Company.objects.filter(name=company['company']['name'])[0]
-
-                        if company['developer'] == True:
-                            getDevRole = CompanyRole.objects.filter(id=4)[0]
-                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getDevRole)
-                            gameCompanyMap.save()
-                        if company['publisher'] == True:
-                            getPubRole = CompanyRole.objects.filter(id=5)[0]
-                            gameCompanyMap = VideoGameCompanyMapping(videoGame=getGame, company=getCompany, role=getPubRole)
-                            gameCompanyMap.save()
-
-        print("\n")
-
-#Temporary
-def addBookData():
-    badCharsTitles = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', ]
-
-    with open("D:\MediaDB Datasets\gamesData.json", "r", encoding="utf8") as f:
-        data = json.loads(f.read())
-
 #Function-based view to render the search results page
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the searchResults.html file with the contents of the context dictionary
 def searchResults(request):
+
+    #def recalculateHighestRated(mediaType, highestRatingType, minRatings, quantity, reverse):
 
     #Retrieve the context of the query string from the request object
     title_contains = request.GET.get('q').lower()
@@ -1307,6 +1535,7 @@ def searchResults(request):
             'webseries':WebSeries.objects.all().filter(title__icontains=title_contains).order_by('id')[:72],
             'companiesPictures': companyPictures[:25],
             'companiesOthers': companyOther[:20],
+            'users': User.objects.filter(username__icontains=title_contains)[:25]
         }
 
     return render(request, 'media/searchResults.html', context)
@@ -1314,7 +1543,6 @@ def searchResults(request):
 #Function-based view to render the media browsing grid page
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the browse.html file with the contents of the context dictionary
-#----NEED TO WORK ON THIS----#
 def browse(request):
 
     films = Film.objects.all()
@@ -1322,36 +1550,26 @@ def browse(request):
     videoGames = VideoGame.objects.all()
     books = Book.objects.all()
     webSeries = WebSeries.objects.all()
-    people = Person.objects.exclude(image='MissingIcon.png')
-    #print(people.count())
-    """
-    allMedia = list(chain(films, television, videoGames, books, webSeries, people))
+    #people = Person.objects.exclude(image='MissingIcon.png')
 
-    filteredFilms = filmFilter(request.GET, queryset=films)
-    paginatedFilteredFilms = Paginator(filteredFilms.qs, 90)
+    allMedia = sorted(list(chain(films, television, videoGames, books, webSeries)), key=attrgetter('id'))
+
+    #filteredFilms = filmFilter(request.GET, queryset=allMedia)
+    paginated = Paginator(allMedia, 90)
     page_number = request.GET.get('page', 1)
-    mediaPageObject = paginatedFilteredFilms.get_page(page_number)
+    mediaPageObject = paginated.get_page(page_number)
     context = {
-        'filteredFilms' : filteredFilms,
-        'mediaPageObject': mediaPageObject,
-        'seenFilms' : FilmRating.objects.filter(user=request.user)
-    }
-
-    """
-    allMedia = list(chain(films, television, videoGames, books, webSeries, people))
-
-    #filteredMedia = mediaFilter(request.GET, queryset=allMedia)
-    paginatedMedia = Paginator(allMedia, 90)
-    page_number = request.GET.get('page', 1)
-    mediaPageObject = paginatedMedia.get_page(page_number)
-
-    context = {
-        'filteredFilms' : paginatedMedia,
+        'filtered' : paginated,
         'mediaPageObject': mediaPageObject,
     }
+
 
     if request.user.is_authenticated:
         context['seenFilms'] = getSeen(request.user, Film)
+        context['seenTelevision'] = getSeen(request.user, Television)
+        context['seenVideoGames'] = getSeen(request.user, VideoGame)
+        context['seenBooks'] = getSeen(request.user, Book)
+        context['seenWebSeries'] = getSeen(request.user, WebSeries)
 
     return render(request, 'media/browse.html', context)
 
@@ -1462,7 +1680,15 @@ def gameHome(request):
 def bookHome(request):
 
     context = {
-        'books':Book.objects.all(),
+        'topRated' : getHighestRated(Book, 30),
+        'books' : Book.objects.all()[:100],
+        'classics' : Book.objects.filter(release__range=["1000", "1960"])[:100],
+        'teens' : Book.objects.filter(release__range=["2010", "2019"])[:100],
+        'naughties' : Book.objects.filter(release__range=["2000", "2009"])[:100],
+        'nineties' : Book.objects.filter(release__range=["1990", "1999"])[:100],
+        'eighties' : Book.objects.filter(release__range=["1980", "1989"])[:100],
+        'seventies' : Book.objects.filter(release__range=["1970", "1979"])[:100],
+
     }
     return render(request, 'media/bookHome.html', context)
 
@@ -1805,7 +2031,7 @@ class PersonDetailView(generic.DetailView):
         directingAll = list(chain(fDirecting, tvDirecting, vgDirecting, wsDirecting))
         # All the mappings are sorted by the most recent first
         directing = sorted(directingAll, key=attrgetter('release'), reverse=True)
-#
+
         #All mappings where this person was attached with role=3 (Writer) are retrieved
         fWriting = []
         for fw in FilmPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-film__release'):
@@ -1816,14 +2042,11 @@ class PersonDetailView(generic.DetailView):
         vgWriting = []
         for vgw in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-videogame__release'):
             vgWriting.append(vgw.videogame)
-        bWriting = []
-        for bw in BookPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-book__release'):
-            bWriting.append(bw.book)
         wsWriting = []
         for wsw in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(role=3).order_by('-webSeries__release'):
             wsWriting.append(wsw.webSeries)
         #All the mappings are combined
-        writingAll = list(chain(fWriting, tvWriting, vgWriting, bWriting, wsWriting))
+        writingAll = list(chain(fWriting, tvWriting, vgWriting, wsWriting))
         # All the mappings are sorted by the most recent first
         writing = sorted(writingAll, key=attrgetter('release'), reverse=True)
 
@@ -1845,6 +2068,11 @@ class PersonDetailView(generic.DetailView):
         # All the mappings are sorted by the most recent first
         producing = sorted(producingAll, key=attrgetter('release'), reverse=True)
 
+        #All mappings where this person was attached with role=5 (Author) are retrieved
+        bookAuthor = []
+        for ba in BookPersonMapping.objects.filter(person=self.object.id).filter(role=5).order_by('-book__release'):
+            bookAuthor.append(ba.book)
+
         #If the combined, sorted lists of mappings have entries, add them to a roleOrder dictionary
         roleOrder = {}
         if len(actingAll) > 0:
@@ -1855,6 +2083,10 @@ class PersonDetailView(generic.DetailView):
             roleOrder['Writer'] = writing
         if len(producingAll) > 0:
             roleOrder['Producer'] = producing
+        if len(producingAll) > 0:
+            roleOrder['Producer'] = producing
+        if len(bookAuthor) > 0:
+            roleOrder['Author'] = bookAuthor
 
         #Sort the roleOrder dictionary based on the number of items
         #(ie: the person's categories will be sorted by how many mappings there are of each type)
@@ -1898,6 +2130,96 @@ class CompanyDetailView(generic.DetailView):
         context['gameFranchises'] = VideoGameFranchiseCompanyMapping.objects.filter(company=self.object.id)
         return context
 
+#Class-based ListView that gathers the context for the film media browsing grid
+class BrowsingGridFilms(generic.ListView):
+    model = Film
+    template_name = 'media/browse.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = filmFilter(self.request.GET, queryset=Film.objects.all())
+        paginatedFiltered = Paginator(filtered.qs, 90)
+        page_number = self.request.GET.get('page', 1)
+        mediaPageObject = paginatedFiltered.get_page(page_number)
+        context['mediaType'] = "Films"
+        context['filtered'] = filtered
+        context['mediaPageObject'] = mediaPageObject
+        if self.request.user.is_authenticated:
+            context['seenFilms'] = getSeen(self.request.user, Film)
+        return context
+
+#Class-based ListView that gathers the context for the tv media browsing grid
+class BrowsingGridTV(generic.ListView):
+    model = Television
+    template_name = 'media/browse.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = televisionFilter(self.request.GET, queryset=Television.objects.all())
+        paginatedFiltered = Paginator(filtered.qs, 90)
+        page_number = self.request.GET.get('page', 1)
+        mediaPageObject = paginatedFiltered.get_page(page_number)
+        context['mediaType'] = "Television Series"
+        context['filtered'] = filtered
+        context['mediaPageObject'] = mediaPageObject
+        if self.request.user.is_authenticated:
+            context['seenTelevision'] = getSeen(self.request.user, Television)
+        return context
+
+#Class-based ListView that gathers the context for the video games media browsing grid
+class BrowsingGridVideoGames(generic.ListView):
+    model = VideoGame
+    template_name = 'media/browse.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = videoGameFilter(self.request.GET, queryset=VideoGame.objects.all())
+        paginatedFiltered = Paginator(filtered.qs, 90)
+        page_number = self.request.GET.get('page', 1)
+        mediaPageObject = paginatedFiltered.get_page(page_number)
+        context['mediaType'] = "Video Games"
+        context['filtered'] = filtered
+        context['mediaPageObject'] = mediaPageObject
+        if self.request.user.is_authenticated:
+            context['seenVideoGames'] = getSeen(self.request.user, VideoGame)
+        return context
+
+#Class-based ListView that gathers the context for the video games media browsing grid
+class BrowsingGridBooks(generic.ListView):
+    model = Book
+    template_name = 'media/browse.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = bookFilter(self.request.GET, queryset=Book.objects.all())
+        paginatedFiltered = Paginator(filtered.qs, 90)
+        page_number = self.request.GET.get('page', 1)
+        mediaPageObject = paginatedFiltered.get_page(page_number)
+        context['mediaType'] = "Books"
+        context['filtered'] = filtered
+        context['mediaPageObject'] = mediaPageObject
+        if self.request.user.is_authenticated:
+            context['seenBooks'] = getSeen(self.request.user, Book)
+        return context
+
+#Class-based ListView that gathers the context for the video games media browsing grid
+class BrowsingGridWebSeries(generic.ListView):
+    model = WebSeries
+    template_name = 'media/browse.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filtered = bookFilter(self.request.GET, queryset=WebSeries.objects.all())
+        paginatedFiltered = Paginator(filtered.qs, 90)
+        page_number = self.request.GET.get('page', 1)
+        mediaPageObject = paginatedFiltered.get_page(page_number)
+        context['mediaType'] = "Web Series"
+        context['filtered'] = filtered
+        context['mediaPageObject'] = mediaPageObject
+        if self.request.user.is_authenticated:
+            context['seenWebSeries'] = getSeen(self.request.user, WebSeries)
+        return context
+
 #Class-based DetailView that handles, gathers the context for and renders a page for a particular franchise
 class FranchiseDetailView(generic.DetailView):
     model = Franchise
@@ -1935,7 +2257,6 @@ class FranchiseDetailView(generic.DetailView):
 
         #Every item in all subcategories are combined together
         completeFranchise = list(chain(franchiseFilms, franchiseTelevision, franchiseVideoGames, franchiseBooks, franchiseWebSeries))
-
 
         franchiseActors = {}
         franchiseProducers = {}
@@ -2253,7 +2574,7 @@ class BookDetailView(generic.UpdateView):
         context = super().get_context_data(**kwargs)
         #Retrieve the necessary context
         context['genres'] = BookGenreMapping.objects.filter(book=self.object.id)
-        context['authors'] = BookPersonMapping.objects.filter(role=3, book=self.object.id)
+        context['authors'] = BookPersonMapping.objects.filter(role=5, book=self.object.id)
         context['publishers'] = BookCompanyMapping.objects.filter(role=5, book=self.object.id)
 
         #Retrieve the parent franchise based on the book-franchisesubcategory mapping
@@ -2278,12 +2599,14 @@ class BookDetailView(generic.UpdateView):
             context['averageRating'] = averageRating
             context['averageRatingText'] = "{:.1f}".format(float(averageRating)/2)
 
-            #Attempt to retrieve the user's rating of the book
+            #Attempt to retrieve the user's rating of this television series
             if self.request.user.is_authenticated:
                 r = BookRating.objects.filter(user=self.request.user, book=self.object.id).first()
                 if r is not None:
                     context['userRating'] = r.rating
                     context['userRatingText'] = r.rating / 2
+                    if r.review is not None:
+                        context['review'] = r.review
 
         #Retrieve whether the book is in the user's list or not
         if self.request.user.is_authenticated:
@@ -2382,7 +2705,7 @@ class GenreDetailView(generic.DetailView):
         context['fortiesFilms'] = FilmGenreMapping.objects.filter(genre=self.object.id).filter(film__release__range=["1940-01-01", "1949-12-25"])[:30]
         context['tv'] = TelevisionGenreMapping.objects.filter(genre=self.object.id).order_by('-television__release')[:30]
         context['games'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('-videoGame__release')[:30]
-        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('-book__release')[:30]
+        #context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('-book__release')[:30]
         context['webseries'] = WebSeriesGenreMapping.objects.filter(genre=self.object.id).order_by('-webSeries__release')[:30]
         return context
 
@@ -2413,6 +2736,20 @@ class VideoGameGenreDetailView(generic.DetailView):
         context['franchises'] = VideoGameFranchiseGenreMapping.objects.filter(genre=self.object.id)
         context['projects'] = VideoGameGenreMapping.objects.filter(genre=self.object.id).order_by('videoGame__release')[:100]
         return context
+
+#Class-based DetailView that handles, gathers the context for and renders a page for a particular video game genre
+class BookGenreDetailView(generic.DetailView):
+    model = BookGenre
+    template_name = 'media/bookGenreDetail.html'
+
+    #Method to set up the context data to pass to the template
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #Retrieve all of the data for the different horizontal sliders on the genre detail page
+        context['books'] = BookGenreMapping.objects.filter(genre=self.object.id).order_by('-book__release')[:100]
+        return context
+
+
 
 #Class-based DetailView that handles, gathers the context for and renders a page for a particular console
 class ConsoleDetailView(generic.DetailView):
