@@ -125,7 +125,6 @@ urlpatterns = [
 #REST API URLS
 router = routers.DefaultRouter()
 router.register('films', views.FilmSerializerView)
-router.register('tv', views.TelevisionSerializerView)
 
 urlpatterns += [
     path('api/', include(router.urls))

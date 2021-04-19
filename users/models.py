@@ -16,8 +16,8 @@ class Profile(models.Model):
         return self.user.username + " Profile"
 
 class UserFollows(models.Model):
-    userA = models.ForeignKey(User, on_delete=models.PROTECT, related_name='userA')
-    userB = models.ForeignKey(User, on_delete=models.PROTECT, related_name='userB')
+    userA = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userA')
+    userB = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userB')
 
     def __str__(self):
         return self.userA.username + " follows " + self.userB.username

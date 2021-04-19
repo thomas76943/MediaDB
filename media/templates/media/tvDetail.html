@@ -64,24 +64,22 @@
                 {% endif %}
 
                 {% if averageRating or user.is_authenticated %}
-                    <div class="col ratingCol" style="padding-left: 0;">
+                    <div class="col ratingCol" style="padding-left: 0;" id="refresh">
                         <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
-                            {% if averageRating %}
-                                <div id="ratingDiv">
-                                    <h5>Average Rating: </h5>
-                                    <h4>{{ averageRatingText }}</h4>
-                                    <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                                </div>
+                            <h5>Average Rating: </h5>
+                            <h4 id="refreshAverageText">{{ averageRatingText }}</h4>
+                            {% if not averageRatingText %}
+                                <h4 id="refreshAverageNoneText">0</h4>
                             {% endif %}
+                            <h6 id="refreshCountText">from {{ ratingCount }} user{% if ratingCount > 1 or ratingCount == 0 %}s{% endif %}</h6>
                             {% if user.is_authenticated %}
                                 <hr>
-                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate">
-                                    {% csrf_token %}
-                                </div>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate"></div>
+                                {% csrf_token %}
                                 <div id="reviewButtonContainer">
                                     {% if userRating %}
                                         <hr>
-                                        <button id="writeReviewButton" class="btn btn-primary btn-raised" style="margin-top:5px;">
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised reviewButton" style="margin-top:5px;">
                                             {% if review %}
                                                 Edit Review
                                             {% else %}

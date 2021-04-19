@@ -58,7 +58,7 @@
                                     <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
                                 </a>
                                 <div class="content">
-                                   <button id="f-{{ entry.film.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                   <button id="f-{{ entry.film.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
                                 </div>
                             </div>
                         </li>
@@ -70,7 +70,7 @@
                                     <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
                                 </a>
                                 <div class="content">
-                                   <button id="t-{{ entry.television.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                   <button id="t-{{ entry.television.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
                                 </div>
                             </div>
                         </li>
@@ -82,7 +82,7 @@
                                     <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
                                 </a>
                                 <div class="content">
-                                   <button id="v-{{ entry.videoGame.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                   <button id="v-{{ entry.videoGame.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
                                 </div>
                             </div>
                         </li>
@@ -94,7 +94,7 @@
                                     <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
                                 </a>
                                 <div class="content">
-                                   <button id="b-{{ entry.book.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                   <button id="b-{{ entry.book.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
                                 </div>
                             </div>
                         </li>
@@ -106,7 +106,7 @@
                                     <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
                                 </a>
                                <div class="content">
-                                   <button id="w-{{ entry.webSeries.slug }}" onClick="test(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                   <button id="w-{{ entry.webSeries.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
                                 </div>
                           </div>
                         </li>
@@ -129,7 +129,7 @@
                 }).disableSelection();
               });
 
-              function test(media) {
+              function remove(media) {
                 console.log(media)
                 $.ajax({
                     url: "/profile-section/{{ profileSection.slug }}",
@@ -159,15 +159,9 @@
     <!-- Live Search + Add Media Scripts -->
     <script>
         const data = '{{ media }}'
-        /*console.log(data)*/
-
         const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
-        /*console.log(rdata)*/
-
         const input = document.getElementById('searchMedia')
-
         let filteredArr = []
-
         input.addEventListener('keyup', (e)=>{
             if (e.key !== "ArrowLeft") {
                 results.innerHTML = ""

@@ -341,7 +341,6 @@ class profileSection(generic.UpdateView):
 
         #If an item is being removed from the profile section
         elif request.POST.get('removeMedia') != None:
-            print("removing media attempt")
             get = request.POST.get('removeMedia')
             #If the first character is 'f', the film matching the POST request is removed
             if get[0] == 'f':
@@ -374,7 +373,6 @@ class profileSection(generic.UpdateView):
         #If the order of the items in the profile section is being changed
         elif request.POST.get('changing') == 'confirm':
             entries = QueryDict(request.POST.get('content'))
-            print(entries)
             #Enumerate the items in the section and reorder them by setting the orderInSection to the index in the loop
             for index, entry_id in enumerate(entries.getlist('entry[]')):
                 if object.type == 'Films':
