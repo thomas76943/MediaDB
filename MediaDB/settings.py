@@ -24,27 +24,10 @@ SECRET_KEY = 'pwsjl=-e%$lp3s^+ja7r$ik3ynf@2551v(m0bmjm0u1fy(9d)r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-"""
-ALLOWED_HOSTS = ['192.168.1.156',
-                 '192.168.1.73',
-                 'localhost',
-                 '127.0.0.1',
-                 '185.169.255.28',
-                 '192.168.1.72',
-                 '81.147.110.157'
-                 '31.205.96.246',
-                 '10.203.74.86',
-                 '10.203.74.53',
-                 '86.169.214.56',
-                 '192.168.1.142',
-                 ]
-"""
 ALLOWED_HOSTS = ['*']
 
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'media.apps.MediaConfig',
     'users.apps.UsersConfig',
@@ -58,6 +41,7 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework',
     'storages',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -180,7 +164,6 @@ AWS_S3_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
 
 #AWS Bucket Settings for Static Files
 STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
