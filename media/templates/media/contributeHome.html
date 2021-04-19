@@ -1,0 +1,107 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container profileSection">
+        <h2 style="padding-top:5px">Contribute</h2>
+    </div>
+
+    <br>
+
+    <style>
+        @media screen and (max-width: 675px) {
+            .grid-item {
+                border: none;
+            }
+        }
+
+    </style>
+
+    <div class="container profileSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Add Media Item</h5>
+
+        <div class="grid-container" style="padding-top:10px">
+
+          <div class="grid-item firstVid" style="border: none;">
+            <a class="grid-item" href="/contribute/film" style="border: none;">
+                <img class="mediaIcon Film">
+            </a>
+          </div>
+
+          <div class="grid-item bottomOverlay" style="border: none;">
+            <a class="grid-item" href="/contribute/tv" style="border: none;">
+                <img class="mediaIcon Television">
+            </a>
+          </div>
+
+          <div class="grid-item bottomOverlay" style="border: none;">
+            <a class="grid-item" href="/contribute/video-game" style="border: none;">
+                <img class="mediaIcon VideoGame">
+            </a>
+          </div>
+
+          <div class="grid-item bottomOverlay" style="border: none;">
+            <a class="grid-item" href="/contribute/book" style="border: none;">
+                <img class="mediaIcon Book">
+            </a>
+          </div>
+
+          <div class="grid-item lastVid bottomOverlay" style="border: none;">
+            <a class="grid-item" href="/contribute/web-series" style="border: none;">
+                <img class="mediaIcon WebSeries">
+            </a>
+          </div>
+
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container profileSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Add Other</h5>
+        <br><a href="/contribute/person">Add Person</a>
+        <br><a href="/contribute/company">Add Company</a>
+
+        <br>
+
+        <br><a href="/contribute/film-person">Add Film - Person Mapping</a>
+        <br><a href="/contribute/film-genre">Add Film - Genre Mapping</a>
+        <br><a href="/contribute/film-company">Add Film - Company Mapping</a>
+        <br><a href="/contribute/film-tag">Add Film - Tag Mapping</a>
+
+        <br>
+
+        <br><a href="/contribute/television-person">Add Television - Person Mapping</a>
+        <br><a href="/contribute/television-genre">Add Television - Genre Mapping</a>
+        <br><a href="/contribute/television-company">Add Television - Company Mapping</a>
+        <br><a href="/contribute/television-tag">Add Television - Tag Mapping</a>
+
+        <br>
+
+        <br><a href="/contribute/video-game-person">Add Video Game - Person Mapping</a>
+        <br><a href="/contribute/video-game-genre">Add Video Game - Genre Mapping</a>
+        <br><a href="/contribute/video-game-company">Add Video Game - Company Mapping</a>
+        <br><a href="/contribute/video-game-tag">Add Video Game - Tag Mapping</a>
+        <br><a href="/contribute/video-game-console">Add Video Game - Console Mapping</a>
+
+        <br>
+
+        <br><a href="/contribute/book-person">Add Book - Person Mapping</a>
+        <br><a href="/contribute/book-genre">Add Book - Genre Mapping</a>
+        <br><a href="/contribute/book-company">Add Book - Company Mapping</a>
+        <br><a href="/contribute/book-tag">Add Book - Tag Mapping</a>
+
+        <br>
+
+        <br><a href="/contribute/web-series-person">Add Web Series - Person Mapping</a>
+        <br><a href="/contribute/web-series-genre">Add Web Series - Genre Mapping</a>
+        <br><a href="/contribute/web-series-company">Add Web Series - Company Mapping</a>
+        <br><a href="/contribute/web-series-tag">Add Web Series - Tag Mapping</a>
+
+        <br>
+
+    </div>
+
+
+
+
+{% endblock %}

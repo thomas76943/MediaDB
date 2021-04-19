@@ -1,0 +1,67 @@
+{% extends "media/base.html" %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/">Back to Home Page</a></h6>
+    </div>
+
+    <!-- Hybrid Collaborative and Content-Based Filtering Recommendation Results -->
+    <div class="container infoSection">
+        <h2 style="padding-top: 4px;">
+            Recommendations
+            <div style="float: right">
+                <form action="/recommender/" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Generate" id="generateRecommendationsButton" class="btn btn-primary btn-raised">
+                </form>
+            </div>
+        </h2>
+    </div>
+
+    <div class="container infoSection">
+        Users are considered peers of one another if<br>
+        they have rated at least 5 of the same films<br><br>
+        Ratings will not personalised until one of these peers is found
+    </div>
+
+    {% if contentBasedFiltering %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Hybrid Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film in contentBasedFiltering %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if results %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Hybrid-Filtering Recommendations</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for film in results %}
+                        {% if film not in seenFilms %}
+                            <a class="item" href="/films/{{ film.slug }}">
+                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if results %}
+        <div class="container infoSection">
+            <h6 style="padding-top:10px"><a href="/recommender/detail">See Detailed Breakdown</a></h6>
+        </div>
+    {% endif %}
+
+{% endblock %}

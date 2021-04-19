@@ -2,21 +2,21 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Browsing: </h5><br>
+        <h5 style="padding-top:5px">Browsing:</h5>
         <ul class="cloud-tags">
-            <li class="font-weight-bold text-uppercase" style="padding-right:10px"><a class="cloud-tags" href="/tag/{{tag.name}}"> {{tag.name}}</a></li>
+            <li class="font-weight-bold"><a class="cloud-tags" href="/tag/{{tag.name}}"> {{tag.name}}</a></li>
         </ul>
     </div>
 
     <script>
     $(function(){
-        $(".cloud-tags").prettyTag({randomColor:true});
+        $(".cloud-tags").prettyTag({randomColor:true,font:100});
     });
     </script>
 
     {% if films %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ tag.title }} Films:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ tag.title }} Films:</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for f in films %}
@@ -31,11 +31,11 @@
 
     {% if television %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ tag.title }} Television:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ tag.title }} Television:</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for t in television %}
-                        <a href="/films/{{ t.television.slug }}">
+                        <a href="/tv/{{ t.television.slug }}">
                         <img class="item posterSmall" src="{{t.television.poster.url}}" alt="{{t.television.title}}">
                         </a>
                     {% endfor %}

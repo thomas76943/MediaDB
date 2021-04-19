@@ -2,23 +2,26 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h1 class="nav-link font-weight-bold text-uppercase">Awards - Home</h1>
+        <h2 style="padding-top: 7px;">Awards - Home</h2>
     </div>
+
     {% if types %}
-        <hr>
-        <h4>Types:</h4>
-        {% for type in types %}
-            <a href="/awards/type/{{ type.id }}">{{ type.name }}s</a><br>
-        {% endfor %}
+        <div class="container infoSection">
+            <h4 style="padding-top: 3px;">Types:</h4>
+            {% for type in types %}
+                <a href="/awards/type/{{ type.id }}">{{ type.name }}s</a><br>
+            {% endfor %}
+        </div>
     {% endif %}
 
 
     {% if shows %}
-        <hr>
-        <h4>Most Recent Events:</h4>
-        {% for show in shows %}
-            <a href="/awards/show/{{ show.id }}">{{ show.name }} | {{ show.date.year }}</a><br>
-        {% endfor %}
+        <div class="container infoSection">
+            <h4 style="padding-top: 3px;">Most Recent Events:</h4>
+            {% for show in shows %}
+                <a href="/awards/show/{{ show.id }}">{{ show.name }} | {{ show.date.year }}</a><br>
+            {% endfor %}
+        </div>
     {% endif %}
 
     

@@ -1,0 +1,95 @@
+{% extends "media/base.html" %}
+{% block title %}{{videogame.title}}{% endblock title %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2>{{videogame.title}}</h2>
+        <h5>{{ videogame.release }}</h5>
+        {% if genres %}
+            {% for genre in genres %}
+                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/video-games/{{ videogame.slug }}">Back to Main Page</a></h6>
+    </div>
+
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5 style="padding-top:5px"> Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:5px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5 style="padding-top:5px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if consoles %}
+        <div class="container infoSection">
+            <h5 style="padding-top:5px">Released On:</h5>
+            {% for console in consoles %}
+                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container infoSection">
+            <h5 style="padding-top:5px">Franchise:</h5>
+            {% for franchise in franchises %}
+                <a style="padding-right: 10px" href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if cast %}
+        <div class="container infoSection">
+            <h5>Cast:</h5>
+                {% for actor in cast %}
+                    <a href="/person/{{ actor.person.slug }}">{{actor.getPerson}}</a>
+                    {% if actor.character %} - {{ actor.character }}{% endif %}
+                    <br>
+                {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px">Initial Release Date: {{ videogame.release }}</h6>
+    </div>
+
+     {% if developers %}
+        <div class="container infoSection">
+            <h6 style="padding-top:5px">Developed by:</h6>
+            {% for company in developers %}
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if publishers %}
+        <div class="container infoSection">
+            <h6 style="padding-top:5px">Published by:</h6>
+            {% for company in publishers %}
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}

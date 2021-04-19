@@ -15,111 +15,211 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
         </form>
 
-        <h2>{{videogame.title}} | {{ videogame.getYear }}</h2>
+        <h2>{{videogame.title}}</h2>
         <h5>{{ videogame.release }}</h5>
         {% if genres %}
             {% for genre in genres %}
-                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+                <a style="padding-right:10px" href="/video-game-genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
             {% endfor %}
         {% endif %}
     </div>
 
+    <br>
 
-    {% if videogame.poster != 'MissingIcon.png' or videogame.trailerVideoPath %}
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if videogame.poster or videogame.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
-                {% if videogame.trailerVideoPath %}
-                    <iframe class="trailer" width="711" height="400" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                {% if videogame.poster %}
+                    <img class="item detailPoster" style="float:left" src="{{videogame.poster.url}}" alt="{{videogame.title}}">
                 {% endif %}
 
-                <div class="col">
-                    {% if averageRating %}
-                        <div class="container ratingBox">
+                {% if videogame.trailerVideoPath %}
+                    <iframe class="trailer" src={{videogame.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
+
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;" id="refresh">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
                             <h5>Average Rating: </h5>
-                            <h4>{{ averageRatingText }}</h4>
-                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                            <h4 id="refreshAverageText">{{ averageRatingText }}</h4>
+                            {% if not averageRatingText %}
+                                <h4 id="refreshAverageNoneText">0</h4>
+                            {% endif %}
+                            <h6 id="refreshCountText">from {{ ratingCount }} user{% if ratingCount > 1 or ratingCount == 0 %}s{% endif %}</h6>
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate"></div>
+                                {% csrf_token %}
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised reviewButton" style="margin-top:5px;">
+                                            {% if review %}
+                                                Edit Review
+                                            {% else %}
+                                                Write Review
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <div class="container ratingBox">
-                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                        </div>
-                    {% endif %}
-                </div>
-
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
 
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5 style="padding-top:5px"> Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:5px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5 style="padding-top:5px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
 
     {% if consoles %}
         <div class="container infoSection">
-            <h5>Released On:</h5>
+            <h5 style="padding-top:5px">Released On:</h5>
             {% for console in consoles %}
-                <a style="padding-right:10px" href="/console/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
+                <a style="padding-right:10px" href="/consoles/{{ console.console.slug }}"> {{ console.console.shortName }}</a>
             {% endfor %}
         </div>
     {% endif %}
 
     {% if videogame.synopsis %}
         <div class="container infoSection">
-            <h5>Synopsis:</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ videogame.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if franchises %}
         <div class="container infoSection">
-            <h5>Franchise:</h5>
-            {% for franchise in franchises %}
-                <a href="/video-game-franchises/{{ franchise.slug }}"> {{ franchise.title }} </a><br>
+            <h5 style="padding-top:5px">Franchise:</h5>
+            {% for key, value in franchises.items %}
+                {% if value == 'vgf' %}
+                <a style="padding-right: 10px" href="/video-game-franchises/{{ key.slug }}"> {{ key.title }} </a>
+                {% else %}
+                <a style="padding-right: 10px" href="/franchises/{{ key.slug }}"> {{ key.title }} </a>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}
 
+    {% if cast %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/video-games/{{ videogame.slug }}/crew">See Full Cast & Crew</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in cast %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
+                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="container infoSection">
-        <h6>Release Date: {{ videogame.release }}</h6>
+        <h6 style="padding-top:10px">Initial Release Date: {{ videogame.release }}</h6>
     </div>
 
      {% if developers %}
         <div class="container infoSection">
-            <h6>Developed by:</h6>
+            <h6 style="padding-top:5px">Developed by:</h6>
             {% for company in developers %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
         </div>
     {% endif %}
 
     {% if publishers %}
         <div class="container infoSection">
-            <h6>Published by:</h6>
-            {% for company in publishers %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
+            <h6 style="padding-top:5px">Published by:</h6>
+            {% for company in publishers %}<a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>{% endfor %}
         </div>
     {% endif %}
 
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/video-games/{{ videogame.slug }}/crew">See All Details</a></h6>
+    </div>
+
     {% if images %}
         <div class="container infoSection">
-            <h5>Additional Posters, Stills, Concept Art, Behind the Scenes:</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
-                        <a class="item" href="{{ image.filePath }}">
-                            <img class="item additionalImage" src="{{image.filePath}}" alt={{ image.film.title }}>
+                        <a class="item" href="{{ image.image.url }}">
+                            <img class="item additionalImage" src="{{image.image.url}}" alt={{ image.film.title }}>
                         </a>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     {% endif %}
+
+    <!-- Review Modal Contents -->
+    <div id="writeReviewModal" class="modal">
+      <div class="modal-content">
+        <div class="container profileSection inModal">
+            {% if review %}
+            <h5 class="font-weight-bold border-bottom mb-0">Edit Review: {{ videogame.title }}</h5>
+            {% else %}
+            <h5 class="font-weight-bold border-bottom mb-0">Write Review: {{ videogame.title }}</h5>
+            {% endif %}
+            <br>
+            <form id="writeReview">
+                {%  csrf_token %}
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="reviewTextArea">Review:</label>
+                  <textarea class="form-control" id="reviewTextArea" rows="8" style="color: white">{% if review %}{{ review }}{% endif %}</textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <input type="submit" id="submitReview" class="btn btn-primary btn-raised"
+                       {% if review %}
+                        value="Save Changes"
+                        {% else %}
+                        value="Post Review"
+                        {% endif %}>
+                    <span class="close btn btn-default" style="color: white">X</span>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
 
 {% endblock %}

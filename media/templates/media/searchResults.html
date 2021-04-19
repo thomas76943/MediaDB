@@ -1,107 +1,189 @@
 {% extends "media/base.html" %}
+{% block title %}'{{ searchQuery }}'{% endblock %}
 {% block content %}
 
-    <div class="container infoSection">
-        <h1>Search Results for '{{ searchQuery }}'</h1>
+    <div class="container profileSection">
+        <h2>Search Results for '{{ searchQuery }}'</h2>
     </div>
 
-    {% if people %}
-        <div class="container infoSection">
+    {% if peoplePictures %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">People</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for person in peoplePictures %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/person/{{ person.slug }}">
+                        <img class="item personSmall" src="{{person.image.url}}" alt="{{person.getFullName}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if franchises %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Franchises</h5>
+            <ul class="auto-grid franchiseGrid" style="padding-top: 10px">
+                {% for franchise in franchises %}
+                    <li class="module franchiseModule" style="list-style-type: none; white-space: normal">
+                        <a href="/franchises/{{ franchise.slug }}">
+                        <img class="item box" style="padding:10px" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if videogamefranchises %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Video Game Franchises</h5>
+            <ul class="auto-grid franchiseGrid" style="padding-top: 10px">
+                {% for franchise in videogamefranchises %}
+                    <li class="module franchiseModule" style="list-style-type: none; white-space: normal">
+                        <a href="/video-game-franchises/{{ franchise.slug }}">
+                        <img class="item box white" style="padding:10px" src="{{franchise.image.url}}" alt="{{franchise.title}}">
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if consoles %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Consoles</h5>
+            <ul class="auto-grid franchiseGrid" style="padding-top: 10px">
+                {% for console in consoles %}
+                    <li class="module franchiseModule" style="list-style-type: none; white-space: normal">
+                        <a href="/consoles/{{ console.slug }}">
+                        <img class="item box white" style="padding:10px" src="{{console.image.url}}" alt="{{console.shortName}}">
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if films %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Films</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for film in films %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/films/{{ film.slug }}">
+                        <img class="item personSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if television %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Television</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for tv in television %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/tv/{{ tv.slug }}">
+                        <img class="item personSmall" src="{{tv.poster.url}}" alt="{{tv.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if games %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Video Games</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for videoGame in games %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/video-games/{{ videoGame.slug }}">
+                        <img class="item personSmall" src="{{videoGame.poster.url}}" alt="{{videoGame.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if books %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Books</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for book in books %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/books/{{ book.slug }}">
+                        <img class="item personSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if webseries %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Web Series</h5>
+            <ul class="auto-grid" style="padding-top: 10px">
+            {% for web in webseries %}
+                <li class="module" style="list-style-type: none; white-space: normal">
+                    <a href="/web-series/{{ web.slug }}">
+                        <img class="item personSmall" src="{{web.poster.url}}" alt="{{web.title}}">
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if companiesPictures %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Companies</h5>
+            <ul class="auto-grid franchiseGrid" style="padding-top: 10px">
+                {% for company in companiesPictures %}
+                    <li class="module franchiseModule" style="list-style-type: none; white-space: normal">
+                        <a href="/company/{{ company.slug }}">
+                        <img class="item box white" style="padding:10px" src="{{company.image.url}}" alt="{{company.name}}">
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <hr>
+
+    {% if peopleOther %}
+        <div class="container profileSection">
             <h5>People:</h5>
-            {% for person in people %}
+            {% for person in peopleOther %}
                 <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }}</a><br>
             {% endfor %}
         </div>
     {% endif %}
 
-    {% if franchises %}
-        <div class="container infoSection">
-            <h5>Franchises:</h5>
-            {% for franchise in franchises %}
-                <a href="/franchises/{{ franchise.slug }}"> {{ franchise.title }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if videogamefranchises %}
-        <div class="container infoSection">
-            <h5>Video Game Franchises:</h5>
-            {% for videoGameFranchise in videogamefranchises %}
-                <a href="/video-game-franchises/{{ videoGameFranchise.slug }}"> {{ videoGameFranchise.title }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if consoles %}
-        <div class="container infoSection">
-            <h5>Video Game Consoles:</h5>
-            {% for console in consoles %}
-                <a href="/console/{{ console.slug }}"> {{ console.name }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if films %}
-        <div class="container infoSection">
-            <h5>Films:</h5>
-            {% for film in films %}
-                <a href="/films/{{ film.slug }}"> {{ film.title }} | {{ film.getYear }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if tv %}
-        <div class="container infoSection">
-            <h5>Television:</h5>
-            {% for television in tv %}
-                <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
-                {% if television.ongoing == False %}
-                    {% if television.getYear != television.getEndYear %}
-                        - {{ television.getEndYear }}
-                    {% endif %}
-                {% else %}
-                    -
-                {% endif %}</a><br>
-                {% endfor %}
-        </div>
-    {% endif %}
-
-
-    {% if books %}
-        <div class="container infoSection">
-            <h5>Books:</h5>
-            {% for book in books %}
-                <a href="/books/{{ book.slug }}"> {{ book.title }} | {{ book.getYear }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if games %}
-        <div class="container infoSection">
-            <h5>Video Games:</h5>
-            {% for videoGame in games %}
-                <a href="/video-games/{{ videoGame.slug }}"> {{ videoGame.title }} | {{ videoGame.getYear }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if webseries %}
-        <div class="container infoSection">
-            <h5>Web Series:</h5>
-            {% for ws in webseries %}
-                <a href="/web-series/{{ ws.slug }}"> {{ ws.title }} | {{ ws.getYear }}</a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if companies %}
-        <div class="container infoSection">
+    {% if companiesOthers %}
+        <div class="container profileSection">
             <h5>Companies:</h5>
-            {% for company in companies %}
+            {% for company in companiesOthers %}
                 <a href="/company/{{ company.slug }}"> {{ company.name }}</a><br>
             {% endfor %}
         </div>
     {% endif %}
-    <hr>
+
+    {% if users %}
+        <div class="container profileSection">
+            <h5>Users:</h5>
+            {% for user in users %}
+                <a href="/user/{{ user.username }}"> {{ user.username }}</a><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
 
 {% endblock %}

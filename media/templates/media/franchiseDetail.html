@@ -14,12 +14,32 @@
         </div>
     {% endif %}
 
-    {% if franchisePeople %}
+    {% if franchise.showPeople %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Franchise Actors</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">{{ franchise.title }} Actors</h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for key, val in franchisePeople.items %}
+                    {% for key, val in franchiseActors.items %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ key.slug }}">
+                                <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ val }} - {{ key.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if franchise.showProducers %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">{{ franchise.title }} Producers</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for key, val in franchiseProducers.items %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ key.slug }}">
                                 <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
@@ -36,37 +56,45 @@
 
     {% if subcategories %}
         {% for subcategory in subcategories %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ subcategory.title }}</h5>
-                <div class="scroller">
-                    <ul class="hs full">
-                        {% with var=subcategory.title %}
-                        {% dynamicVariableValue var as var_url %}
-                        {% for entry in var_url %}
-                            {%  if entry.film != NULL %}
-                                <a class="item" href="/films/{{ entry.film.slug }}">
-                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.television != NULL %}
-                                <a class="item" href="/tv/{{ entry.television.slug }}">
-                                <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.videogame != NULL %}
-                                <a class="item posterSmall" style="background:url({{entry.videogame.poster.url}})" href="/video-games/{{ entry.videogame.slug }}"></a>
-                            {% endif %}
-                            {%  if entry.book != NULL %}
-                                <a class="item posterSmall" style="background:url({{entry.book.image.url}})" href="/books/{{ entry.book.slug }}"></a>
-                            {% endif %}
-                            {%  if entry.webseries != NULL %}
-                                <a class="item posterSmall" style="background:url({{entry.webseries.poster.url}})" href="/webseries/{{ entry.webseries.slug }}"></a>
-                            {% endif %}
-                        {% endfor %}
-                        {% endwith %}
-                    </ul>
-                </div>
-            </div>
+            {% with var=subcategory.title %}
+            {% dynamicVariableValue var as var_url %}
+                {% if var_url %}
+                    <div class="container infoSection">
+                        <h5 class="font-weight-bold border-bottom mb-0">{{ subcategory.title }}</h5>
+                        <div class="scroller">
+                            <ul class="hs full">
+                                {% for entry in var_url %}
+                                    {%  if entry.film != NULL %}
+                                        <a class="item" href="/films/{{ entry.film.slug }}">
+                                            <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if entry.television != NULL %}
+                                        <a class="item" href="/tv/{{ entry.television.slug }}">
+                                        <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if entry.videoGame != NULL %}
+                                        <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                            <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if entry.book != NULL %}
+                                        <a class="item" href="/books/{{ entry.book.slug }}">
+                                            <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if entry.webseries != NULL %}
+                                        <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                            <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
         {% endfor %}
     {% endif %}
 

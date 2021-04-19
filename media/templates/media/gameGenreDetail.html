@@ -1,25 +1,42 @@
 {% extends "media/base.html" %}
 {% block content %}
 
-    <h2>{{videogamegenre.title}} Video Games</h2>
-
-    <hr>
+    <div class="container infoSection">
+        <h2 style="padding-top: 7px">Browsing Genre - {{videogamegenre.title}}</h2>
+    </div>
 
     {% if franchises %}
-    <h5>{{ videogamegenre.title }} Franchises:</h5>
-    <div class="scroller">
-        <ul class="hs full">
-            {% for f in franchises %}
-                <a href="/video-game-franchises/{{ f.franchise.slug }}">
-                <img class="item box white" src="{{f.franchise.image.url}}" alt="{{f.franchise.title}}">
-                </a>
-            {% endfor %}
-        </ul>
-    </div><br>
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Browse by Franchise
+                <a style="float:right;" href="{% url 'media-videogamefranchise-home' %}">See All</a></h5>
+            </h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for f in franchises %}
+                        <a href="/video-game-franchises/{{ f.franchise.slug }}">
+                        <img class="item box white" src="{{f.franchise.image.url}}" alt="{{f.franchise.title}}">
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     {% endif %}
 
-    {% for game in projects %}
-        <a href="/video-games/{{ game.videoGame.slug }}"> {{ game.videoGame.title }} | {{ game.videoGame.getYear }}</a><br>
-    {% endfor %}
+    {% if projects %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">{{ videogamegenre.title }} Games</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for game in projects %}
+                        {% if game.videoGame.poster %}
+                            <a href="/video-games/{{ game.videoGame.slug }}">
+                            <img class="item posterSmall game" src="{{game.videoGame.poster.url}}" alt="{{ game.videoGame.title }}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}

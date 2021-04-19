@@ -1,60 +1,235 @@
 {% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}Browse Media{% endblock title %}
 {% block content %}
 
+    <!-- Remove Form Highlights -->
+    <style>
+        .form-control:focus {
+            outline: 0;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+        .dropdownOption {
+            background-color: #404040;
+            font-size: 15px;
+            width: 100px;
+            text-overflow: ellipsis;
+            word-break: break-word;
+            max-width: 80px;
+        }
+        select,
+        option.selected {
+          width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+    </style>
+
+    {% if mediaType %}
+        <div class="container infoSection">
+            <h6 style="padding-top:10px"><a href="/browse/">Back</a></h6>
+        </div>
+    {% endif %}
+
+    <!-- Filter Forms -->
     <div class="container infoSection">
-        <h1 class="font-weight-bold text-uppercase">Browse Media</h1>
+        {% if mediaType %}
+            <h2 style="padding-top: 7px;">Browse {{ mediaType }}</h2>
+            <form method="get">
+                <div class="form">
+                    {% for field in filtered.form %}
+                        {% if field.label == "Title" %}
+                            <!--<input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.label }}" style="color: white; padding-right: 10px">-->
+                        {% elif field.label == "Rating" %}
+                            <div class="form-group col-md-2 col-lg-2">
+                                <div class="form-group">
+                                    <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                                    <select class="form-control shadow-none" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white; text-overflow: ellipsis !important;">
+                                        {% for v, t in field.field.choices %}
+                                            <option class="dropdownOption" style="width: 80px; max-width: 80px!important; text-overflow: ellipsis!important;" value="{{ v }}">{{ t }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% elif field.label == "Release After" %}
+                            <div class="form-group col-md-2 col-lg-2">
+                                <input type="date" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" placeholder="Release" style="color: white">
+                            </div>
+                            <script>
+                                $(function(){
+                                   $("#id_{{ field.name }}")
+                                });
+                            </script>
+                        {% endif %}
+                    {% endfor %}
+                    <input class="btn btn-primary btn-raised" type="submit" value="Filter" style="margin-top: 10px; margin-left: 15px">
+                </div>
+            </form>
+        {% else %}
+            <!-- Generic Browsing Grid Page for all Media Items -->
+
+            <h2 style="padding-top: 7px;">Choose a Media Type</h2>
+
+            <div class="grid-container" style="padding-top:10px">
+
+              <div class="grid-item firstVid" style="border: none;">
+                <a class="grid-item" href="/browse/films" style="border: none;">
+                    <img class="mediaIcon Film">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/tv" style="border: none;">
+                    <img class="mediaIcon Television">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/video-games" style="border: none;">
+                    <img class="mediaIcon VideoGame">
+                </a>
+              </div>
+
+              <div class="grid-item bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/books" style="border: none;">
+                    <img class="mediaIcon Book">
+                </a>
+              </div>
+
+              <div class="grid-item lastVid bottomOverlay" style="border: none;">
+                <a class="grid-item" href="/browse/web-series" style="border: none;">
+                    <img class="mediaIcon WebSeries">
+                </a>
+              </div>
+
+            </div>
+
+        {% endif %}
+
     </div>
 
-    <div class="container infoSection">
-        <ul class="auto-grid">
-            {% for film in films %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/films/{{ film.slug }}">
-                        {% if film in seenFilms %}
-                            <img class="item posterSmall seen" src="{{film.poster.url}}" alt="{{film.title}}">
-                        Seen
-                        {% else %}
-                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
-                        {% endif %}
-                    </a>
-                </li>
-            {% endfor %}
-            {% for television in tv %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/tv/{{ television.slug }}">
-                        <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
-                    </a>
-                </li>
-            {% endfor %}
-            {% for videoGame in videoGames %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/video-games/{{ videoGame.slug }}">
-                        <img class="item posterSmall" src="{{videoGame.poster.url}}" alt="{{videoGame.title}}">
-                    </a>
-                </li>
-            {% endfor %}
-            {% for book in books %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/books/{{ book.slug }}">
-                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
-                    </a>
-                </li>
-            {% endfor %}
-            {% for ws in webSeries %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/web-series/{{ ws.slug }}">
-                        <img class="item posterSmall" src="{{ws.poster.url}}" alt="{{ws.title}}">
-                    </a>
-                </li>
-            {% endfor %}
-            {% for p in people %}
-                <li class="module" style="list-style-type: none; white-space: normal">
-                    <a href="/person/{{ p.slug }}">
-                        <img class="item personSmall" src="{{p.image.url}}" alt="{{p.getFullName}}">
-                    </a>
-                </li>
+    <!-- Grid and Pagination -->
+    <div class="container profileSection">
+        <hr>
+        <ul class="auto-grid" style="padding-top: 10px">
+            {% for media in mediaPageObject %}
+                {% if media.poster or media.image %}
+                    <li class="module" style="list-style-type: none; white-space: normal">
+                        {% with media|classname as modelclass %}
+
+                            {% if modelclass == "Film" %}
+                                <a href="/films/{{ media.slug }}">
+                                    {% if media in seenFilms %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall loading" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
+
+                            {% elif modelclass == "Television" %}
+                                <a href="/tv/{{ media.slug }}">
+                                    {% if media in seenTelevision %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
+
+                            {% elif modelclass == "VideoGame" %}
+                                <a href="/video-games/{{ media.slug }}">
+                                    {% if media in seenVideoGames %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Played
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
+
+                            {% elif modelclass == "Book" %}
+                                <a href="/books/{{ media.slug }}">
+                                    {% if media in seenBooks %}
+                                        <img class="item posterSmall seen" src="{{media.image.url}}" alt="{{media.title}}">
+                                        Read
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.image.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
+
+                            {% elif modelclass == "WebSeries" %}
+                                <a href="/web-series/{{ media.slug }}">
+                                    {% if media in seenWebSeries %}
+                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        Seen
+                                    {% else %}
+                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                    {% endif %}
+                                </a>
+
+                            {% elif modelclass == "Person" %}
+                                <a href="/person/{{ media.slug }}">
+                                    <img class="item personSmall" src="{{media.image.url}}" alt="{{media.getFullName}}">
+                                </a>
+
+                            {% endif %}
+                        {% endwith %}
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
+
+        <style>
+            /*Fix Spacing*/
+            .page-link {
+                margin-left: 0px;
+                margin-right: 0px;
+            }
+            /*New background on item hover*/
+            .page-item:hover {
+                background: 5px rgba(0, 186, 122, 0.9);
+                border: 5px black;
+                border-radius: 3px;
+            }
+            /*Remove default white circle background*/
+            .page-link:hover {
+                background: none;
+            }
+            /*Remove button click highlight focus*/
+            .page-link:focus {
+              outline: none;
+              box-shadow: none;
+            }
+            /*First and Last Buttons Wider*/
+            .page-link.firstLast {
+                width:75px
+            }
+        </style>
+
+        <hr>
+        <div style="margin: auto; width: 20%">
+            <nav class="here" aria-label="Pagination Indicators">
+                  <ul class="pagination justify-content-center">
+
+                    {% if mediaPageObject.has_previous %}
+                        <li class="page-item"><a class="page-link firstLast" style="color: white" href="{% relativeUrl 1 'page' request.GET.urlencode %}">&laquo; First</a></li>
+                        <li class="page-item"><a class="page-link" style="color: white" href="{% relativeUrl mediaPageObject.previous_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.previous_page_number }}</a></li>
+                    {% endif %}
+
+                        <li class="page-item"><a class="page-link" style="color: white" href="#"><strong>{{ mediaPageObject.number }}</strong></a></li>
+
+                      {% if mediaPageObject.has_next %}
+                        <li class="page-item"><a class="page-link" style="color: white" href="{% relativeUrl mediaPageObject.next_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.next_page_number }}</a></li>
+                        <li class="page-item"><a class="page-link firstLast" style="color: white" href="{% relativeUrl mediaPageObject.paginator.num_pages 'page' request.GET.urlencode %}">Last &raquo;</a></li>
+                    {% endif %}
+
+                  </ul>
+            </nav>
+        </div>
+
     </div>
 
 {% endblock %}

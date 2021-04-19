@@ -1,0 +1,141 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block content %}
+
+    <div class="container profileSection" style="max-width: 800px; margin: auto">
+        <a href="/contribute/">Back to Contribution Home Page</a>
+    </div>
+
+    <br>
+
+    <style>
+    .dropdownOption {
+        background-color: #404040;
+        font-size: 15px;
+        width: 100px;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        max-width: 80px;
+    }
+    select,
+    option.selected {
+      width: 100px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    </style>
+
+    <div class="container profileSection" style="max-width: 800px; margin: auto;">
+
+    <form style="display: inline-block" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% with "Person Genre Role Tag Company Film Book Television VideoGame Videogame Webseries WebSeries Console" as list %}
+            {% for field in form %}
+                {% if field.label == "Release" or field.label == "End" or field.label == "DoD" or field.label == "DoB"%}
+                    <div class="form-group">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        <input class="form-control" type="text" id="id_{{ field.name }}" name="{{ field.name }}" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" style="color: white">
+                        <span class="bmd-help">Enter the release date of the new film</span>
+                    </div>
+
+                {% elif field.label == "Poster" or field.label == "Image" or field.label == "Cover" %}
+                    <div class="form-group">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        <input type="file" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white">
+                    </div>
+
+                {% elif field.label == "Slug" %}
+                    <!-- Don't Display this field-->
+
+                {% elif field.label == "TrailerVideoPath" %}
+                    <div class="form-group">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">Trailer Video Path</label>
+                        <input type="text" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white">
+                        <span class="bmd-help">Enter the Trailer Video Path of the new item</span>
+                    </div>
+
+                {% elif field.label == "Rating" %}
+                    <div class="form-group">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">Age Rating</label>
+                        <input type="text" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white">
+                        <span class="bmd-help">Enter the Age Rating of the new item</span>
+                    </div>
+
+                {% elif field.label == "Ongoing" or field.label == "Alive" %}
+                    <div class="form-group">
+                      <div class="checkbox" style="padding-top: 5px; padding-bottom: 10px">
+                        <label for="id_{{ field.name }}" style="color: #009999">
+                          <input type="checkbox" id="id_{{ field.name }}" name="{{ field.name }}" >{{ field.label }}
+                        </label>
+                      </div>
+                    </div>
+
+                <!-- If the field is a foreign key, create a dropdown-->
+                {% elif field.label in list %}
+                    <div class="form-group">
+                        {% if field.label == "Videogame" or field.label == "VideoGame" %}
+                            <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">Video Game</label>
+                        {% elif field.label == "Webseries" %}
+                            <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">Web Series</label>
+                        {% else %}
+                            <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        {% endif %}
+                        <select class="form-control shadow-none" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white; text-overflow: ellipsis !important;">
+                            {% for v, t in field.field.choices %}
+                                    <option class="dropdownOption" style="width: 80px; max-width: 80px!important; text-overflow: ellipsis!important;" value="{{ v }}">{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                {% elif field.label == "Synopsis" %}
+                    <div class="form-group">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        <textarea class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white" rows="5"></textarea>
+                        <span class="bmd-help">Enter the {{ field.label }} of the new item</span>
+                    </div>
+
+                {% elif field.label == "Billing" %}
+                    <div class="form-group form-white">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        <input type="number" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white" value=1>
+                        <span class="bmd-help">Enter the {{ field.label }} of the new item</span>
+                    </div>
+
+                {% else %}
+                    <div class="form-group form-white">
+                        <label for="id_{{ field.name }}" class="bmd-label-floating" style="color: #009999">{{ field.label }}</label>
+                        <input type="text" class="form-control" id="id_{{ field.name }}" name="{{ field.name }}" style="color: white">
+                        <span class="bmd-help">Enter the {{ field.label }} of the new item</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <input class="btn btn-primary btn-raised" type="submit" value="Make Contribution" style="margin-top: 10px">
+
+
+            <div class="formSuccess">
+                {% if messages %}
+                    <br>
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert"> &times;</button>
+                            <strong>{{ message }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+         {% endwith %}
+        </form>
+    </div>
+
+    <script>
+    $('select').on('change', function() {
+      $(this).find('option').removeClass('selected');
+      $(this).find('option:selected').addClass('selected');
+    });
+    </script>
+
+
+{% endblock %}

@@ -3,37 +3,116 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h1 class="font-weight-bold text-uppercase">Television - Home</h1>
+        <h2 style="padding-top: 7px;">Television - Home</h2>
     </div>
 
+    <!--Carousel-->
+    <div id="c1" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#c1" data-slide-to="0" class="active"></li>
+          <li data-target="#c1" data-slide-to="1"></li>
+          <li data-target="#c1" data-slide-to="2"></li>
+          <li data-target="#c1" data-slide-to="3"></li>
+        </ul>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+
+          <div class="carousel-item active">
+              <a href="/tv/daredevil-2015-04-10">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/daredevil-banner-2.jpg)">
+              </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/tv/the-mandalorian-2019-11-01">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3.amazonaws.com/extraImages/mandalorian-banner.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/tv/peaky-blinders-2014-09-30">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/peaky-blinders-banner-5.png)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+              <a href="/tv/better-call-saul-2015-02-08">
+                <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/better-call-saul-banner-3.jpg)">
+              </a>
+          </div>
+
+        </div>
+
+        <!-- LR controls -->
+        <a class="carousel-control-prev" href="#c1" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#c1" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+    </div>
+
+    <script>
+        $('#c1').carousel({
+          interval: 30000,
+          cycle: true
+        });
+    </script>
+
+    <br>
+
+    <!-- Highest Rated Shows -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1990s Shows</h5>
-        <div class="scroller">
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Shows</h5>
+        <div class="scroller" >
             <ul class="hs full">
-                {% for television in nineties %}
-                    <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
-                    </a>
+                {% for series in highestRatedShows %}
+                    <div class="bottomOverlay">
+                        <a href="/tv/{{ series.media.slug }}">
+                            <img class="item posterSmall" src="{{series.media.poster.url}}" alt="{{series.media.title}}">
+                            <div class="content">
+                                <h6 class="font-weight-bold" >
+                                    <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    <div style="display: inline-block">{{ series.rating }}</div>
+                                    <script>
+                                        $('#{{forloop.counter}}').rateYo({
+                                            rating:'{% widthratio series.rating 1 2 %}',
+                                            starWidth:'15px', numStars:5, minValue:0, maxValue:10,
+                                            normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                                        })
+                                    </script>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
+    <!-- Browse by Genre -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">2000s Shows</h5>
-        <div class="scroller">
+        <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre</h5>
+         <div class="scroller">
             <ul class="hs full">
-                {% for television in naughties %}
-                    <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                {% for genre in genres %}
+                    <a href="/genre/{{ genre.slug }}">
+                        <img class="item box genre" src="{{ genre.image.url }}" alt="|">
+                        <div class="lowerLabel">
+                            <h7 class="font-weight-bold">{{ genre.title }}</h7>
+                        </div>
                     </a>
                 {% endfor %}
             </ul>
-        </div>
+         </div>
     </div>
 
+
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">2010s Shows</h5>
+        <h5 class="font-weight-bold border-bottom mb-1">2010s Shows</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for television in tens %}
@@ -46,19 +125,29 @@
     </div>
 
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">All Shows</h5>
-        {% for television in shows %}
-            <br>
-            <a href="/tv/{{ television.slug }}">{{ television.title }} | {{ television.getYear }}
-            {% if television.ongoing == False %}
-                {% if television.getYear != television.getEndYear %}
-                    - {{ television.getEndYear }}
-                {% endif %}
-            {% else %}
-                -
-            {% endif %}</a>
-            <br>
-        {% endfor %}
+        <h5 class="font-weight-bold border-bottom mb-1">2000s Shows</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in naughties %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-1">1990s Shows</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for television in nineties %}
+                    <a href="/tv/{{ television.slug }}">
+                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
 {% endblock %}

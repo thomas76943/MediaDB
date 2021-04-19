@@ -14,114 +14,174 @@
         <div class="blur"></div>
     {% endif %}
 
+
     <div class="container titleSection">
-            <form id="listForm">
-                {% csrf_token %}
-                <div style="float:right" class="plus-toggle">
-                  <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
-                  <label for="plus-toggle"></label>
-                </div>
-            </form>
 
-            <h2>{{film.title}}</h2>
-            <h5>{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
-            {% if genres %}
-                {% for genre in genres %}
-                    <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
-                {% endfor %}
-                <br>
-            {% endif %}
-        </div><br>
+        <form id="listForm">
+            {% csrf_token %}
+            <div style="float:right" class="plus-toggle" id="addListToggle">
+              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+              <label for="plus-toggle"></label>
+            </div>
+        </form>
 
+        <h2>{{film.title}}</h2>
+        <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
+        {% if genres %}
+            {% for genre in genres %}
+                <a style="padding-right:10px" href="/genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
+            {% endfor %}
+        {% endif %}
 
-        <!-- If there is a poster or a trailer then create parent element for them -->
-        {% if film.poster != 'MissingIcon.png' or film.trailerVideoPath or averageRating %}
-            <div class="container posterTrailerContainer">
-                <div class="row" style="padding: 10px">
+    </div>
+
+    <br>
+    <!--
+    <style>
+        .container.ratingBox {
+            min-height: 65px;
+        }
+
+        .container.ratingBox.taller {
+            min-height: 110px;
+        }
+
+        @media screen and (max-width: 675px) {
+    .item.detailPoster {
+        width: 110px;
+        height: 165px;
+    }
+    .trailer {
+        height: 165px;
+        min-height: 165px;
+        max-height: 165px;
+        width:281px;
+        max-width: 281px;
+    }
+    .ratingCol {
+        max-width: 391px;
+        padding-right: 5px;
+    }
+    .ratingBox.taller {
+        height: 260px;
+    }
+        }
+
+    @media screen and (max-width: 450px) {
+        .cloud-tags {
+            display: none;
+        }
+    }
+
+    </style>
+    -->
+
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if film.poster or film.trailerVideoPath or averageRating %}
+        <div class="container posterTrailerContainer" id="testrefresh">
+            <div class="row" style="padding: 10px">
+
+                {% if film.poster %}
                     <img class="item detailPoster" style="float:left" src="{{film.poster.url}}" alt="{{film.title}}">
-                    {% if film.trailerVideoPath %}
-                        <iframe class="trailer" src={{film.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    {% endif %}
-
-                    <div class="col">
-                        {% if averageRating %}
-                            <div class="container ratingBox">
-                                <h5>Average Rating: </h5>
-                                <h4>{{ averageRatingText }}</h4>
-                                <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_authenticated %}
-                            <div class="container ratingBox">
-                                <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-
-        {% if directors or writers or producers %}
-            <div class="container infoSection">
-                {% if directors %}
-                    <h5 style="padding-top:10px"> Directed by:</h5>
-                    {% for director in directors %}
-                        <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
-                    {% endfor %}
                 {% endif %}
 
-                {% if writers %}
-                    <h5 style="padding-top:10px"> Written by:</h5>
-                    {% for writer in writers %}
-                        <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} </a>
-                    {% endfor %}
+                {% if film.trailerVideoPath %}
+                    <iframe class="trailer" src={{film.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% endif %}
 
-                {% if producers %}
-                    <h5 style="padding-top:10px"> Produced by:</h5>
-                    {% for producer in producers %}
-                        <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endif %}
-
-        {% if nominationCount != 0 %}
-            <div class="container infoSection">
-                {{ nominationCount }} Nomination{% if nominationCount > 1 %}s{% endif %}
-                {% if winCount != 0 %}
-                     | {{ winCount }} Win{% if winCount > 1 %}s{% endif %}
-                {% endif %}
-            </div>
-        {% endif %}
-
-        {% if film.synopsis %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
-                <h6>{{ film.synopsis }}</h6>
-            </div>
-        {% endif %}
-
-        {% if cast %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
-                <div class="scroller">
-                    <ul class="hs full">
-                        {% for actor in cast %}
-                            <div class="bottomOverlay">
-                                <a class="item" href="/person/{{ actor.person.slug }}">
-                                    <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
-                                </a>
-                                <div class="content">
-                                    <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;" id="refresh">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
+                            <h5>Average Rating: </h5>
+                            <h4 id="refreshAverageText">{{ averageRatingText }}</h4>
+                            {% if not averageRatingText %}
+                                <h4 id="refreshAverageNoneText">0</h4>
+                            {% endif %}
+                            <h6 id="refreshCountText">from {{ ratingCount }} user{% if ratingCount > 1 or ratingCount == 0 %}s{% endif %}</h6>
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate"></div>
+                                {% csrf_token %}
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised reviewButton" style="margin-top:5px;">
+                                            {% if review %}
+                                                Edit Review
+                                            {% else %}
+                                                Write Review
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </ul>
-                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
+
+    {% if directors or writers or producers %}
+        <div class="container infoSection">
+            {% if directors %}
+                <h5 style="padding-top:5px"> Directed by:</h5>
+                {% for director in directors %}
+                    <a style="padding-right:10px" href="/person/{{ director.person.slug }}"> {{ director.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if writers %}
+                <h5 style="padding-top:5px"> Written by:</h5>
+                {% for writer in writers %}
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if producers %}
+                <h5 style="padding-top:5px"> Produced by:</h5>
+                {% for producer in producers %}
+                    <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if nominationCount != 0 %}
+        <div class="container infoSection">
+            {{ nominationCount }} Nomination{% if nominationCount > 1 %}s{% endif %}
+            {% if winCount != 0 %}
+                 | {{ winCount }} Win{% if winCount > 1 %}s{% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if film.synopsis %}
+        <div class="container infoSection">
+            <h5 style="padding-top:5px">Synopsis:</h5>
+            <h6>{{ film.synopsis }}</h6>
+        </div>
+    {% endif %}
+
+    {% if cast %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in cast %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
+                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 
     {% if franchises %}
         <div class="container infoSection">
@@ -134,11 +194,10 @@
 
     {% if tags %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Tags</h5>
-            <br>
+            <h5 style="padding-top:5px">Tags:</h5>
             <ul class="cloud-tags">
                 {% for t in tags %}
-                    <li class="font-weight-bold text-uppercase" style="padding-right:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
+                    <li class="font-weight-bold" style="margin-top:0; padding-right:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -152,32 +211,36 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6>US Release Date: {{ film.release }}</h6>
+        <h6 style="padding-top:10px">US Release Date: {{ film.release }}</h6>
         {% if film.budget %}<h6>Budget: {{ budgetFormatted }}</h6>{% endif %}
         {% if film.boxOffice %}<h6>Box Office: {{ boxOfficeFormatted }}</h6>{% endif %}
     </div>
 
-    {% if distributors %}
+    {% if distributors or productionCompanies %}
         <div class="container infoSection">
-            <h6 style="padding-top:5px"> Distributed by:</h6>
-            {% for company in distributors %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
+            {% if distributors %}
+                <h6 style="padding-top:5px"> Distributors:</h6>
+                {% for company in distributors %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
+
+            {% if productionCompanies %}
+                <h6 style="padding-top:5px"> Production Companies:</h6>
+                {% for company in productionCompanies %}
+                    <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
+                {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
 
-    {% if productionCompanies %}
-        <div class="container infoSection">
-            <h6 style="padding-top:5px"> Produced by:</h6>
-            {% for company in productionCompanies %}
-                <a href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a><br>
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/films/{{ film.slug }}/crew">See All Details</a></h6>
+    </div>
 
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">ADDITIONAL POSTERS, STILLS, CONCEPT ART, BEHIND THE SCENES</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
@@ -189,5 +252,36 @@
             </div>
         </div>
     {% endif %}
+
+    <!-- Review Modal Contents -->
+    <div id="writeReviewModal" class="modal">
+        <div class="modal-content">
+            <div class="container profileSection inModal">
+                {% if review %}
+                <h5 class="font-weight-bold border-bottom mb-0">Edit Review: {{ film.title }}</h5>
+                {% else %}
+                <h5 class="font-weight-bold border-bottom mb-0">Write Review: {{ film.title }}</h5>
+                {% endif %}
+                <br>
+                <form id="writeReview">
+                    {%  csrf_token %}
+                    <div class="form-outline mb-4">
+                      <label class="form-label" for="reviewTextArea">Review:</label>
+                      <textarea class="form-control" id="reviewTextArea" rows="8" style="color: white">{% if review %}{{ review }}{% endif %}</textarea>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <input type="submit" id="submitReview" class="btn btn-primary btn-raised"
+                           {% if review %}
+                            value="Save Changes"
+                            {% else %}
+                            value="Post Review"
+                            {% endif %}>
+                        <span class="close btn btn-default" style="color: white">X</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

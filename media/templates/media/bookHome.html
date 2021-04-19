@@ -3,14 +3,182 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h1 class="font-weight-bold text-uppercase">Books - Home</h1>
+        <h2 style="padding-top: 7px;">Books - Home</h2>
     </div>
 
-    <h3>All Books:</h3>
-    {% for book in books %}
-        <hr>
-        <a href="/books/{{ book.slug }}">{{ book.title }} | {{ book.getYear }}</a>
-    {% endfor %}
+    <!--Carousel-->
+    <div id="c1" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#c1" data-slide-to="0" class="active"></li>
+          <li data-target="#c1" data-slide-to="1"></li>
+          <li data-target="#c1" data-slide-to="2"></li>
+        </ul>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <a href="/books/harry-potter-and-the-sorcerers-stone-1997">
+                <img class="carousel"
+                style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/hpbanner2.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="/person/roald-dahl">
+                <img class="carousel"
+                style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/blakebanner.jpg)">
+            </a>
+          </div>
+
+          <div class="carousel-item">
+              <a href="/books/the-adventures-of-sherlock-holmes-1892">
+                  <img class="carousel"
+                  style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/sherlockbanner.jpg)">
+              </a>
+          </div>
+
+        </div>
+
+        <!-- LR controls -->
+        <a class="carousel-control-prev" href="#c1" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#c1" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+    </div>
+
+    <!-- Carousel Script -->
+    <script>
+        $('#c1').carousel({
+          interval: 10000,
+          cycle: true
+        });
+    </script>
+
+    <br>
+
+    <!-- Highest Rated Films -->
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Books</h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for book in topRated %}
+                    <div class="bottomOverlay">
+                        <a href="/books/{{ book.media.slug }}">
+                            <img class="item posterSmall" src="{{book.media.image.url}}" alt="{{book.media.title}}">
+                            <div class="content">
+                                <h6 class="font-weight-bold" >
+                                    <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    <div style="display: inline-block">{{ book.rating }}</div>
+                                    <script>
+                                        $('#{{forloop.counter}}').rateYo({
+                                            rating:'{% widthratio book.rating 1 2 %}',
+                                            starWidth:'15px', numStars:5, minValue:0, maxValue:10,
+                                            normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                                        })
+                                    </script>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Classics</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in classics %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">2010s</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in teens %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">2000s</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in naughties %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">1990s</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in nineties %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">1980s</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in eighties %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-0">1970s</h5>
+        <div class="scroller">
+            <ul class="hs full">
+                {% for book in seventies %}
+                    {% if book.image %}
+                        <a href="/books/{{ book.slug }}">
+                        <img class="item posterSmall" src="{{book.image.url}}" alt="{{book.title}}">
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
 
     <hr>
 

@@ -1,0 +1,26 @@
+{% extends "media/base.html" %}
+{% block title %}{{ bookgenre.title }}{% endblock %}
+{% block content %}
+
+    <div class="container infoSection">
+        <h2 style="padding-top: 7px">Browsing Genre - {{bookgenre.title}}</h2>
+    </div>
+
+    {% if books %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">{{ bookgenre.title }} Books</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for book in books %}
+                        {% if book.book.image %}
+                            <a href="/books/{{ book.book.slug }}">
+                            <img class="item posterSmall game" src="{{book.book.image.url}}" alt="{{ book.book.title }}">
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

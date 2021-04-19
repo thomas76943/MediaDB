@@ -22,14 +22,15 @@
 
         <form id="listForm">
             {% csrf_token %}
-            <div style="float:right" class="plus-toggle">
+            <div style="float:right" class="plus-toggle" id="addListToggle">
               <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
               <label for="plus-toggle"></label>
             </div>
         </form>
 
-        <h2>
-        {{television.title}} | {{ television.getYear }}
+        <h2>{{television.title}}</h2>
+        <h5>
+        {{ television.getYear }}
         {% if television.ongoing == False %}
             {% if television.getYear != television.getEndYear %}
                 - {{ television.getEndYear }}
@@ -37,44 +38,60 @@
         {% else %}
             -
         {% endif %}
-        </h2>
-
+        </h5>
         <h5>{{ television.episodes }} Episodes | Seasons: {{ television.seasons }}</h5>
 
         {% if genres %}
             {% for genre in genres %}
-                <a style="padding-right:10px" href="/genre/{{ genre.genre.id }}"> {{ genre.genre.title }}</a>
+                <a style="padding-right:10px" href="/genre/{{ genre.genre.slug }}"> {{ genre.genre.title }}</a>
             {% endfor %}
         {% endif %}
     </div>
 
     <br>
 
-    {% if television.poster != 'MissingIcon.png' or television.trailerVideoPath or averageRating %}
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if television.poster or television.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
-                <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
-                {% if television.trailerVideoPath %}
-                    <iframe class="trailer" width="711" height="400" src={{television.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                {% if television.poster %}
+                    <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
                 {% endif %}
 
-                <div class="col">
+                {% if television.trailerVideoPath %}
+                    <iframe class="trailer" src={{television.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
 
-                    {% if averageRating %}
-                        <div class="container ratingBox">
+                {% if averageRating or user.is_authenticated %}
+                    <div class="col ratingCol" style="padding-left: 0;" id="refresh">
+                        <div class="container ratingBox taller" style="border: solid white; border-width: 1px 1px;">
                             <h5>Average Rating: </h5>
-                            <h4>{{ averageRating }}</h4>
-                            <h6>from {{ ratingCount }} user{% if ratingCount > 1 %}s{% endif %}</h6>
+                            <h4 id="refreshAverageText">{{ averageRatingText }}</h4>
+                            {% if not averageRatingText %}
+                                <h4 id="refreshAverageNoneText">0</h4>
+                            {% endif %}
+                            <h6 id="refreshCountText">from {{ ratingCount }} user{% if ratingCount > 1 or ratingCount == 0 %}s{% endif %}</h6>
+                            {% if user.is_authenticated %}
+                                <hr>
+                                <div class="below" style="display:inline-block;padding-top:8px;padding-bottom:10px" id="rate"></div>
+                                {% csrf_token %}
+                                <div id="reviewButtonContainer">
+                                    {% if userRating %}
+                                        <hr>
+                                        <button id="writeReviewButton" class="btn btn-primary btn-raised reviewButton" style="margin-top:5px;">
+                                            {% if review %}
+                                                Edit Review
+                                            {% else %}
+                                                Write Review
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-
-                    {% if user.is_authenticated %}
-                        <div class="container ratingBox">
-                            <div class="below" style="padding-top:10px;padding-bottom:10px" id="rate">{% csrf_token %}</div>
-                        </div>
-                    {% endif %}
-
-                </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
@@ -89,14 +106,14 @@
             {% endif %}
 
             {% if writers %}
-                <h5 style="padding-top:10px">Written by:</h5>
+                <h5 style="padding-top:5px">Written by:</h5>
                 {% for writer in writers %}
                     <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} </a>
                 {% endfor %}
             {% endif %}
 
             {% if producers %}
-                <h5 style="padding-top:10px">Produced by:</h5>
+                <h5 style="padding-top:5px">Produced by:</h5>
                 {% for producer in producers %}
                     <a style="padding-right:10px" href="/person/{{ producer.person.slug }}"> {{ producer.getPerson }} </a>
                 {% endfor %}
@@ -106,14 +123,14 @@
 
     {% if television.synopsis %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase">Synopsis</h5>
+            <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ television.synopsis }}</h6>
         </div>
     {% endif %}
 
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
@@ -141,33 +158,37 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6 style="padding-top:5px">First Episode Air  Date: {{ television.release }}</h6>
+        <h6 style="padding-top:10px">First Episode Air  Date: {{ television.release }}</h6>
         {% if television.ongoing == False %}
-            <h6>Final Episode Air Date: {{ television.end }}</h6>
+            <h6 style="padding-top:5px">Final Episode Air Date: {{ television.end }}</h6>
         {% endif %}
     </div>
 
-     {% if productionCompanies %}
-         <div class="container infoSection">
-            <h6> Produced by:</h6>
+    {% if productionCompanies %}
+        <div class="container infoSection">
+            <h6 style="padding-top:5px; "> Production Companies:</h6>
             {% for company in productionCompanies %}
-                <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
+                <a style="padding-right: 10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
-         </div>
+        </div>
     {% endif %}
 
     {% if networks %}
         <div class="container infoSection">
-            <h6> Networks:</h6>
+            <h6 style="padding-top:5px; "> Networks:</h6>
             {% for company in networks %}
                 <a style="padding-right:10px" href="/company/{{ company.company.slug }}"> {{ company.company.name }} </a>
             {% endfor %}
         </div>
     {% endif %}
 
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/tv/{{ television.slug }}/crew">See All Details</a></h6>
+    </div>
+
     {% if images %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Additional Posters, Stills, Concept Art, Behind the Scenes</h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Posters, Stills, Concept Art and Behind the Scenes</h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for image in images %}
@@ -179,5 +200,32 @@
             </div>
         </div>
     {% endif %}
+
+    <!-- Review Modal Contents -->
+    <div id="writeReviewModal" class="modal">
+        <div class="modal-content">
+        <div class="container profileSection inModal">
+            {% if review %}
+            <h5 class="font-weight-bold border-bottom mb-0">Edit Review: {{ television.title }}</h5>
+            {% else %}
+            <h5 class="font-weight-bold border-bottom mb-0">Write Review: {{ television.title }}</h5>
+            {% endif %}
+            <br>
+            <form id="writeReview">
+                {%  csrf_token %}
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="reviewTextArea">Review:</label>
+                  <textarea class="form-control" id="reviewTextArea" rows="8" style="color: white">{% if review %}{{ review }}{% endif %}</textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <input type="submit" id="submitReview" class="btn btn-primary btn-raised" {% if review %} value="Save Changes" {% else %} value="Post Review"{% endif %}>
+                    <span class="close btn btn-default" style="color: white">X</span>
+                </div>
+            </form>
+        </div>
+      </div>
+
+    </div>
 
 {% endblock %}

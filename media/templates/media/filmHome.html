@@ -3,10 +3,10 @@
 {% load static %}
 
     <div class="container infoSection">
-        <h1 class="font-weight-bold text-uppercase">Films - Home</h1>
+        <h2 style="padding-top: 7px;">Films - Home</h2>
     </div>
 
-        <!--Carousel-->
+    <!--Carousel-->
     <div id="c1" class="carousel slide" data-ride="carousel">
 
         <!-- Indicators -->
@@ -15,7 +15,6 @@
           <li data-target="#c1" data-slide-to="1"></li>
           <li data-target="#c1" data-slide-to="2"></li>
           <li data-target="#c1" data-slide-to="3"></li>
-          <li data-target="#c1" data-slide-to="4"></li>
         </ul>
 
         <!-- Slideshow -->
@@ -23,43 +22,30 @@
           <div class="carousel-item active">
             <a href="/films/spirited-away-2003-09-12">
                 <img class="carousel"
-                style="content: url(../../../resources/carouselImages/castle-in-the-sky-cover.jpg)">
+                style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SpritiedAway.jpg)">
             </a>
-            <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Studio Ghibli</span></h2>
-            </div>
           </div>
 
           <div class="carousel-item">
             <a href="/films/star-wars-episode-iv-a-new-hope-1977-05-25">
                 <img class="carousel"
-                style="content: url(../../../resources/carouselImages/sw-esb-cover.png)">
+                style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/sw-esb-cover.png)">
             </a>
-            <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Star Wars</span></h2>
-            </div>
           </div>
 
           <div class="carousel-item">
               <a href="/films/singin-in-the-rain-1952-04-11">
                   <img class="carousel"
-                  style="content: url(../../../resources/carouselImages/SinginInTheRainBanner-New.jpg)">
+                  style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/SinginInTheRainBanner-New.jpg)">
               </a>
-              <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Classics</span></h2>
-              </div>
           </div>
 
           <div class="carousel-item">
               <a href="/franchises/marvel-comics">
                   <img class="carousel" width="1400" height="300"
-                  style="content: url(../../../resources/carouselImages/mcuCarousel.png)">
+                  style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/mcuCarousel.png)">
               </a>
-              <div class="carousel-caption">
-                <h2 class="font-weight-bold text-uppercase"><span>Marvel Cinematic Universe</span></h2>
-              </div>
           </div>
-
 
         </div>
 
@@ -72,18 +58,48 @@
         </a>
     </div>
 
+    <!-- Carousel Script -->
     <script>
-    $('#c1').carousel({
-      interval: 30000,
-      cycle: true
-    });
+        $('#c1').carousel({
+          interval: 30000,
+          cycle: true
+        });
     </script>
+
     <br>
 
+    <!-- Highest Rated Films -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY FRANCHISE
-            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
-        </h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Highest Rated Films<a style="float:right" href={% url 'media-top-rated' %}>See All</a></h5>
+        <div class="scroller" >
+            <ul class="hs full">
+                {% for film in highestRatedFilms %}
+                    <div class="bottomOverlay">
+                        <a href="/films/{{ film.media.slug }}">
+                            <img class="item posterSmall" src="{{film.media.poster.url}}" alt="{{film.media.title}}">
+                            <div class="content">
+                                <h6 class="font-weight-bold" >
+                                    <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    <div style="display: inline-block">{{ film.rating }}</div>
+                                    <script>
+                                        $('#{{forloop.counter}}').rateYo({
+                                            rating:'{% widthratio film.rating 1 2 %}',
+                                            starWidth:'15px', numStars:5, minValue:0, maxValue:10,
+                                            normalFill:'gray', ratedFill:'orange', halfStar:true, readOnly:true,
+                                        })
+                                    </script>
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Browse by Franchise -->
+    <div class="container infoSection">
+        <h5 class="font-weight-bold border-bottom mb-1">Browse by Franchise<a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a></h5>
          <div class="scroller">
             <ul class="hs full">
                 {% for franchise in franchises %}
@@ -95,17 +111,31 @@
         </div>
     </div>
 
+    <!-- Genre/Franchise Box Padding -->
+    <style>
+        .item.box.genre {
+            padding: 40px;
+        }
+        @media screen and (max-width: 675px) {
+             .item.box.genre {
+                padding: 20px;
+            }
+            .lowerLabel {
+                display: none;
+            }
+        }
+    </style>
+
+    <!-- Browse by Genre -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">BROWSE BY GENRE
-            <a style="float:right;" href="{% url 'media-franchise-home' %}">See All</a>
-        </h5>
+        <h5 class="font-weight-bold border-bottom mb-1">Browse by Genre</h5>
          <div class="scroller">
             <ul class="hs full">
                 {% for genre in genres %}
-                    <a href="/genre/{{ genre.id }}">
-                        <img class="item box" src="#" alt="|">
+                    <a href="/genre/{{ genre.slug }}">
+                        <img class="item box genre" src="{{ genre.image.url }}" alt="|">
                         <div class="lowerLabel">
-                            <h7 class="font-weight-bold text-uppercase">{{ genre.title }}</h7>
+                            <h7 class="font-weight-bold">{{ genre.title }}</h7>
                         </div>
                     </a>
                 {% endfor %}
@@ -113,8 +143,9 @@
          </div>
     </div>
 
+    <!-- 1970s -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1970s FILMS</h5>
+        <h5 class="font-weight-bold border-bottom mb-1">1970s Films</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for film in seventies %}
@@ -126,8 +157,9 @@
         </div>
     </div>
 
+    <!-- 1980s -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold border-bottom mb-1">1980s FILMS</h5>
+        <h5 class="font-weight-bold border-bottom mb-1">1980s Films</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for film in eighties %}
@@ -139,8 +171,9 @@
         </div>
     </div>
 
+    <!-- 1990s -->
     <div class="container infoSection">
-        <h5 class="font-weight-bold text-uppercase border-bottom mb-1">1990s FILMS</h5>
+        <h5 class="font-weight-bold border-bottom mb-1">1990s Films</h5>
         <div class="scroller">
             <ul class="hs full">
                 {% for film in nineties %}
