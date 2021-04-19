@@ -1,0 +1,281 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}{{profileSection.sectionName}}{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <a href="/user/{{ profileSection.profile.user.username }}">Back to Profile Page</a>
+    </div>
+
+    <!-- Change Name Form -->
+    <div class="container profileSection" id="nameChangeContainer">
+        <h5 class="font-weight-bold border-bottom mb-0">Change Name</h5><br>
+            <form id="changeName">
+                {%  csrf_token %}
+                <div class="form-outline mb-4">
+                  <textarea class="form-control" id="nameChangeArea" rows="1" style="color: white">{{ profileSection.sectionName }}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" id="submitNameChange" class="btn btn-primary btn-raised" value="Change">
+                </div>
+            </form>
+    </div>
+
+    <!-- Change Name Script -->
+    <script type="text/javascript">
+
+        var frm = $('#changeName')
+
+        console.log(frm)
+        frm.submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url:document.URL,
+                type : "POST",
+                data : {
+                    'newName': document.querySelector('#nameChangeArea').value,
+                    'csrfmiddlewaretoken' : '{{ csrf_token }}',
+                },
+                success: setTimeout(function(){
+                    location.reload()
+                }, 1000),
+            })
+            return false;
+        })
+
+    </script>
+
+    <!-- View and Reorder the Media in the Profile Section -->
+    <div class="container profileSection" id="sectionViewer">
+        <h5 class="font-weight-bold border-bottom mb-0">{{ profileSection.sectionName }}</h5>
+        <div class="scroller">
+            <ul class="hs full" style="list-style: none" id="sectionID">
+                {% for entry in entries %}
+                    {%  if entry.film != NULL %}
+                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                            <div class="bottomOverlay">
+                                <a class="item" href="/films/{{ entry.film.slug }}">
+                                    <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                </a>
+                                <div class="content">
+                                   <button id="f-{{ entry.film.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {%  if entry.television != NULL %}
+                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                            <div class="bottomOverlay">
+                                <a class="item" href="/tv/{{ entry.television.slug }}">
+                                    <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                </a>
+                                <div class="content">
+                                   <button id="t-{{ entry.television.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {%  if entry.videoGame != NULL %}
+                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                            <div class="bottomOverlay">
+                                <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                    <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                </a>
+                                <div class="content">
+                                   <button id="v-{{ entry.videoGame.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {%  if entry.book != NULL %}
+                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                            <div class="bottomOverlay">
+                                <a class="item" href="/books/{{ entry.book.slug }}">
+                                    <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                </a>
+                                <div class="content">
+                                   <button id="b-{{ entry.book.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {%  if entry.webSeries != NULL %}
+                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                          <div class="bottomOverlay">
+                                <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                    <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                </a>
+                               <div class="content">
+                                   <button id="w-{{ entry.webSeries.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>
+                                </div>
+                          </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <!-- Changing the Order of the Section Script -->
+            <script type="text/javascript" language="javascript">
+              $(document).ready(function() {
+                $("#sectionID").sortable({
+                    axis:'x',
+                    update: function(event, ui) {
+                        var data = $(this).sortable('serialize',{attribute:"id"});
+                        $.ajax({
+                          url: "/profile-section/{{ profileSection.slug }}",
+                          type: "POST",
+                          data: { 'changing':"confirm", 'content': data, 'csrfmiddlewaretoken' : '{{ csrf_token }}' }
+                        });
+                    },
+                }).disableSelection();
+              });
+
+              function remove(media) {
+                console.log(media)
+                $.ajax({
+                    url: "/profile-section/{{ profileSection.slug }}",
+                    type: "POST",
+                    data: { 'removeMedia': media, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+                    success: setTimeout(function () {
+                        location.reload()
+                    }, 1000),
+                })};
+
+            </script>
+        </div>
+    </div>
+
+    <!-- Search for new media to add to the Profile Section -->
+    <div class="container profileSection">
+        <h5 class="font-weight-bold border-bottom mb-0">Add {{ profileSection.type }}</h5><br>
+        <form class="input-group input-group-lg">
+            <input class="form-control" style="color: white; max-width: 600px" type="search" id="searchMedia" name="searchMedia" placeholder="Search for {{ profileSection.type }}...">
+        </form>
+
+        <div id="results" style="padding-top: 15px">
+        </div>
+
+    </div>
+
+    <!-- Live Search + Add Media Scripts -->
+    <script>
+        const data = '{{ media }}'
+        const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
+        const input = document.getElementById('searchMedia')
+        let filteredArr = []
+        input.addEventListener('keyup', (e)=>{
+            if (e.key !== "ArrowLeft") {
+                results.innerHTML = ""
+                filteredArr = rdata.filter(item => (item['title']).toLowerCase().includes(e.target.value.toLowerCase()))
+                if (filteredArr.length > 0) {
+                    filteredArr.map(item => {
+                        //Dynamically creating buttons for every search item
+                        results.innerHTML += `
+                            <button id="${item['slug']}" class="btn btn-primary btn-raised">Add</button>
+                            {% if profileSection.type == "Films" %}
+                            <a href="/films/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Television" %}
+                            <a href="/tv/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Video Games" %}
+                            <a href="/video-games/${item['slug']}"> ${item['title']}</a>
+                            {% elif profileSection.type == "Books" %}
+                            <a href="/books/${item['slug']}"> ${item['title']}</a>
+                            {% else %}
+                            <a href="/web-series/${item['slug']}"> ${item['title']}</a>
+                            {% endif %}
+                            <br><br>`
+                    })
+
+                    //Function to handle whichever button is pressed and to then make the AJAX POST request
+                    $('#results').unbind().on('click', 'button', function (e) {
+                        e.preventDefault()
+                        var mediaToAdd = $(this).attr('id');
+                        console.log("Clicked:", mediaToAdd)
+
+                        $.ajax({
+                            url: "/profile-section/{{ profileSection.slug }}",
+                            type: "POST",
+                            data: {
+                                'addMedia': mediaToAdd,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            },
+                            success: setTimeout(function () {
+                                location.reload()
+                            }, 1000),
+                        })
+                    });
+                } else {
+                    results.innerHTML = "No results"
+                }
+            }
+        })
+    </script>
+
+    <!-- Delete Section Button -->
+    <div class="container infoSection">
+        <div class="form-group" style="padding-top: 20px">
+            <button id="deleteSectionButton" style="background: none; border: none; color:white;">
+                <input type="submit" class="btn btn-danger btn-raised" value="DELETE SECTION">
+            </button>
+        </div>
+    </div>
+
+    <!-- Delete Section Modal Content -->
+    <div id="deleteSectionModal" class="modal">
+        <div class="modal-content">
+            <div class="container profileSection inModal">
+                <h5 class="font-weight-bold border-bottom mb-0">Deleting: {{ profileSection.sectionName }}</h5><br>
+                <h5 class="font-weight-bold">Are you sure?</h5><br>
+
+                <form id="deleteProfileSection">
+                    {%  csrf_token %}
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-danger btn-raised" value="Delete">
+                        <span class="close btn btn-default" style="color: white">X</span>
+                    </div>
+                </form>
+
+                <script type="text/javascript">
+                    var frm = $('#deleteProfileSection')
+                    console.log(frm)
+                    frm.submit(function(e) {
+                        e.preventDefault()
+                        $.ajax({
+                            url : "/profile-section/{{ profileSection.slug }}",
+                            type : "POST",
+                            data : {
+                                'delete': 'confirm',
+                                'csrfmiddlewaretoken' : '{{ csrf_token }}',
+                            },
+                            success: setTimeout(function(){// wait for 5 secs(2)
+                                //location.reload(); // then reload the page.(3)
+                                window.location.href="/user/{{ profileSection.profile.user.username }}"
+                            }, 0.01),
+                        })
+                        return false;
+                    })
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Script -->
+    <script>
+        var modal = document.getElementById("deleteSectionModal");
+        var btn = document.getElementById("deleteSectionButton");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+    </script>
+
+{% endblock %}

@@ -3,16 +3,38 @@
 {% load crispy_forms_filters %}
 {% block content %}
 
-    <div class="container infoSection">
+    <style>
+        .bmd-label-static {
+            color: #009999;
+        }
+
+        .form-control, .form-group {
+            color: white;
+        }
+
+        .form-control:focus {
+            color: white;
+        }
+
+        .form-text {
+            display: none;
+        }
+
+    </style>
+
+    <div class="container profileSection" style="max-width: 800px; margin: auto; margin-top:100px; border: 3px solid #888;">
         <form method="POST">
             {% csrf_token %}
-            <div style="padding: 20px">
+
+                <legend class="border-bottom mb-4">Register</legend>
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4">Join Today</legend>
-                    {{ form|crispy }}
+                    {% for field in form %}
+                        <div style="color: white;">{{ field|as_crispy_field }}</div>
+                    {% endfor %}
                 </fieldset>
+
                 <div class="form-group">
-                    <button class="btn btn-outline-info" type="submit">Sign Up</button>
+                    <button class="btn btn-primary btn-raised" type="submit">Sign Up</button>
                 </div>
 
                 <div class="border-top pt-3">
@@ -21,7 +43,7 @@
                         <a class="ml-2" href="{% url 'login' %}">Log In</a>
                     </small>
                 </div>
-            </div>
+
         </form>
     </div>
 

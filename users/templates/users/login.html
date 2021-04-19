@@ -3,24 +3,37 @@
 {% load crispy_forms_filters %}
 {% block content %}
 
-    <div class="container profileSection">
-    <form method="POST">
-        {% csrf_token %}
-        <fieldset class="form-group">
+    <div class="container profileSection" style="max-width: 600px; margin: auto; margin-top:100px; border: 3px solid #888;">
+        <form method="POST">
+            {% csrf_token %}
             <legend class="border-bottom mb-4">Login</legend>
-            {{ form|crispy }}
-        </fieldset>
-        <div class="form-group">
-            <button class="btn btn-outline-info" type="submit">Log In</button>
+            <fieldset class="form-group">
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label class="bmd-label-floating" for="id_{{ field.name }}" style="color: #009999">{{ field.label }}</label>
+                        <div>
+                            {% if field.label == "Username" %}
+                            <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" style="color: white">
+                            {% else %}
+                            <input type="password" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" style="color: white">
+                            {% endif %}
+                        </div>
+                        <span class="bmd-help">Enter the {{ field.label }} of your account</span>
+                    </div>
+                {% endfor %}
+
+
+            </fieldset>
+            <br>
+            <button class="btn btn-primary btn-raised" type="submit">Log In</button>
+        </form>
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Need an Account?
+                <a class="ml-2" href="{% url 'register' %}">Register</a>
+            </small>
         </div>
-    </form>
-
-    <div class="border-top pt-3">
-        <small class="text-muted">
-            Need an Account?
-            <a class="ml-2" href="{% url 'register' %}">Register</a>
-        </small>
     </div>
 
-    </div>
 {% endblock %}

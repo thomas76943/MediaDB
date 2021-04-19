@@ -1,7 +1,9 @@
 {% extends "media/base.html" %}
 {% load media_tags %}
+{% load static %}
 {% block title %}{{memberProfile.username}}{% endblock title %}
 {% block content %}
+
 
     <div class="container profileSection">
         <div class="media">
@@ -10,74 +12,114 @@
                 {{ memberProfile.profile.image.url }}
              {% else %}
                 https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png
-            {% endif %}
-                >
+            {% endif %}>
+
             <div class="media-body" style="padding-left:15px">
+                {% if user.is_authenticated %}
+                    {% if user.username != memberProfile.username %}
+                        <form id="listForm">
+                            {% csrf_token %}
+                            <div style="float:right" class="plus-toggle" id="addListToggle">
+                              <input type="checkbox" id="plus-toggle" {% if inList == True %}checked{% endif %}>
+                              <label for="plus-toggle"></label>
+                            </div>
+                        </form>
+                    {% endif %}
+                {% endif %}
+
+                <!-- User Follow Toggle Script
+                <script>
+                    $('#plus-toggle').click(function() {
+                        var toggle;
+                        {% if following == True %}
+                            toggle = "remove"
+                        {% else %}
+                            toggle = "add"
+                        {% endif %}
+
+                        $.ajax({
+                            url:document.URL,
+                            type: "POST",
+                            data: {
+                                'toggle': toggle,
+                                'csrfmiddlewaretoken': csrftoken
+                            },
+                            success: setTimeout(function(){
+                                $('#followToggle').load(' #followToggle', function (){$(this).children().unwrap()})
+                            }, 500),
+                        });
+                    });
+                </script>
+                 -->
+
                 <h2 class="account-heading">{{memberProfile.username}}</h2>
-                <p class="text-secondary">{{ memberProfile.email }}</p>
-                Ratings:<br>
-                Films - {{ filmCount }}<br>
-                Television - {{ tvCount }}<br>
-                Video Games - {{ vgCount }}<br>
-                Books - {{ bookCount }}<br>
-                Web Series - {{ wsCount }}<br>
+                <p class="text-secondary">{{ memberProfile.profile.bio }}</p>
+                <a class="font-weight-bold" style="padding-top:3px;font-size: 18px" href="/user/{{ memberProfile.username }}/stats">Stats</a>
 
             </div>
         </div>
     </div>
 
     {% if ratings %}
-        <div class="container profileSection">
-            <h5 class="font-weight-bold text-uppercase border-bottom mb-0">Recent Activity <a style="float:right" href="/user/{{ memberProfile.username }}/activity">See All</a></h5>
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Recent Activity <a style="float:right" href="/user/{{ memberProfile.username }}/activity">See All</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for rating in ratings %}
                         <div class="bottomOverlay">
                             {%  if rating.film != NULL %}
                                 <a class="item" href="/films/{{ rating.film.slug }}">
-                                <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                    <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                    <div class="content">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    </div>
                                 </a>
-
                             {% endif %}
                             {%  if rating.television != NULL %}
                                 <a class="item" href="/tv/{{ rating.television.slug }}">
-                                <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                                    <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                                    <div class="content">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    </div>
                                 </a>
                             {% endif %}
                             {%  if rating.videoGame != NULL %}
                                 <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
-                                <img class="item posterSmall" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                    <img class="item posterSmall game" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                                    <div class="content">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    </div>
                                 </a>
                             {% endif %}
                             {%  if rating.book != NULL %}
                                 <a class="item" href="/books/{{ rating.book.slug }}">
-                                <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                                    <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                                    <div class="content">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    </div>
                                 </a>
                             {% endif %}
                             {%  if rating.webSeries != NULL %}
                                 <a class="item" href="/web-series/{{ rating.webSeries.slug }}">
-                                <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                                    <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                                    <div class="content">
+                                        <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
+                                    </div>
                                 </a>
                             {% endif %}
-                            <div class="content">
-                                <h6 class = "font-weight-bold text-uppercase" >
-                                    <div class="below" style="display: inline-block" id="{{ rating.film.slug }}"></div>
-                                    <div style="display: inline-block">{% widthratio rating.rating 2 1 %}</div>
-                                    <script>
-                                        $('#{{rating.film.slug}}').rateYo({
-                                            rating:'{{ rating.rating }}',
-                                            starWidth:'15px',
-                                            numStars:5,
-                                            minValue:0,
-                                            maxValue:10,
-                                            normalFill:'gray',
-                                            ratedFill:'orange',
-                                            halfStar:true,
-                                            readOnly:true,
-                                        })
-                                    </script>
-                                </h6>
-                            </div>
+                            <script>
+                                $('#{{ forloop.counter }}').rateYo({
+                                    rating:'{{ rating.rating }}',
+                                    starWidth:'18px',
+                                    numStars:5,
+                                    minValue:0,
+                                    maxValue:10,
+                                    normalFill:'gray',
+                                    ratedFill:'orange',
+                                    halfStar:true,
+                                    readOnly:true,
+                                })
+                            </script>
                         </div>
                     {% endfor %}
                 </ul>
@@ -86,45 +128,168 @@
     {% endif %}
 
     {% if profileSections %}
+        <ul id="sections" style="list-style: none">
         {% for section in profileSections %}
-            <div class="container infoSection">
-                <h5 class="font-weight-bold text-uppercase border-bottom mb-0">{{ section.sectionName }}</h5>
-                <div class="scroller">
-                    <ul class="hs full">
+            <li id="section_{{ section.id }}" class="ui-state-default">
+                <div class="container infoSection">
+                    <h5 class="font-weight-bold border-bottom mb-0">
+                        {{ section.sectionName }}
+                        {% if user.username == memberProfile.username %}
+                            <a style="float:right" href="/profile-section/{{ section.slug }}">Edit</a>
+                        {% endif %}
+                    </h5>
+                    <div class="scroller">
                         {% with var=section.sectionName %}
                         {% dynamicVariableValue var as var_url %}
-                        {% for entry in var_url %}
-                            {%  if entry.film != NULL %}
-                                <a class="item" href="/films/{{ entry.film.slug }}">
-                                <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.television != NULL %}
-                                <a class="item" href="/tv/{{ entry.television.slug }}">
-                                <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.videoGame != NULL %}
-                                <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
-                                <img class="item posterSmall" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.book != NULL %}
-                                <a class="item" href="/books/{{ entry.book.slug }}">
-                                <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
-                                </a>
-                            {% endif %}
-                            {%  if entry.webSeries != NULL %}
-                                <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
-                                <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
-                                </a>
-                            {% endif %}
-                        {% endfor %}
+                            <ul class="hs full" style="list-style: none">
+                                {% for entry in var_url %}
+                                    {%  if entry.film != NULL %}
+                                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                            <a class="item" href="/films/{{ entry.film.slug }}">
+                                            <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {%  if entry.television != NULL %}
+                                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                            <a class="item" href="/tv/{{ entry.television.slug }}">
+                                            <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {%  if entry.videoGame != NULL %}
+                                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                            <a class="item" href="/video-games/{{ entry.videoGame.slug }}">
+                                            <img class="item posterSmall game" src="{{entry.videoGame.poster.url}}" alt="{{entry.videoGame.title}}">
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {%  if entry.book != NULL %}
+                                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                            <a class="item" href="/books/{{ entry.book.slug }}">
+                                            <img class="item posterSmall" src="{{entry.book.image.url}}" alt="{{entry.book.title}}">
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {%  if entry.webSeries != NULL %}
+                                        <li id="entry_{{ entry.id }}" class="ui-state-default">
+                                            <a class="item" href="/web-series/{{ entry.webSeries.slug }}">
+                                            <img class="item posterSmall" src="{{entry.webSeries.poster.url}}" alt="{{entry.webSeries.title}}">
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
                         {% endwith %}
-                    </ul>
+                    </div>
                 </div>
-            </div>
+            </li>
         {% endfor %}
+        </ul>
     {% endif %}
+
+    <script type="text/javascript" language="javascript">
+      $(document).ready(function() {
+          $("#sections").sortable({
+              axis: 'y',
+              update: function(event, ui) {
+                  var data = $(this).sortable('serialize', {attribute: "id"});
+
+                  $.ajax({
+                      url: "/user/{{ memberProfile.username }}",
+                      type: "POST",
+                      data: {'changing': "confirm", 'content': data, 'csrfmiddlewaretoken': '{{ csrf_token }}'}
+                  });
+              },
+          }).disableSelection();
+      });
+    </script>
+
+    <!-- Show Button if Page Belongs to Current User -->
+    {% if user.username == memberProfile.username %}
+        <div class="container profileSection">
+            <div style="padding-top: 5px">
+                <button id="newSectionButton" class="btn btn-primary btn-raised">New Section</button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- The Modal -->
+    <div id="newSectionModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="container profileSection inModal">
+           <h5 class="font-weight-bold border-bottom mb-0">
+              Add Profile Section
+          </h5>
+
+            <form id="newProfileSection">
+                {%  csrf_token %}
+                <div class="form-group">
+                    <label for="nameInput" class="bmd-label-floating" style="color: #009999">Section Name</label>
+                    <input type="text" class="form-control" name="nameInput" id="nameInput" style="color: white">
+                    <span class="bmd-help">Enter your desired name for your new profile section</span>
+                </div>
+                <div class="form-group">
+                    <div class="radio"><label style="color: white"><input type="radio" name="optionsRadios" id="films" value="Films" checked>Films</label></div>
+                    <div class="radio"><label style="color: white"><input type="radio" name="optionsRadios" id="television" value="Television">Television</label></div>
+                    <div class="radio"><label style="color: white"><input type="radio" name="optionsRadios" id="videogames" value="Video Games">Video Games</label></div>
+                    <div class="radio"><label style="color: white"><input type="radio" name="optionsRadios" id="books" value="Books">Books</label></div>
+                    <div class="radio"><label style="color: white"><input type="radio" name="optionsRadios" id="webseries" value="Web Series">Web Series</label></div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-success btn-raised" value="submit">
+                    <span class="close btn btn-default" style="color: white">X</span>
+                </div>
+            </form>
+
+            <!-- New Section Form Script -->
+            <script type="text/javascript">
+
+                var sectionForm = $('#newProfileSection')
+
+                console.log(sectionForm)
+                sectionForm.submit(function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        url : "/user/{{ memberProfile.username }}",
+                        type : "POST",
+                        data : {
+                            'name': document.querySelector('#nameInput').value,
+                            'type': document.querySelector('input[name="optionsRadios"]:checked').value,
+                            'csrfmiddlewaretoken' : '{{ csrf_token }}',
+                        },
+                        success: setTimeout(function(){// wait for 5 secs(2)
+                            location.reload(); // then reload the page.(3)
+                        }, 0.01),
+                    })
+                    return false;
+                })
+
+            </script>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+        var modal = document.getElementById("newSectionModal");
+        var btn = document.getElementById("newSectionButton");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+    </script>
+
 
 {% endblock %}

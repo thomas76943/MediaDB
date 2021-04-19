@@ -5,27 +5,61 @@
 
     <div class="container profileSection">
         <div class="media">
-            <img class="item additionalImage" alt="profilePicture" src={{ user.profile.image.url }}>
+            {% if user.profile.image %}
+                <img class="item additionalImage" alt="profilePicture" src={{ user.profile.image.url }}>
+            {% endif %}
             <div class="media-body" style="padding-left:15px">
                 <h2 class="account-heading">{{user.username}}</h2>
-                <p class="text-secondary">{{ user.email }}</p>
-                <p>{{ user.profile.bio }}</p>
+                <p class="text-secondary">{{ user.profile.bio }}</p>
             </div>
         </div>
     </div>
 
     <div class="container profileSection">
+        <a href="/user/{{ user.username }}">View Profile Page</a>
+    </div>
+
+    <div class="container profileSection">
+        <h5 class="font-weight-bold border-bottom mb-4">Profile Info</h5>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="font-weight-bold text-uppercase border-bottom mb-4">Profile Info</legend>
-                {{ userUpdateForm|crispy }}
-                {{ profileUpdateForm|crispy }}
+                {% for field in userUpdateForm %}
+                    <div class="form-group">
+                        <label class="bmd-label-floating" for="id_{{ field.name }}" style="color: #009999">{{ field.label }}</label>
+                        <div>
+                            {% if field.label == "Username" %}
+                            <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.username }}" style="color: white">
+                            {% else %}
+                            <input type="email" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.email }}"style="color: white">
+                            {% endif %}
+                        </div>
+                        <span class="bmd-help">Change your account {{ field.label }}</span>
+                    </div>
+                {% endfor %}
+
+                {% for field in profileUpdateForm %}
+                    <div class="form-group">
+                        <label class="bmd-label-floating" for="id_{{ field.name }}" style="color: #009999">Change {{ field.label }}</label>
+                        <div>
+                            {% if field.label == "Bio" %}
+                            <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.profile.bio }}" style="color: white">
+                            {% else %}
+                                {% if user.profile.image %}
+                                    <input type="file" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ user.profile.image.url }}" style="color: white">
+                                {% else %}
+                                    <input type="file" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" style="color: white">
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <span class="bmd-help">Change your account {{ field.label }}</span>
+                    </div>
+                {% endfor %}
 
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">
-                    <a class="font-weight-bold text-uppercase">Update</a>
+                <button class="btn btn-primary btn-raised" type="submit">
+                    <a class="font-weight-bold">Update</a>
                 </button>
             </div>
         </form>

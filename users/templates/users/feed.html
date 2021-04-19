@@ -1,0 +1,176 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}{% endblock title %}
+{% block content %}
+
+    <div class="container profileSection">
+        <h6 style="padding-top:10px"><a href="/">Back to Home Page</a></h6>
+    </div>
+
+    {% if following %}
+        <div class="container profileSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Following</h5>
+            <br>
+            <div class="scroller">
+                <ul class="hs full" style="overflow-x: hidden">
+                    {% for follow in following %}
+                            <div class="bottomOverlay" style="width:75px; height:75px; list-style: none; margin:0;">
+                                <a class="item" href="/user/{{ follow.userB.username }}">
+                                    {% if follow.userB.profile.image %}
+                                        <img style="border-radius:50%" class="item additionalImage" src="{{follow.userB.profile.image.url}}" alt="{{follow.userB.username}}">
+                                    {% else %}
+                                        <img style="border-radius:50%" class="item additionalImage" src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/MissingIcon.png" alt="{{follow.userB.username}}">
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% if feed %}
+        <div class="container profileSection">
+
+            <h5 class="font-weight-bold border-bottom mb-0">Feed</h5>
+
+        {% for rating in feed %}
+                <br>
+                {%  if rating.film != NULL %}
+                    <div class="media">
+                        <a class="item" href="/films/{{ rating.film.slug }}">
+                            <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                        </a>
+                        <div class="media-body" style="padding-left:15px">
+                                <h5 class="font-weight-bold">
+                                    <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
+                                    rated
+                                    <a href="/films/{{ rating.film.slug }}">{{ rating.film.title }} ({{ rating.film.getYear }})</a>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                </h5>
+                                <p>
+                                    on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
+                                </p>
+                            {% if rating.review %}
+                                <br>{{ rating.review }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.television != NULL %}
+                    <div class="media">
+                        <a class="item" href="/tv/{{ rating.television.slug }}">
+                            <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                        </a>
+                        <div class="media-body" style="padding-left:15px">
+                                <h5 class="font-weight-bold">
+                                    <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
+                                    rated
+                                    <a href="/tv/{{ rating.television.slug }}">{{ rating.television.title }} ({{ rating.television.getYear }})</a>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                </h5>
+                                <p>
+                                    on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
+                                </p>
+                            {% if rating.review %}
+                                <br>{{ rating.review }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.videoGame != NULL %}
+                    <div class="media">
+                        <a class="item" href="/video-games/{{ rating.videoGame.slug }}">
+                            <img class="item posterSmall game" src="{{rating.videoGame.poster.url}}" alt="{{rating.videoGame.title}}">
+                        </a>
+                        <div class="media-body" style="padding-left:15px">
+                                <h5 class="font-weight-bold">
+                                    <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
+                                    rated
+                                    <a href="/video-games/{{ rating.videoGame.slug }}">{{ rating.videoGame.title }} ({{ rating.videoGame.getYear }})</a>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                </h5>
+                                <p>
+                                    on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
+                                </p>
+                            {% if rating.review %}
+                                <br>{{ rating.review }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.book != NULL %}
+                    <div class="media">
+                        <a class="item" href="/books/{{ rating.book.slug }}">
+                            <img class="item posterSmall" src="{{rating.book.image.url}}" alt="{{rating.book.title}}">
+                        </a>
+                        <div class="media-body" style="padding-left:15px">
+                                <h5 class="font-weight-bold">
+                                    <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
+                                    rated
+                                    <a href="/books/{{ rating.book.slug }}">{{ rating.book.title }} ({{ rating.book.getYear }})</a>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                </h5>
+                                <p>
+                                    on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
+                                </p>
+                            {% if rating.review %}
+                                <br>{{ rating.review }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {%  if rating.webSeries != NULL %}
+                    <div class="media">
+                        <a class="item" href="/web-series/{{ rating.webSeries.slug }}">
+                            <img class="item posterSmall" src="{{rating.webSeries.poster.url}}" alt="{{rating.webSeries.title}}">
+                        </a>
+                        <div class="media-body" style="padding-left:15px">
+                                <h5 class="font-weight-bold">
+                                    <a style="color:#009999" href="/user/{{ rating.user.username }}">{{ rating.user.username }}</a>
+                                    rated
+                                    <a href="/web-series/{{ rating.webSeries.slug }}">{{ rating.webSeries.title }} ({{ rating.webSeries.getYear }})</a>
+                                    <div style="display: inline-block; z-index: 0" id="{{ forloop.counter }}"></div>
+                                </h5>
+                                <p>
+                                    on {{ rating.dateTime.date }} at {{ rating.dateTime.time }}
+                                </p>
+                            {% if rating.review %}
+                                <br>{{ rating.review }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+        <br><hr>
+
+        <script>
+            $('#{{ forloop.counter }}').rateYo({
+                rating:'{{ rating.rating }}',
+                starWidth:'20px',
+                numStars:5,
+                minValue:0,
+                maxValue:10,
+                normalFill:'gray',
+                ratedFill:'orange',
+                halfStar:true,
+                readOnly:true,
+            })
+        </script>
+
+        {% endfor %}
+
+        </div>
+    {% else %}
+        <div class="container profileSection">
+            <h6 style="padding-top:10px">Follow Users to Generate a Personalised Activity Feed</h6>
+        </div>
+    {% endif %}
+
+
+{% endblock %}
