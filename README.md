@@ -11,7 +11,7 @@ Clone Repository
 git clone https://github.com/thomas76943/MediaDB.git
 ```
 
-Create a new Python virtual environment to install dependencies
+Create a new Python virtual environment and install dependencies from the requirements.txt file
 ```
 (venv) pip install -r requirements.txt
 ```
