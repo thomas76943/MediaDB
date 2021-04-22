@@ -35,7 +35,7 @@ Access the local server (default: http://127.0.0.1:8000/)
 
 <hr>
 
-Home Page:
+Sample Pages:
 
 <img src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/Sample1.png" width="1000" title="hover text">
 
