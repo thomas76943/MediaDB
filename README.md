@@ -9,29 +9,29 @@
 
 Ensure Python 3.9.0 or later is installed
 
-Clone Repository
+1. Clone Repository
 
 ```
 git clone https://github.com/thomas76943/MediaDB.git
 ```
 
-Optional: Create a new Python virtual environment
+(optional: create a new Python virtual environment)
 
-Install dependencies from the requirements.txt file
+2. Install dependencies from the requirements.txt file
 ```
 (venv) pip install -r requirements.txt
 ```
 
 
 
-Open the project root directory and run the local server
+3. Open the project root directory and run the local server
 ```
 (venv) cd MediaDb
 (venv) python manage.py runserver
 ```
 
 
-Access the local server (default: http://127.0.0.1:8000/)
+4. Access the local server (default: http://127.0.0.1:8000/)
 
 <hr>
 
