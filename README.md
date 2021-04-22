@@ -39,5 +39,6 @@ Sample Pages:
 
 <img src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/Sample1.png" width="1000" title="hover text">
 
+<img src="https://mediadb-bucket.s3-us-west-2.amazonaws.com/extraImages/Sample2.png" width="1000" title="hover text">
 
 
