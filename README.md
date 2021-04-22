@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://mediadb-bucket.s3.amazonaws.com/media/logoNew.png" width="350" title="hover text">
+</p>
+
 ![alt text](https://mediadb-bucket.s3.amazonaws.com/media/logoNew.png)
 
 # MediaDB - Media Database Website Project
