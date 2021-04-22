@@ -790,8 +790,8 @@ def home(request):
     if request.user.is_authenticated:
         seen = getSeen(request.user, Film)
         context['seenFilms'] = seen
-        if len(seen) < 5:
-            context['ratingMessage'] = "Rate at least 5 films to generate recommendations"
+        if len(seen) < 15:
+            context['ratingMessage'] = "Rate at least 15 films to generate recommendations"
         else:
             getr = getRecommendations(request.user)
             if getr:

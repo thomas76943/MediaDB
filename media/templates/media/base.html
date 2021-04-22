@@ -400,7 +400,7 @@
                 type: "POST",
                 data: { 'type': "rating", 'nr': newRating, 'csrfmiddlewaretoken': csrftoken },
                 success: setTimeout(function(){
-                    /*Refresh the 5-star rating input and the review button*/
+                    /*Refresh the 5-star rating input, average score text and the review button*/
                     $('#reviewButtonContainer').load(' #reviewButtonContainer', function (){$(this).children().unwrap()})
                     $('#refreshAverageNoneText').load(' #refreshAverageNoneText', function (){$(this).children().unwrap()})
                     $('#refreshAverageText').load(' #refreshAverageText', function (){$(this).children().unwrap()})
