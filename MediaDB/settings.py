@@ -146,6 +146,8 @@ REST_FRAMEWORK = {
 
 #AWS S3 Bucket Settings from Environmental Variables
 
+AWS_ACCESS_KEY_ID = "AKIA3PZJAERXYJ7FQSV4"
+AWS_SECRET_ACCESS_KEY = "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"
 AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
 AWS_DEFAULT_REGION = "us-west-2"
 AWS_REGION_NAME = "us-west-2"
