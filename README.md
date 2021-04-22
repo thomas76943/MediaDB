@@ -2,7 +2,7 @@
 
 
 
-# MediaDB - Media Database Website Project
+# Media Database Website Project
 ## ECM3401 - Candidate Number: 066929
 
 ### Instructions to Run Locally (Windows)
