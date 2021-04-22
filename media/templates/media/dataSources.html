@@ -6,36 +6,45 @@
     </div>
 
     <div class="container profileSection">
-        <h4>Film IDs 1-118, Television IDs 1-25:</h4>
-        <h6>Data: IMDb, Wikipedia</h6>
+        <h4>Films (IDs 1-118), Television, Web Series:</h4>
+        <h6>Data: IMDb</h6>
         <h6>Images: m.media-amazon.com</h6>
     </div>
 
     <div class="container profileSection">
-        <h4>Film IDs 119-428, Television IDs 26-117:</h4>
+        <h4>Films (IDs 119-428):</h4>
         <h6>Data: data.world/crowdflower/blockbuster-database</h6>
         <h6>Data: data.world/jamesgaskin/movies/</h6>
         <h6>Images: Flixster.com, m.media-amazon.com</h6>
+        <h6>Accessed: 22/11/20</h6>
     </div>
 
     <div class="container profileSection">
-        <h4>Film IDs 428-onwards</h4>
-        <h6>Data: omdb-api (from IMDb)</h6>
-        <h6>Images: omdb-api (from IMDb)</h6>
+        <h4>Films (remaining)</h4>
+        <h6>Data and Images: omdb-api (from IMDb)</h6>
+        <h6>Available at: https://www.omdbapi.com/</h6>
+        <h6>Accessed: 06/02/21</h6>
     </div>
 
     <div class="container profileSection">
-    {% for key, values in collaborative.items %}
-        <br><br>Key: {{ key }}<br>
-        {% for value in values %}
-            {% if value not in seen %}
-                {{ forloop.counter }}{{ value.title }}<br>
-            {% endif %}
-        {% endfor %}
-    {% endfor %}
-
-
+        <h4>Film Ratings</h4>
+        <h6>Data: MovieLens Small Dataset (2018 release) (GroupLens, 2021)</h6>
+        <h6>Available at: https://grouplens.org/datasets/movielens/</h6>
+        <h6>Accessed: 06/02/21</h6>
     </div>
 
+    <div class="container profileSection">
+        <h4>Video Games</h4>
+        <h6>Data and Images: IGDB API</h6>
+        <h6>Available at: https://api-docs.igdb.com</h6>
+        <h6>Accessed: 11/03/21</h6>
+    </div>
+
+    <div class="container profileSection">
+        <h4>Books</h4>
+        <h6>Data and Images: goodreads.com via kaggle.com (Austin Reese)</h6>
+        <h6>Available at: https://www.kaggle.com/austinreese/goodreads-books</h6>
+        <h6>Accessed: 10/04/21</h6>
+    </div>
 
 {% endblock %}
