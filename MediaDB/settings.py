@@ -140,26 +140,16 @@ REST_FRAMEWORK = {
     #'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdmin',)
 }
 
-#-----------------------------------------------------------------------------------------------------#
-
-#AWS S3 Bucket Settings from Environmental Variables
-
-AWS_ACCESS_KEY_ID = "AKIA3PZJAERXYJ7FQSV4"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
-AWS_DEFAULT_REGION = "us-west-2"
-AWS_REGION_NAME = "us-west-2"
+#---Image and Static Files Settings-----------------------------------------------------------------------------------#
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
+AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-#AWS Bucket Settings for Static Files
-STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
-STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
-
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
+STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
