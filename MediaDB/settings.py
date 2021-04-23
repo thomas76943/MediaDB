@@ -23,8 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'pwsjl=-e%$lp3s^+ja7r$ik3ynf@2551v(m0bmjm0u1fy(9d)r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = os.environ.get('DEBUG', False)
+ALLOWED_HOSTS = ['127.0.0.1', 'themediadb.herokuapp.com']
 
 
 # Application definition
@@ -123,8 +123,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-#Old Static and Media Settings
-
 #STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
 MEDIA_URL = '/resources/'
@@ -144,31 +142,14 @@ REST_FRAMEWORK = {
 
 #-----------------------------------------------------------------------------------------------------#
 
-#AWS S3 Bucket Settings from Environmental Variables
-
-#AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-#AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-#AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-#AWS_DEFAULT_REGION = os.environ.get('AWS_DEFAULT_REGION')
-
-AWS_ACCESS_KEY_ID = "AKIA3PZJAERXYJ7FQSV4"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
-AWS_DEFAULT_REGION = "us-west-2"
-AWS_REGION_NAME = "us-west-2"
-
-#Temp Fix
 AWS_QUERYSTRING_AUTH = False
-
 AWS_S3_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
+AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-#AWS Bucket Settings for Static Files
-STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
-STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
-
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
+STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
