@@ -20,13 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY="pwsjl=-e%$lp3s^+ja7r$ik3ynf@2551v(m0bmjm0u1fy(9d)r"
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'pwsjl=-e%$lp3s^+ja7r$ik3ynf@2551v(m0bmjm0u1fy(9d)r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = False
-DEBUG = os.getenv('DEBUG')
-ALLOWED_HOSTS = ['http://themediadb.herokuapp.com/']
+DEBUG = os.environ.get('DEBUG')
+ALLOWED_HOSTS = ['127.0.0.1', 'themediadb.herokuapp.com']
 
 
 # Application definition
@@ -146,12 +144,9 @@ REST_FRAMEWORK = {
 
 #AWS S3 Bucket Settings from Environmental Variables
 
-#AWS_ACCESS_KEY_ID="AKIA3PZJAERXYJ7FQSV4"
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-#AWS_SECRET_ACCESS_KEY="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"
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-#AWS_STORAGE_BUCKET_NAME="mediadb-bucket"
-AWS_STORAGE_BUCKET_NAME = os.getenv('mediadb-bucket')
+AWS_ACCESS_KEY_ID = "AKIA3PZJAERXYJ7FQSV4"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
 AWS_DEFAULT_REGION = "us-west-2"
 AWS_REGION_NAME = "us-west-2"
 
