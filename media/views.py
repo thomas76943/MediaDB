@@ -774,13 +774,19 @@ def recommendationsDetail(request):
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the home.html file with the contents of the context dictionary
 def home(request):
+
+    #Collect people with images attached
+    peopleImages = Person.objects.exclude(image__isnull=True)
+    #Filter people with images by those whose birthday is today
+    bornToday = peopleImages.filter(DoB__day=date.today().day).filter(DoB__month=date.today().month)
+
     #Information to be displayed on the website's home page is gathered in the context dictionary
     context = {
         'upcoming':getUpcomingTitles(f=True, tv=True, vg=True, b=True, ws=True),
         'longestRunningTV':Television.objects.all().order_by('-episodes')[:16],
         'books':Book.objects.all()[:30],
         'webseries':WebSeries.objects.all()[:30],
-        'bornToday': Person.objects.all().filter(DoB__day=date.today().day).filter(DoB__month=date.today().month),
+        'bornToday': bornToday,
         'highestRatedFilms':getHighestRated(Film, 30),
         'topGrossing':getTopGrossing(16),
     }
@@ -790,8 +796,8 @@ def home(request):
     if request.user.is_authenticated:
         seen = getSeen(request.user, Film)
         context['seenFilms'] = seen
-        if len(seen) < 5:
-            context['ratingMessage'] = "Rate at least 5 films to generate recommendations"
+        if len(seen) < 15:
+            context['ratingMessage'] = "Rate at least 15 films to generate recommendations"
         else:
             getr = getRecommendations(request.user)
             if getr:
