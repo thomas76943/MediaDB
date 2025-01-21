@@ -1,3 +1,12 @@
+import requests
+import json
+from themoviedb import TMDb
+from .models import Film, FilmPersonMapping, FilmGenreMapping, FilmCompanyMapping, FilmTagMapping
+from .models import Television, TelevisionPersonMapping, TelevisionGenreMapping, TelevisionCompanyMapping, TelevisionTagMapping
+from .models import Person, PersonRole, Genre, Company, CompanyRole
+from django.utils.text import slugify
+from django.core.files import File
+
 #Script to import films data
 def addFilmRatings():
     pathToFilmsData = ""
@@ -97,7 +106,7 @@ def addFilmRatings():
                 directors = data['Director'].split(', ')
                 for director in directors:
 
-                    #Removing parantheses or credits from names
+                    #Removing parentheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", director)
 
                     if firstLastNames == "N/A":
@@ -185,7 +194,7 @@ def addFilmRatings():
                 actors = data['Actors'].split(', ')
                 for actor in actors:
 
-                    #Removing parantheses or credits from names
+                    #Removing parentheses or credits from names
                     firstLastNames = re.sub(r" ?\([^)]+\)", "", actor)
 
                     if firstLastNames == "N/A":
@@ -607,3 +616,162 @@ def addBookData():
                         print(getcompany.name, "is already tied to", getBook, "in this role")
 
         getBook.save()
+
+
+def addTMDBIDsToPeople():
+
+    # new TMDB object
+    tmdb = TMDb()
+    tmdb.key = "519e516edf4f8f69710bded749a22ff7"
+
+    pd = tmdb.person(id).details()
+
+    #https://api.themoviedb.org/3/search/person?include_adult=false&query=matt damon&api_key=519e516edf4f8f69710bded749a22ff7
+
+
+
+def addTMDBData():
+
+    badCharsTitles = ['/', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+    badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+
+    # get titles and tmdb IDs of all existing films in database
+    existingFilmTitles = []
+    existingFilmIDs = []
+    for film in Film.objects.all():
+        existingFilmTitles.append(film.title)
+        existingFilmIDs.append(film.tmdbid)
+
+    # get full names of all existing people in database
+    existingPeopleNames = []
+    existingPeopleObjects = []
+
+    for fpm in FilmPersonMapping.objects.all():
+        if fpm.person not in existingPeopleObjects:
+            print("adding to list:", fpm.person.getFullName())
+            existingPeopleNames.append(fpm.person.getFullName())
+            existingPeopleObjects.append(fpm.person)
+
+    for tpm in TelevisionPersonMapping.objects.all():
+        if tpm.person not in existingPeopleObjects:
+            print("adding to list:", tpm.person.getFullName())
+            existingPeopleNames.append(tpm.person.getFullName())
+            existingPeopleObjects.append(tpm.person)
+
+    print("Unique People with Film-Person Mappings:", len(existingPeopleObjects))
+
+    getActorRole = PersonRole(id=1)
+    getDirectorRole = PersonRole(id=2)
+    getWriterRole = PersonRole(id=3)
+    getProducerRole = PersonRole(id=6)
+
+    # create TMDb object and provide api_key
+    tmdb = TMDb()
+    tmdb.key = "519e516edf4f8f69710bded749a22ff7"
+
+    testIDs = ['414906','872585','546554','361743','530915','646380']
+    singleTest = ['414906']
+
+    for id in singleTest:
+
+        print("\n Attempting Film:", id)
+
+        #get film details based on tmdb-id
+        md = tmdb.movie(id).details()
+        print("Found:", md.title, "---", md.release_date)
+
+        if md.title not in existingFilmTitles and id not in existingFilmIDs:
+
+            # add title, release date and tmdb-id
+            newFilm = Film(title=md.title)
+            newFilm.release = md.release_date
+            newFilm.tmdbid = id
+
+            # add runtime
+            if md.runtime is not None and md.runtime > 0:
+                print("Runtime:", md.runtime)
+                newFilm.length = md.runtime
+
+            # add synopsis
+            if md.overview is not None and len(md.overview) > 0:
+                newFilm.synopsis = md.overview
+
+            # add budget
+            if md.budget is not None and int(md.budget) != 0:
+                newFilm.budget = md.budget
+
+            # add box office revenue
+            if md.revenue is not None and int(md.revenue) != 0:
+                newFilm.boxOffice = md.revenue
+
+            # add poster image
+            #if md.poster_path is not None and len(md.poster_path) > 1:
+            #    print("Poster: https://image.tmdb.org/t/p/original" + md.poster_path)
+            #    img_data = requests.get("https://image.tmdb.org/t/p/original" + md.poster_path).content
+            #    img_name = slugify(md.title + "-" + str(md.release_date)) + "-poster.jpg"
+            #    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, 'wb') as handler:
+            #        handler.write(img_data)
+            #    newFilm.poster.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, "rb")))
+
+            # add cover image
+            #if md.backdrop_path is not None and len(md.backdrop_path) > 1:
+            #    print("Backdrop: https://image.tmdb.org/t/p/original" + md.backdrop_path)
+            #    img_data = requests.get("https://image.tmdb.org/t/p/original" + md.backdrop_path).content
+            #    img_name = slugify(md.title + "-" + str(md.release_date)) + "-cover.jpg"
+            #    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, 'wb') as handler:
+            #        handler.write(img_data)
+            #    newFilm.cover.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, "rb")))
+
+            # save new film
+            newFilm.save()
+
+            # add Film-Genre Mappings
+            #if md.genres is not None and len(md.genres) > 0:
+            #    for genre in md.genres:
+            #        getGenre = Genre.objects.filter(title=genre).first()
+            #        fgm = FilmGenreMapping()
+            #        fgm.film = newFilm
+            #        fgm.genre = getGenre
+            #        fgm.save()
+            #        print("Genre Added:", genre)
+
+
+            for pc in md.production_companies:
+                print("Production Company:", pc.name, pc.origin_country, pc.logo_path)
+    
+            
+            mc = tmdb.movie(id).credits()
+
+            for index,credit in enumerate(mc.cast):
+
+                personDetails = tmdb.person(credit.id).details()
+
+                #if credit.name in existingPeopleNames:#
+
+                #else:
+                #    newPerson = Person()
+
+                getPerson = Person.objects.filter().first()
+
+                print("Actor:", credit.name, "--- Character:", credit.character, "--- Billing Order:", credit.order)
+                print("DOB:", personDetails.birthday)
+                print("DOD:", personDetails.deathday)
+                print("Picture:", "https://image.tmdb.org/t/p/original" + personDetails.profile_path)
+
+                fpm = FilmPersonMapping(Film=newFilm, Person=getPerson, Role=getActorRole)
+
+                #if index > 20:
+                #    break
+    
+            for credit in mc.crew:
+                if credit.job == "Director":
+                    print("Director:", credit.name)
+    
+                if credit.job == "Writer":
+                    print("Writer:", credit.name)
+    
+                if credit.job == "Producer":
+                    print("Producer:", credit.name)
+    
+
+

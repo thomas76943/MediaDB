@@ -29,7 +29,7 @@
             {% if writers %}
                 <h5 style="padding-top:5px"> Written by:</h5>
                 {% for writer in writers %}
-                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
+                    <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }} {{writer.id}} </a>
                 {% endfor %}
             {% endif %}
 
@@ -46,7 +46,7 @@
         <div class="container infoSection">
             <h5>Cast:</h5>
                 {% for actor in cast %}
-                    <a href="/person/{{ actor.person.slug }}">{{actor.getPerson}}</a>
+                    <a href="/person/{{ actor.person.slug }}">{{actor.getPerson}} {{actor.id}}</a>
                     {% if actor.character %} - {{ actor.character }}{% endif %}
                     <br>
                 {% endfor %}

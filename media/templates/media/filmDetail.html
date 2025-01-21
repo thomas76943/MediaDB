@@ -25,7 +25,7 @@
             </div>
         </form>
 
-        <h2>{{film.title}}</h2>
+        <h2>{{film.title}} - {{film.id}} </h2>
         <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
         {% if genres %}
             {% for genre in genres %}

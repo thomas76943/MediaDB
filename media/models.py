@@ -15,6 +15,7 @@ class Person(models.Model):
     bio = models.CharField(max_length=1000, default='', blank=True)
     image = models.ImageField(default='MissingIcon.png', upload_to='people', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
 
     def __str__(self):
         return (self.firstName + " " + self.surname)
@@ -92,6 +93,7 @@ class Film(models.Model):
     cover = models.ImageField(upload_to='coverImages', blank=True)
     trailerVideoPath = models.CharField(max_length=500, blank=True)
     slug = models.SlugField(max_length=150, null=True, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
 
     #Overwritten save method to populate the slugfield based on the film's title and release date
     def save(self, *args, **kwargs):

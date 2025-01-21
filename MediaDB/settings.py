@@ -146,10 +146,19 @@ AWS_QUERYSTRING_AUTH = False
 AWS_S3_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
-AWS_STORAGE_BUCKET_NAME = "mediadb-bucket"
+#AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_ACCESS_KEY_ID = 'AKIA3PZJAERX74IBFLY5'
+#AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+
+
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
-STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
+#STATIC_URL = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/'
+STATIC_URL = '/media/static/'
+#STATIC_ROOT = 'https://mediadb-bucket.s3-us-west-2.amazonaws.com/media'
+STATIC_ROOT = '/media/static/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static/')]

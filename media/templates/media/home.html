@@ -190,6 +190,7 @@
     <div style="clear: both"><br></div>
 
     <!-- Full: Upcoming Media -->
+    {% if upcoming %}
     <div class="container infoSection fullScroll">
         <h5 class="font-weight-bold border-bottom mb-0">Upcoming Media</h5>
         <div class="scroller">
@@ -251,8 +252,9 @@
             </ul>
         </div>
     </div>
-
     <div style="clear: both"><br></div>
+    {% endif %}
+
 
     <!-- Left: Activity Feed -->
     {% if feed %}

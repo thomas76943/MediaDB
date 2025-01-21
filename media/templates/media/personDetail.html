@@ -4,7 +4,7 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2 style="padding-top:5px">{{person.firstName}} {{ person.surname }}</h2>
+        <h2 style="padding-top:5px">{{person.firstName}} {{ person.surname }} - {{person.id}}</h2>
         {% if person.DoB %}
             <h5>Born: {{ person.DoB }}</h5>
         {% endif %}
@@ -42,7 +42,13 @@
     {% if roles %}
         {% for roleType, mappings in roles %}
                 <div class="container infoSection">
-                    <h5 class="font-weight-bold border-bottom mb-0">{{ roleType }}</h5>
+                    <h5 class="font-weight-bold border-bottom mb-0">
+                        {% if roleType == "Writer" %}
+                        Screenwriter
+                        {% else %}
+                        {{ roleType }}
+                        {% endif %}
+                    </h5>
                     <div class="scroller">
                         <ul class="hs full">
                             {% for entry in mappings %}

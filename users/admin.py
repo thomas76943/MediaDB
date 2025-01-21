@@ -1,11 +1,14 @@
 from django.contrib import admin
 from .models import *
+from import_export.admin import ImportExportModelAdmin
 
 admin.site.register(Profile)
 
 admin.site.register(UserFollows)
 
-admin.site.register(FilmRating)
+@admin.register(FilmRating)
+class FilmRatingAdmin(ImportExportModelAdmin):
+    pass
 admin.site.register(TelevisionRating)
 admin.site.register(VideoGameRating)
 admin.site.register(BookRating)

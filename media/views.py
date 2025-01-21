@@ -16,6 +16,7 @@ from django.db.models import Count, Q
 from .models import *
 from .forms import *
 from .filters import *
+from .importScripts import *
 from users.models import *
 from users.views import *
 
@@ -780,6 +781,31 @@ def home(request):
     #Filter people with images by those whose birthday is today
     bornToday = peopleImages.filter(DoB__day=date.today().day).filter(DoB__month=date.today().month)
 
+
+    fpm = FilmPersonMapping.objects.all()
+    fpmCount = {}
+
+    '''
+    for person in fpm:
+        if person.person in peopleImages:
+            if person.person not in fpmCount:
+                fpmCount[person.person] = 1
+            else:
+                fpmCount[person.person] += 1
+
+    fpmCountSorted = dict(sorted(fpmCount.items(), key=lambda item: item[1]))
+    print(fpmCountSorted)
+    '''
+
+    #print(Person.objects.filter(image__isnull=True))
+    #for person in Person.objects.filter(image='MissingIcon.png'):
+    #    if person not in fpmCount:
+    #        print("got here:", person.getFullName())
+    #        fpmCount[person.getFullName()] = len(FilmPersonMapping.objects.filter(person=person))
+
+    #fpmCountSorted = dict(sorted(fpmCount.items(), key=lambda item: item[1]))
+    #print(fpmCountSorted)
+
     #Information to be displayed on the website's home page is gathered in the context dictionary
     context = {
         'upcoming':getUpcomingTitles(f=True, tv=True, vg=True, b=True, ws=True),
@@ -856,6 +882,7 @@ def calendar(request):
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the dataSources.html file with the contents of the context dictionary
 def dataSources(request):
+    addTMDBData()
     return render(request, "media/dataSources.html", {})
 
 #Function-based view to render the search results page
