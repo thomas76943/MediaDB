@@ -66,7 +66,7 @@
                                 {% for entry in var_url %}
                                     {%  if entry.film != NULL %}
                                         <a class="item" href="/films/{{ entry.film.slug }}">
-                                            <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                            <img class="item posterSmall" src="{{entry.film.posterSmall.url}}" alt="{{entry.film.title}}">
                                         </a>
                                     {% endif %}
                                     {%  if entry.television != NULL %}

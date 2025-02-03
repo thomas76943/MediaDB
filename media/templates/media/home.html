@@ -177,7 +177,7 @@
                         {% for film in recommendations %}
                             {% if film not in seenFilms %}
                                 <a class="item" href="/films/{{ film.slug }}">
-                                    <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                    <img class="item posterSmall" src="{{film.posterSmall.url}}" alt="{{film.title}}">
                                 </a>
                             {% endif %}
                         {% endfor %}
@@ -270,23 +270,25 @@
                             {% if rating.film != NULL %}
                                 <div class="bottomOverlay">
                                     <a href="/films/{{ rating.film.slug }}">
-                                        <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                        <img class="item posterSmall" src="{{rating.film.posterSmall.url}}" alt="{{rating.film.title}}">
                                         <div class="content">
                                             <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
                                         </div>
                                     </a>
                                 </div>
                             {% endif %}
+
                             {%  if rating.television != NULL %}
                                 <div class="bottomOverlay">
                                     <a href="/tv/{{ rating.television.slug }}">
-                                        <img class="item posterSmall" src="{{rating.television.poster.url}}" alt="{{rating.television.title}}">
+                                        <img class="item posterSmall" src="{{rating.television.getPosterSmall}}" alt="{{rating.television.title}}">
                                         <div class="content">
                                             <h6 class = "font-weight-bold" >{{ rating.user.username }}</h6>
                                         </div>
                                     </a>
                                 </div>
                             {% endif %}
+
                             {%  if rating.videoGame != NULL %}
                                 <div class="bottomOverlay">
                                     <a href="/video-games/{{ rating.videoGame.slug }}">
@@ -331,7 +333,7 @@
                 <ul class="hs full">
                     {% for person in bornToday %}
                         <a href="/person/{{ person.slug }}">
-                            <img class="item personSmall" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                            <img class="item personSmall" src="{{person.imageSmall.url}}" alt="{{person.firstName}} {{person.surname}}">
                         </a>
                     {% endfor %}
                 </ul>
@@ -381,7 +383,7 @@
                 {% for film, gross in topGrossing.items %}
                     <div class="bottomOverlay">
                         <a href="/films/{{ film.slug }}">
-                            <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                            <img class="item posterSmall" src="{{film.posterSmall.url}}" alt="{{film.title}}">
                             <div class="content">
                                 <h6 class = "font-weight-bold" >{{ gross }}</h6>
                             </div>
@@ -392,14 +394,14 @@
         </div>
     </div>
 
-    <!-- Right: Longest Running TV -->
+    <!-- Right: TV -->
     <div class="container infoSection leftScroll">
-        <h5 class="font-weight-bold border-bottom mb-0">Longest Running Television Series</h5>
+        <h5 class="font-weight-bold border-bottom mb-0">Television Series</h5>
         <div class="scroller">
             <ul class="hs full">
-                {% for television in longestRunningTV %}
+                {% for television in tv %}
                     <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    <img class="item posterSmall" src="{{television.getPosterSmall}}" alt="{{television.title}}">
                     </a>
                 {% endfor %}
             </ul>

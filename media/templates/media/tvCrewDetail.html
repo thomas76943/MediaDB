@@ -4,17 +4,17 @@
 
     <div class="container infoSection">
         <h2>
-        {{television.title}} | {{ television.getYear }}
+        {{television.title}} | {{ television.getStartingYear }}
         {% if television.ongoing == False %}
-            {% if television.getYear != television.getEndYear %}
-                - {{ television.getEndYear }}
+            {% if television.getStartingYear != television.getEndingYear %}
+                - {{ television.getEndingYear }}
             {% endif %}
         {% else %}
             -
         {% endif %}
         </h2>
 
-        <h5>{{ television.episodes }} Episodes | Seasons: {{ television.seasons }}</h5>
+        <h5>{{ television.seasonCount }} Seasons | {{ television.episodeCount }} Episodes</h5>
 
         {% if genres %}
             {% for genre in genres %}

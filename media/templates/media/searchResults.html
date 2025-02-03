@@ -73,7 +73,7 @@
             {% for film in films %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/films/{{ film.slug }}">
-                        <img class="item personSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                        <img class="item personSmall" src="{{film.posterSmall.url}}" alt="{{film.title}}">
                     </a>
                 </li>
             {% endfor %}
@@ -88,7 +88,7 @@
             {% for tv in television %}
                 <li class="module" style="list-style-type: none; white-space: normal">
                     <a href="/tv/{{ tv.slug }}">
-                        <img class="item personSmall" src="{{tv.poster.url}}" alt="{{tv.title}}">
+                        <img class="item personSmall" src="{{tv.getPoster}}" alt="{{tv.title}}">
                     </a>
                 </li>
             {% endfor %}
@@ -162,7 +162,7 @@
         <div class="container profileSection">
             <h5>People:</h5>
             {% for person in peopleOther %}
-                <a href="/person/{{ person.slug }}"> {{ person.firstName }} {{ person.surname }}</a><br>
+                <a href="/person/{{ person.slug }}"> {{ person.getFullName }}</a><br>
             {% endfor %}
         </div>
     {% endif %}

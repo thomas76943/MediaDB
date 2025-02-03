@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from django.conf import settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,8 +42,11 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework',
     'storages',
-    'django_filters',
+    'django_filters'
 ]
+
+THUMBNAIL_MAKER_DEBUG = True
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -4,20 +4,21 @@
 {% block content %}
 
     <div class="container infoSection">
-        <h2 style="padding-top:5px">{{person.firstName}} {{ person.surname }} - {{person.id}}</h2>
+        <h2 style="padding-top:5px">{{person.name}}</h2>
         {% if person.DoB %}
             <h5>Born: {{ person.DoB }}</h5>
         {% endif %}
         {% if person.alive is False %}
         <h5>Died: {{ person.DoD }}</h5>
         {% endif %}
+        <h7>ID: {{person.id}}</h7>
     </div>
 
-    {% if person.image or person.bio %}
+    {% if person.image != 'MissingIcon.png' or person.bio %}
         <div class="container infoSection">
             <div class="media">
-                {% if person.image %}
-                    <img class="item personDetail" src="{{person.image.url}}" alt="{{person.firstName}} {{person.surname}}">
+                {% if person.image.url %}
+                    <img class="item personDetail" src="{{person.image.url}}" alt="{{person.name}}">
                 {% endif %}
                 {% if person.bio %}
                     <div class="media-body" style="padding-left:15px">
@@ -55,12 +56,12 @@
                                 {% with entry|classname as modelclass %}
                                     {%  if modelclass == "Film" %}
                                         <a class="item" href="/films/{{ entry.slug }}">
-                                        <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                        <img class="item posterSmall" src="{{entry.posterSmall.url}}" alt="{{entry.title}}">
                                         </a>
                                     {% endif %}
                                     {%  if modelclass == "Television" %}
                                         <a class="item" href="/tv/{{ entry.slug }}">
-                                        <img class="item posterSmall" src="{{entry.poster.url}}" alt="{{entry.title}}">
+                                        <img class="item posterSmall" src="{{entry.getPoster}}" alt="{{entry.title}}">
                                         </a>
                                     {% endif %}
                                     {%  if modelclass == "VideoGame" %}

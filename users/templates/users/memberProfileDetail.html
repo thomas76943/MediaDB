@@ -69,7 +69,7 @@
                         <div class="bottomOverlay">
                             {%  if rating.film != NULL %}
                                 <a class="item" href="/films/{{ rating.film.slug }}">
-                                    <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                    <img class="item posterSmall" src="{{rating.film.posterSmall.url}}" alt="{{rating.film.title}}">
                                     <div class="content">
                                         <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
                                     </div>
@@ -146,7 +146,7 @@
                                     {%  if entry.film != NULL %}
                                         <li id="entry_{{ entry.id }}" class="ui-state-default">
                                             <a class="item" href="/films/{{ entry.film.slug }}">
-                                            <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                            <img class="item posterSmall" src="{{entry.film.posterSmall.url}}" alt="{{entry.film.title}}">
                                             </a>
                                         </li>
                                     {% endif %}

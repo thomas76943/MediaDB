@@ -1,9 +1,7 @@
 import requests
 import json
 from themoviedb import TMDb
-from .models import Film, FilmPersonMapping, FilmGenreMapping, FilmCompanyMapping, FilmTagMapping
-from .models import Television, TelevisionPersonMapping, TelevisionGenreMapping, TelevisionCompanyMapping, TelevisionTagMapping
-from .models import Person, PersonRole, Genre, Company, CompanyRole
+from .models import *
 from django.utils.text import slugify
 from django.core.files import File
 
@@ -630,57 +628,495 @@ def addTMDBIDsToPeople():
 
 
 
-def addTMDBData():
-
-    badCharsTitles = ['/', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
-    badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
-
-    # get titles and tmdb IDs of all existing films in database
-    existingFilmTitles = []
-    existingFilmIDs = []
-    for film in Film.objects.all():
-        existingFilmTitles.append(film.title)
-        existingFilmIDs.append(film.tmdbid)
-
-    # get full names of all existing people in database
-    existingPeopleNames = []
-    existingPeopleObjects = []
-
-    for fpm in FilmPersonMapping.objects.all():
-        if fpm.person not in existingPeopleObjects:
-            print("adding to list:", fpm.person.getFullName())
-            existingPeopleNames.append(fpm.person.getFullName())
-            existingPeopleObjects.append(fpm.person)
-
-    for tpm in TelevisionPersonMapping.objects.all():
-        if tpm.person not in existingPeopleObjects:
-            print("adding to list:", tpm.person.getFullName())
-            existingPeopleNames.append(tpm.person.getFullName())
-            existingPeopleObjects.append(tpm.person)
-
-    print("Unique People with Film-Person Mappings:", len(existingPeopleObjects))
-
-    getActorRole = PersonRole(id=1)
-    getDirectorRole = PersonRole(id=2)
-    getWriterRole = PersonRole(id=3)
-    getProducerRole = PersonRole(id=6)
+def addSmallImages():
 
     # create TMDb object and provide api_key
     tmdb = TMDb()
     tmdb.key = "519e516edf4f8f69710bded749a22ff7"
 
-    testIDs = ['414906','872585','546554','361743','530915','646380']
-    singleTest = ['414906']
+    for person in Person.objects.all():
+        #print(person.image)
+        if person.image != 'MissingIcon.png' and person.imageSmall == 'MissingIcon.png':
 
-    for id in singleTest:
+            pd = tmdb.person(person.tmdbid).details()
+            print("Adding Small Image To:", person.getFullName())
+
+            # add small image
+            if pd.profile_path is not None and len(pd.profile_path) > 0:
+                img_data = requests.get("https://image.tmdb.org/t/p/w342" + pd.profile_path).content
+                img_name = slugify(person.getFullName() + "-" + str(person.tmdbid)) + "-w342.jpg"
+                with open(
+                        "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,
+                        'wb') as handler:
+                    handler.write(img_data)
+                    person.imageSmall.save(img_name, File(open(
+                        "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,
+                        "rb")))
+
+
+def resetSlugs():
+
+    for ep in TelevisionEpisode.objects.all():
+        ep.slug = ""
+        ep.save()
+
+
+def testCrewCredits():
+    tmdb = TMDb()
+    tmdb.key = "519e516edf4f8f69710bded749a22ff7"
+
+    for id in ['61889']:
+
+        tvd = tmdb.tv(id).details()
+        tvc = tmdb.tv(id).credits()
+        print("")
+        print("Found TV:", tvd.name)
+
+        #print("")
+        #print("Aggregate Crew Credits:")
+        tvac = tmdb.tv(id).aggregate_credits()
+
+        #print("")
+        #print("Credits:")
+        print(tvc)
+
+        '''
+        for index, credit in enumerate(tvac.crew):
+            jobs = ""
+            for idx, job in enumerate(credit.jobs):
+                    jobs += job.job
+                    jobs += ", "
+            if jobs != '':
+                if jobs[-2] == ',':
+                    jobs = jobs[:-2]
+
+            print("Index:", index, "- Job:", jobs, " - Name:", credit.name, "- Ep Count:", credit.total_episode_count)
+
+            for j in credit.jobs:
+                getCredit = tmdb.credit(j.credit_id).details()
+                print(getCredit.credit_type)
+
+            print("")
+
+            if index > 100:
+                break
+        '''
+
+def addTVData():
+
+    # get tmdb IDs of all existing films in database
+    existingTVIDs = []
+    for tv in Television.objects.all():
+        existingTVIDs.append(str(tv.tmdbid))
+
+    # get names of all existing genres in database
+    existingGenres = []
+    for genre in Genre.objects.all():
+        existingGenres.append(genre.title)
+
+    # get tmdb IDs of all existing people in database
+    existingPeopleIDs = []
+    for person in Person.objects.all():
+        existingPeopleIDs.append(str(person.tmdbid))
+
+    # get list of all role types in database
+    existingPeopleRoleTypes = []
+    for role in PersonRole.objects.all():
+        existingPeopleRoleTypes.append(role.role)
+
+    # get tmdb IDs of all existing companies in database
+    existingCompanies = []
+    for company in Company.objects.all():
+        existingCompanies.append(company.tmdbid)
+
+    # get list of all existing tags in database
+    existingTags = []
+    for tag in Tag.objects.all():
+        existingTags.append(tag.name)
+
+    getActorRole = PersonRole.objects.filter(role="Actor").first()
+    getCastDepartment = Department.objects.filter(department="Cast").first()
+    getProductionCompanyRole = CompanyRole.objects.filter(id=7).first()
+
+    tmdb = TMDb()
+    tmdb.key = "519e516edf4f8f69710bded749a22ff7"
+
+    # mandalorian tvSingleTest = ['82856']
+    # loki tvSingleTest = ['84958']
+    # GoT tvSingleTest = ['1399']
+    # daredevil = ['61889']
+    # rickandmorty = ['60625']
+
+    for id in ['61889']:
+
+        #get film details based on tmdb-id
+        tvd = tmdb.tv(id).details()
+
+        # get details of film credits from tmdb
+        tvc = tmdb.tv(id).credits()
+
+        print("")
+        print("Found TV:", tvd.name)
+
+        if str(id) not in existingTVIDs:
+            print("")
+            print("Adding New TV:", tvd.name)
+            newTV = Television(title=tvd.name)
+            newTV.tmdbid = id
+            newTV.release = tvd.first_air_date
+            newTV.ongoing = tvd.in_production
+            newTV.seasonCount = tvd.number_of_seasons
+            newTV.episodeCount = tvd.number_of_episodes
+            newTV.synopsis = tvd.overview
+            newTV.save()
+
+            # add show cover image
+            if tvd.backdrop_path is not None and len(tvd.backdrop_path) > 1:
+                print("Backdrop: https://image.tmdb.org/t/p/w1280" + tvd.backdrop_path)
+                img_data = requests.get("https://image.tmdb.org/t/p/w1280" + tvd.backdrop_path).content
+                img_name = slugify(tvd.name + "-" + str(tvd.id)) + "-cover.jpg"
+                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVCoverDownloads/" + img_name,'wb') as handler: handler.write(img_data)
+                newTV.cover.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVCoverDownloads/" + img_name,"rb")))
+
+            getTV = newTV
+            print("")
+
+        else:
+            print("")
+            print("TV Already in DB:", tvd.name)
+            getTV = Television.objects.filter(tmdbid=id).first()
+
+        #Aggregate Credits for Whole Show
+        '''
+        tvac = tmdb.tv(id).aggregate_credits()
+
+        print("Aggregate Cast Credits:")
+        for index,credit in enumerate(tvac.cast):
+            roles = ""
+            for idx,role in enumerate(credit.roles):
+                if role.character != '':
+                    roles += role.character
+                    roles += ", "
+            if roles != '':
+                if roles[-2] == ',':
+                    roles = roles[:-2]
+            print("Index:", index, "- Name:", credit.name, "- Order:", credit.order, "- Ep Count:", credit.total_episode_count, "- Role:", roles)
+
+            if index > 20:
+                break
+        
+        print("")
+        print("Aggregate Crew Credits:")
+        #print(tvac.crew)
+        for index, credit in enumerate(tvac.crew):
+            jobs = ""
+            for idx, job in enumerate(credit.jobs):
+                    jobs += job.job
+                    jobs += ", "
+            if jobs != '':
+                if jobs[-2] == ',':
+                    jobs = jobs[:-2]
+
+            print("Index:", index, "- Job:", jobs, " - Name:", credit.name, "- Order:", credit.order, "- Ep Count:", credit.total_episode_count)
+
+            if index > 60:
+                break
+        '''
+
+
+        # get keywords from tmdb
+        tvkeywords = tmdb.tv(id).keywords()
+
+
+        # get all existing seasons in the db for this show
+        getExistingSeasons = []
+        for s in TelevisionSeason.objects.filter(televisionSeries=getTV):
+            getExistingSeasons.append(str(s.tmdbid))
+
+
+        # for each season in tv show
+        for season in tvd.seasons:
+
+            seasonDetails = tmdb.season(tv_id=id, season_id=season.season_number).details()
+
+            # if season not already in db, add new season
+            if str(season.id) not in getExistingSeasons:
+
+                print("")
+                print("Adding New Season:")
+                print("Season Name:", season.name)
+                print("Season Number:", season.season_number)
+                print("Season Episode Count:", season.episode_count)
+                if season.poster_path is not None:
+                    print("Season Poster: https://image.tmdb.org/t/p/w780" + season.poster_path)
+                print("Season Overview:", seasonDetails.overview)
+                print("")
+
+                newSeason = TelevisionSeason(televisionSeries=getTV, seasonNumber=season.season_number, episodeCount=season.episode_count)
+
+                newSeason.tmdbid = seasonDetails.id
+                newSeason.release = seasonDetails.air_date
+
+                if seasonDetails.name is not None and len(seasonDetails.name) > 0:
+                    newSeason.title = seasonDetails.name
+
+                if seasonDetails.overview is not None and len(seasonDetails.overview) > 0:
+                    newSeason.synopsis = seasonDetails.overview
+
+                newSeason.save()
+
+                # add season poster images
+                if season.poster_path is not None and len(season.poster_path) > 1:
+
+                    # save full size poster image
+                    img_data = requests.get("https://image.tmdb.org/t/p/w780" + season.poster_path).content
+                    img_name = slugify(tvd.name + "-" + str(tvd.id) + "-s" + str(season.season_number)) + "-poster-w780.jpg"
+                    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVPosterDownloads/" + img_name,'wb') as handler: handler.write(img_data)
+                    newSeason.poster.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVPosterDownloads/" + img_name,"rb")))
+
+                    # save small poster image
+                    img_data = requests.get("https://image.tmdb.org/t/p/w342" + season.poster_path).content
+                    img_name = slugify(tvd.name + "-" + str(tvd.id) + "-s" + str(season.season_number)) + "-poster-w342.jpg"
+                    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVPosterDownloadsSmall/" + img_name,'wb') as handler: handler.write(img_data)
+                    newSeason.posterSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVPosterDownloadsSmall/" + img_name,"rb")))
+
+                getSeason = newSeason
+
+            else:
+                print("")
+                print("Already Got This Season: S" + str(season.season_number))
+                getSeason = TelevisionSeason.objects.filter(tmdbid=season.id).first()
+
+            print("")
+
+            # get all existing episodes in the db for this season
+            getExistingEpisodes = []
+            for e in TelevisionEpisode.objects.filter(televisionSeason=getSeason):
+                getExistingEpisodes.append(str(e.tmdbid))
+
+
+            # for each episode in season
+            for episode in seasonDetails.episodes:
+
+                episodeDetails = tmdb.episode(tv_id=id, season_id=season.season_number,episode_id=episode.episode_number).details()
+                episodeCredits = tmdb.episode(tv_id=id, season_id=season.season_number,episode_id=episode.episode_number).credits()
+                episodeGuestStars = episodeDetails.guest_stars
+                episodeCrew = episodeDetails.crew
+
+                # if episode not already in db, add new episode
+                if str(episode.id) not in getExistingEpisodes:
+
+                    print("          Adding New Episode")
+                    print("          Episode ID:", episode.id)
+                    print("          Episode Name:", episode.name, "---", "S" + str(season.season_number) + "E" + str(episode.episode_number))
+                    print("          Episode Runtime:", episode.runtime)
+                    print("          Episode Air Date:", episode.air_date)
+                    print("          Episode Overview:", episode.overview)
+
+                    newEpisode = TelevisionEpisode(televisionSeason=getSeason)
+                    newEpisode.tmdbid = episode.id
+                    newEpisode.title = episode.name
+                    newEpisode.episodeNumber = episode.episode_number
+                    newEpisode.release = episode.air_date
+                    newEpisode.save()
+
+                    # add show cover image
+                    if episode.still_path is not None and len(episode.still_path) > 1:
+                        print("          Still: https://image.tmdb.org/t/p/w780" + episode.still_path)
+                        img_data = requests.get("https://image.tmdb.org/t/p/w780" + episode.still_path).content
+                        img_name = slugify(tvd.name + "-" + str(tvd.id) + "-s" + str(season.season_number) + "e" + str(episode.episode_number)) + "-still-w780.jpg"
+                        with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVCoverDownloads/" + img_name,'wb') as handler: handler.write(img_data)
+                        newEpisode.stillImage.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbTVCoverDownloads/" + img_name,"rb")))
+
+                    print("")
+
+                    getEpisode = newEpisode
+
+                else:
+                    print("Already Got This Episode: S" + str(season.season_number) + "-E" + str(episode.episode_number))
+                    getEpisode = TelevisionEpisode.objects.filter(tmdbid=episode.id).first()
+
+
+                # test with only 1 episode
+                if season.season_number == 1 and episode.episode_number == 1:
+
+
+                    print("Episode Crew:",)
+                    for index, credit in enumerate(episodeCrew):
+
+                        pd = tmdb.person(credit.id).details()
+
+                        if str(credit.id) in existingPeopleIDs:
+                            print(credit.job, "-", credit.name, "- already in db")
+                        else:
+                            print(credit.job, "-", credit.name, "- NEED TO ADD")
+
+                    print("Episode Crew (Other):",)
+                    for index, credit in enumerate(episodeCredits.crew):
+
+                        pd = tmdb.person(credit.id).details()
+
+                        if str(credit.id) in existingPeopleIDs:
+                            print(credit.job, "-", credit.name, "- already in db")
+                        else:
+                            print(credit.job, "-", credit.name, "- NEED TO ADD")
+
+                    '''
+                    print("")
+                    print("Series Cast:",)
+                    for index, credit in enumerate(episodeCredits.cast):
+
+                        pd = tmdb.person(credit.id).details()
+
+                        if str(credit.id) in existingPeopleIDs:
+                            print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- already in db")
+                            getPerson = Person.objects.filter(tmdbid=credit.id).first()
+                        else:
+                            print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- ADDING NEW PERSON")
+                            newPerson = Person(name=credit.name, DoB=pd.birthday, tmdbid=credit.id)
+                            existingPeopleIDs.append(str(credit.id))
+
+                            if pd.profile_path is not None and len(pd.profile_path) > 1:
+                                # add full-size image
+                                img_data = requests.get("https://image.tmdb.org/t/p/w500" + pd.profile_path).content
+                                img_name = slugify(credit.name + "-" + str(credit.id)) + "-w500.jpg"
+                                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,'wb') as handler:handler.write(img_data)
+                                newPerson.image.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,"rb")))
+
+                                # add small image
+                                img_data = requests.get("https://image.tmdb.org/t/p/w342" + pd.profile_path).content
+                                img_name = slugify(credit.name + "-" + str(credit.id)) + "-w342.jpg"
+                                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,'wb') as handler:handler.write(img_data)
+                                newPerson.imageSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,"rb")))
+
+                            if pd.deathday is not None:
+                                newPerson.DoD = pd.deathday
+                                newPerson.alive = False
+
+                            newPerson.save()
+                            getPerson = newPerson
+
+                        tpm = TelevisionEpisodePersonMapping(televisionEpisode=getEpisode, person=getPerson, role=getActorRole, department=getCastDepartment)
+
+                        if credit.character is not None and len(credit.character) > 0:
+                            tpm.character = credit.character
+                        if credit.order is not None:
+                            tpm.billing = credit.order
+
+                        tpm.save()
+
+
+                    print("")
+                    print("Guest Cast:")
+                    for index, credit in enumerate(episodeGuestStars):
+
+                        pd = tmdb.person(credit.id).details()
+
+                        if str(credit.id) in existingPeopleIDs:
+                            print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- already in db")
+                            getPerson = Person.objects.filter(tmdbid=credit.id).first()
+                        else:
+                            print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- ADDING NEW PERSON")
+                            newPerson = Person(name=credit.name, DoB=pd.birthday, tmdbid=credit.id)
+                            existingPeopleIDs.append(str(credit.id))
+
+                            if pd.profile_path is not None and len(pd.profile_path) > 1:
+                                # add full-size image
+                                img_data = requests.get("https://image.tmdb.org/t/p/w500" + pd.profile_path).content
+                                img_name = slugify(credit.name + "-" + str(credit.id)) + "-w500.jpg"
+                                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,'wb') as handler:handler.write(img_data)
+                                newPerson.image.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,"rb")))
+
+                                # add small image
+                                img_data = requests.get("https://image.tmdb.org/t/p/w342" + pd.profile_path).content
+                                img_name = slugify(credit.name + "-" + str(credit.id)) + "-w342.jpg"
+                                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,'wb') as handler:handler.write(img_data)
+                                newPerson.imageSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,"rb")))
+
+                            if pd.deathday is not None:
+                                newPerson.DoD = pd.deathday
+                                newPerson.alive = False
+
+                            newPerson.save()
+                            getPerson = newPerson
+
+                        tpm = TelevisionEpisodePersonMapping(televisionEpisode=getEpisode, person=getPerson, role=getActorRole, department=getCastDepartment)
+
+                        if credit.character is not None and len(credit.character) > 0:
+                            tpm.character = credit.character
+                        if credit.order is not None:
+                            tpm.billing = credit.order
+
+                        tpm.save()
+                    
+                    '''
+
+def addTMDBData():
+
+    badCharsTitles = ['/', '"', '<', '>', '[', ']', '{', '}', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+    badCharsPeople = ['?', '/', '#', '!', '"', '<', '>', '[', ']', '{', '}', '(', ')', ':', ';', '@', 'Ã', 'Â', '©', '¢', '€', 'ž', '¦', '¶', 'º']
+
+    # get tmdb IDs of all existing films in database
+    existingFilmIDs = []
+    for film in Film.objects.all():
+        existingFilmIDs.append(film.tmdbid)
+
+    # get names of all existing genres in database
+    existingGenres = []
+    for genre in Genre.objects.all():
+        existingGenres.append(genre.title)
+
+    # get tmdb IDs of all existing people in database
+    existingPeopleIDs = []
+    for person in Person.objects.all():
+        existingPeopleIDs.append(str(person.tmdbid))
+    #print("existing people IDs:", existingPeopleIDs)
+
+    # get list of all role types in database
+    existingPeopleRoleTypes = []
+    for role in PersonRole.objects.all():
+        existingPeopleRoleTypes.append(role.role)
+
+    # get tmdb IDs of all existing companies in database
+    existingCompanies = []
+    for company in Company.objects.all():
+        existingCompanies.append(company.tmdbid)
+    #print(existingCompanies)
+
+    # get list of all existing tags in database
+    existingTags = []
+    for tag in Tag.objects.all():
+        existingTags.append(tag.name)
+
+    getActorRole = PersonRole.objects.filter(role="Actor").first()
+    getCastDepartment = Department.objects.filter(department="Cast").first()
+    getProductionCompanyRole = CompanyRole.objects.filter(id=7).first()
+
+    # create TMDb object and provide api_key
+    tmdb = TMDb()
+    tmdb.key = "519e516edf4f8f69710bded749a22ff7"
+
+
+    filmIDs = ['782','1213','49047','296098','264644','17431','261023','45269','1272','42188','49049','264660','300668','780609','929590','170','1562']
+    #filmIDs = ['11']
+
+    for id in filmIDs:
 
         print("\n Attempting Film:", id)
 
         #get film details based on tmdb-id
         md = tmdb.movie(id).details()
+
+        # get details of film credits from tmdb
+        mc = tmdb.movie(id).credits()
+
+        # get keywords from tmdb
+        keywords = tmdb.movie(id).keywords()
+
         print("Found:", md.title, "---", md.release_date)
 
-        if md.title not in existingFilmTitles and id not in existingFilmIDs:
+        # if the film is not in the database
+        if id not in existingFilmIDs:
 
             # add title, release date and tmdb-id
             newFilm = Film(title=md.title)
@@ -689,7 +1125,6 @@ def addTMDBData():
 
             # add runtime
             if md.runtime is not None and md.runtime > 0:
-                print("Runtime:", md.runtime)
                 newFilm.length = md.runtime
 
             # add synopsis
@@ -705,73 +1140,239 @@ def addTMDBData():
                 newFilm.boxOffice = md.revenue
 
             # add poster image
-            #if md.poster_path is not None and len(md.poster_path) > 1:
-            #    print("Poster: https://image.tmdb.org/t/p/original" + md.poster_path)
-            #    img_data = requests.get("https://image.tmdb.org/t/p/original" + md.poster_path).content
-            #    img_name = slugify(md.title + "-" + str(md.release_date)) + "-poster.jpg"
-            #    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, 'wb') as handler:
-            #        handler.write(img_data)
-            #    newFilm.poster.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, "rb")))
+            if md.poster_path is not None and len(md.poster_path) > 1:
+                print("Poster: https://image.tmdb.org/t/p/original" + md.poster_path)
+
+                # save full size poster image
+                img_data = requests.get("https://image.tmdb.org/t/p/original" + md.poster_path).content
+                img_name = slugify(md.title + "-" + str(md.release_date)) + "-poster.jpg"
+                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, 'wb') as handler:
+                    handler.write(img_data)
+                newFilm.poster.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloads/" + img_name, "rb")))
+
+                # save small poster image
+                img_data = requests.get("https://image.tmdb.org/t/p/w342" + md.poster_path).content
+                img_name = slugify(md.title + "-" + str(md.release_date)) + "-poster-w342.jpg"
+                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloadsSmall/" + img_name, 'wb') as handler:
+                    handler.write(img_data)
+                newFilm.posterSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPosterDownloadsSmall/" + img_name, "rb")))
 
             # add cover image
-            #if md.backdrop_path is not None and len(md.backdrop_path) > 1:
-            #    print("Backdrop: https://image.tmdb.org/t/p/original" + md.backdrop_path)
-            #    img_data = requests.get("https://image.tmdb.org/t/p/original" + md.backdrop_path).content
-            #    img_name = slugify(md.title + "-" + str(md.release_date)) + "-cover.jpg"
-            #    with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, 'wb') as handler:
-            #        handler.write(img_data)
-            #    newFilm.cover.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, "rb")))
+            if md.backdrop_path is not None and len(md.backdrop_path) > 1:
+                print("Backdrop: https://image.tmdb.org/t/p/w1280" + md.backdrop_path)
+                img_data = requests.get("https://image.tmdb.org/t/p/w1280" + md.backdrop_path).content
+                img_name = slugify(md.title + "-" + str(md.release_date)) + "-cover.jpg"
+                with open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, 'wb') as handler:
+                    handler.write(img_data)
+                    newFilm.cover.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCoverDownloads/" + img_name, "rb")))
 
             # save new film
             newFilm.save()
+            getFilm = newFilm
 
-            # add Film-Genre Mappings
-            #if md.genres is not None and len(md.genres) > 0:
-            #    for genre in md.genres:
-            #        getGenre = Genre.objects.filter(title=genre).first()
-            #        fgm = FilmGenreMapping()
-            #        fgm.film = newFilm
-            #        fgm.genre = getGenre
-            #        fgm.save()
-            #        print("Genre Added:", genre)
+        # else retrieve the film if it already exists in the database
+        else:
+            getFilm = Film.objects.filter(tmdbid=id).first()
 
 
-            for pc in md.production_companies:
-                print("Production Company:", pc.name, pc.origin_country, pc.logo_path)
-    
-            
-            mc = tmdb.movie(id).credits()
+        # if there are no Film-Genre mappings for this film
+        if not FilmGenreMapping.objects.filter(film=getFilm):
+            # if Film-Genre mappings exist in tmdb
+            if md.genres is not None and len(md.genres) > 0:
+                # for each new genre
+                for genre in md.genres:
+                    # if genre already in the database, get existing genre object
+                    if genre.name in existingGenres:
+                        getGenre = Genre.objects.filter(title=genre.name).first()
+                        print(genre, "- already got this genre")
+                    # otherwise create new genre object
+                    else:
+                        newGenre = Genre(title=genre.name)
+                        newGenre.save()
+                        print(genre, "- added new genre")
+                        existingGenres.append(genre.name)
+                        getGenre = newGenre
 
-            for index,credit in enumerate(mc.cast):
-
-                personDetails = tmdb.person(credit.id).details()
-
-                #if credit.name in existingPeopleNames:#
-
-                #else:
-                #    newPerson = Person()
-
-                getPerson = Person.objects.filter().first()
-
-                print("Actor:", credit.name, "--- Character:", credit.character, "--- Billing Order:", credit.order)
-                print("DOB:", personDetails.birthday)
-                print("DOD:", personDetails.deathday)
-                print("Picture:", "https://image.tmdb.org/t/p/original" + personDetails.profile_path)
-
-                fpm = FilmPersonMapping(Film=newFilm, Person=getPerson, Role=getActorRole)
-
-                #if index > 20:
-                #    break
-    
-            for credit in mc.crew:
-                if credit.job == "Director":
-                    print("Director:", credit.name)
-    
-                if credit.job == "Writer":
-                    print("Writer:", credit.name)
-    
-                if credit.job == "Producer":
-                    print("Producer:", credit.name)
-    
+                    # add Film-Genre mappings
+                    fgm = FilmGenreMapping(film=getFilm, genre=getGenre)
+                    fgm.save()
+        else:
+            "Film-Genre Mappings Already in Database"
 
 
+        # if there are no Film-Company mappings for this film
+        if not FilmCompanyMapping.objects.filter(film=getFilm):
+
+            # if Film-Company mappings exist in tmdb
+            if md.production_companies is not None:
+
+                # add Film-Company mappings
+                for pc in md.production_companies:
+
+                    # retrieve company details from tmdb
+                    cd = tmdb.company(pc.id).details()
+
+                    if str(cd.id) in existingCompanies:
+                        print("Production Company:", cd.name, "--- already in db")
+                        getCompany = Company.objects.filter(tmdbid=cd.id).first()
+                    else:
+                        print("Production Company:", cd.name, "--- adding new company")
+                        newCompany = Company(name=cd.name, tmdbid=cd.id)
+                        existingCompanies.append(str(cd.id))
+
+                        if cd.logo_path is not None and len(cd.logo_path) > 1:
+                            img_data = requests.get("https://image.tmdb.org/t/p/original" + cd.logo_path).content
+                            img_name = slugify(cd.name + "-" + str(cd.id)) + ".png"
+                            with open(
+                                "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCompanyDownloads/" + img_name,'wb') as handler:
+                                handler.write(img_data)
+                                newCompany.image.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbCompanyDownloads/" + img_name, "rb")))
+
+                        if cd.origin_country is not None and len(cd.origin_country) > 0:
+                            newCompany.baseCountry = cd.origin_country
+
+                        if cd.description is not None and len(cd.description) > 0:
+                            newCompany.description = cd.description
+
+                        newCompany.save()
+                        getCompany = newCompany
+
+                    fcm = FilmCompanyMapping(film=getFilm, company=getCompany, role=getProductionCompanyRole)
+                    fcm.save()
+        else:
+            "Film-Company Mappings Already in Database"
+
+
+        # if there are no Film-Person mappings for this film
+        if not FilmPersonMapping.objects.filter(film=getFilm):
+            # if Film-Person (cast) mappings exist in tmdb
+            if mc.cast is not None:
+                # add Film-Person (cast) mappings
+                for index,credit in enumerate(mc.cast):
+                    # retrieve person details from tmdb
+                    pd = tmdb.person(credit.id).details()
+
+                    if str(credit.id) in existingPeopleIDs:
+                        print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- already in db")
+                        getPerson = Person.objects.filter(tmdbid=credit.id).first()
+
+                    else:
+                        print("Actor:", credit.name, "- Character:", credit.character, "- Billing Order:", credit.order, "- adding new person")
+                        newPerson = Person(name=credit.name, DoB=pd.birthday, tmdbid=credit.id)
+                        existingPeopleIDs.append(str(credit.id))
+
+                        if pd.profile_path is not None and len(pd.profile_path) > 1:
+                            # add full-size image
+                            img_data = requests.get("https://image.tmdb.org/t/p/original" + pd.profile_path).content
+                            img_name = slugify(credit.name + "-" + str(credit.id)) + ".jpg"
+                            with open(
+                                "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,'wb') as handler:
+                                handler.write(img_data)
+                                newPerson.image.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name, "rb")))
+
+                            # add small image
+                            img_data = requests.get("https://image.tmdb.org/t/p/w342" + pd.profile_path).content
+                            img_name = slugify(credit.name + "-" + str(credit.id)) + "-w342.jpg"
+                            with open(
+                                "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,'wb') as handler:
+                                handler.write(img_data)
+                                newPerson.imageSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name, "rb")))
+
+
+                        if pd.deathday is not None:
+                            newPerson.DoD = pd.deathday
+                            newPerson.alive = False
+
+                        newPerson.save()
+                        getPerson = newPerson
+
+                    fpm = FilmPersonMapping(film=getFilm, person=getPerson, role=getActorRole, department=getCastDepartment)
+
+                    if credit.character is not None and len(credit.character) > 0:
+                        fpm.character = credit.character
+                    if credit.order is not None:
+                        fpm.billing = credit.order
+
+                    fpm.save()
+
+            if mc.crew is not None:
+
+                # adding credits for directors, writers and producers and rest of the crew
+                for index,credit in enumerate(mc.crew):
+                    pd = tmdb.person(credit.id).details()
+
+                    if str(credit.id) in existingPeopleIDs:
+                        print(credit.job, "- credit id:", credit.id, "- credit name:", credit.name, "already in db")
+                        getPerson = Person.objects.filter(tmdbid=credit.id).first()
+
+                    else:
+                        print(credit.job, "- credit id:", credit.id, "- credit name:", credit.name, "adding new person")
+                        newPerson = Person(name=credit.name, DoB=pd.birthday, tmdbid=credit.id)
+                        existingPeopleIDs.append(str(credit.id))
+
+                        if pd.profile_path is not None and len(pd.profile_path) > 1:
+                            # add full-size image
+                            img_data = requests.get("https://image.tmdb.org/t/p/original" + pd.profile_path).content
+                            img_name = slugify(credit.name + "-" + str(credit.id)) + ".jpg"
+                            with open(
+                                "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name,'wb') as handler:
+                                handler.write(img_data)
+                                newPerson.image.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloads/" + img_name, "rb")))
+
+                            # add small image
+                            img_data = requests.get("https://image.tmdb.org/t/p/w342" + pd.profile_path).content
+                            img_name = slugify(credit.name + "-" + str(credit.id)) + "-w342.jpg"
+                            with open(
+                                "D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name,'wb') as handler:
+                                handler.write(img_data)
+                                newPerson.imageSmall.save(img_name, File(open("D:/Django Projects/Media Database Website/MediaDB Datasets/tmdbPeopleDownloadsSmall/" + img_name, "rb")))
+
+                        if pd.deathday is not None:
+                            newPerson.DoD = pd.deathday
+                            newPerson.alive = False
+
+                        newPerson.save()
+                        getPerson = newPerson
+
+                    # create new film-person mapping
+                    fpm = FilmPersonMapping(film=getFilm, person=getPerson)
+
+                    getDepartment = Department.objects.filter(department=credit.department).first()
+
+                    if credit.job in existingPeopleRoleTypes:
+                        getRole = PersonRole.objects.filter(role=credit.job).first()
+                    else:
+                        newRole = PersonRole(role=credit.job)
+                        newRole.save()
+                        existingPeopleRoleTypes.append(credit.job)
+                        getRole = newRole
+
+                    fpm.department = getDepartment
+                    fpm.role = getRole
+                    fpm.save()
+
+        else:
+            "Film-Person Mappings Already in Database"
+
+
+        # if there are no Film-Tag mappings for this film
+        if not FilmTagMapping.objects.filter(film=getFilm).exists():
+
+            # if Film-Keyword (tag) mappings exist in tmdb
+            if keywords is not None:
+
+                for keyword in keywords:
+                    # if tag already in the database, get existing tag object
+                    if keyword in existingTags:
+                        getTag = Tag.objects.filter(name=keyword).first()
+                        print(keyword, "- already got this tag")
+                    # otherwise create new tag object
+                    else:
+                        newTag = Tag(name=keyword)
+                        newTag.save()
+                        print(keyword, "- added new tag")
+                        existingGenres.append(keyword)
+                        getTag = newTag
+
+                    ftm = FilmTagMapping(film=getFilm, tag=getTag)
+                    ftm.save()

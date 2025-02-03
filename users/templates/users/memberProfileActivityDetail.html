@@ -23,7 +23,7 @@
                     <div class="container profileSection">
                         <div class="media">
                             <a class="item" href="/films/{{ rating.film.slug }}">
-                                <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                                <img class="item posterSmall" src="{{rating.film.posterSmall.url}}" alt="{{rating.film.title}}">
                             </a>
                             <div class="media-body" style="padding-left:15px">
                                     <h5 class="font-weight-bold border-bottom mb-0">
@@ -145,7 +145,7 @@
                 {%  if rating.film != NULL %}
                     <div class="media">
                         <a class="item" href="/films/{{ rating.film.slug }}">
-                            <img class="item posterSmall" src="{{rating.film.poster.url}}" alt="{{rating.film.title}}">
+                            <img class="item posterSmall" src="{{rating.film.posterSmall.url}}" alt="{{rating.film.title}}">
                         </a>
                         <div class="media-body" style="padding-left:15px">
                                 <h5 class="font-weight-bold">

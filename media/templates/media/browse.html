@@ -123,10 +123,10 @@
                             {% if modelclass == "Film" %}
                                 <a href="/films/{{ media.slug }}">
                                     {% if media in seenFilms %}
-                                        <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        <img class="item posterSmall seen" src="{{media.posterSmall.url}}" alt="{{media.title}}">
                                         Seen
                                     {% else %}
-                                        <img class="item posterSmall loading" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        <img class="item posterSmall loading" src="{{media.posterSmall.url}}" alt="{{media.title}}">
                                     {% endif %}
                                 </a>
 
@@ -215,15 +215,15 @@
                   <ul class="pagination justify-content-center">
 
                     {% if mediaPageObject.has_previous %}
-                        <li class="page-item"><a class="page-link firstLast" style="color: white" href="{% relativeUrl 1 'page' request.GET.urlencode %}">&laquo; First</a></li>
-                        <li class="page-item"><a class="page-link" style="color: white" href="{% relativeUrl mediaPageObject.previous_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.previous_page_number }}</a></li>
+                        <li class="page-item"><a class="page-link firstLast" style="color: white; padding:10px" href="{% relativeUrl 1 'page' request.GET.urlencode %}">&laquo; First</a></li>
+                        <li class="page-item"><a class="page-link" style="color: white; padding:10px" href="{% relativeUrl mediaPageObject.previous_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.previous_page_number }}</a></li>
                     {% endif %}
 
-                        <li class="page-item"><a class="page-link" style="color: white" href="#"><strong>{{ mediaPageObject.number }}</strong></a></li>
+                        <li class="page-item"><a class="page-link" style="color: white; font-size: 25px" href="#"><strong>{{ mediaPageObject.number }}</strong></a></li>
 
                       {% if mediaPageObject.has_next %}
-                        <li class="page-item"><a class="page-link" style="color: white" href="{% relativeUrl mediaPageObject.next_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.next_page_number }}</a></li>
-                        <li class="page-item"><a class="page-link firstLast" style="color: white" href="{% relativeUrl mediaPageObject.paginator.num_pages 'page' request.GET.urlencode %}">Last &raquo;</a></li>
+                        <li class="page-item"><a class="page-link" style="color: white; padding:10px" href="{% relativeUrl mediaPageObject.next_page_number 'page' request.GET.urlencode %}">{{ mediaPageObject.next_page_number }}</a></li>
+                        <li class="page-item"><a class="page-link firstLast" style="color: white; padding:10px" href="{% relativeUrl mediaPageObject.paginator.num_pages 'page' request.GET.urlencode %}">Last &raquo;</a></li>
                     {% endif %}
 
                   </ul>

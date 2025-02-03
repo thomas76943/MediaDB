@@ -14,7 +14,7 @@
                     {% for film in collaborativeFiltering %}
                         {% if film not in seenFilms %}
                             <a class="item" href="/films/{{ film.slug }}">
-                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                <img class="item posterSmall" src="{{film.posterSmall.url}}" alt="{{film.title}}">
                             </a>
                         {% endif %}
                     {% endfor %}
@@ -32,7 +32,7 @@
                     {% for film in contentBasedFiltering %}
                         {% if film not in seenFilms %}
                             <a class="item" href="/films/{{ film.slug }}">
-                                <img class="item posterSmall" src="{{film.poster.url}}" alt="{{film.title}}">
+                                <img class="item posterSmall" src="{{film.posterSmall.url}}" alt="{{film.title}}">
                             </a>
                         {% endif %}
                     {% endfor %}

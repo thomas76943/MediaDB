@@ -9,6 +9,8 @@ class PersonAdmin(ImportExportModelAdmin):
     pass
 
 admin.site.register(PersonRole)
+admin.site.register(Department)
+
 
 #Companies
 admin.site.register(Company)
@@ -21,6 +23,12 @@ class FilmAdmin(ImportExportModelAdmin):
 @admin.register(Television)
 class TelevisionAdmin(ImportExportModelAdmin):
     pass
+@admin.register(TelevisionSeason)
+class TelevisionSeasonAdmin(ImportExportModelAdmin):
+    pass
+@admin.register(TelevisionEpisode)
+class TelevisionEpisodeAdmin(ImportExportModelAdmin):
+    pass
 @admin.register(VideoGame)
 class VideoGameAdmin(ImportExportModelAdmin):
     pass
@@ -31,9 +39,12 @@ class BookAdmin(ImportExportModelAdmin):
 class WebSeriesAdmin(ImportExportModelAdmin):
     pass
 
+
 #Genre Types
 admin.site.register(Genre)
-admin.site.register(VideoGameGenre)
+@admin.register(VideoGameGenre)
+class VideoGameGenre(ImportExportModelAdmin):
+    pass
 admin.site.register(BookGenre)
 
 #Genre Mappings
@@ -62,6 +73,9 @@ class FilmPersonMappingAdmin(ImportExportModelAdmin):
 @admin.register(TelevisionPersonMapping)
 class TelevisionPersonMappingAdmin(ImportExportModelAdmin):
     pass
+@admin.register(TelevisionEpisodePersonMapping)
+class TelevisionEpisodePersonMappingAdmin(ImportExportModelAdmin):
+    pass
 @admin.register(VideoGamePersonMapping)
 class VideoGamePersonMappingAdmin(ImportExportModelAdmin):
     pass
@@ -73,20 +87,31 @@ class WebSeriesPersonMappingAdmin(ImportExportModelAdmin):
     pass
 
 #Franchises
-admin.site.register(Franchise)
-admin.site.register(VideoGameFranchise)
-
+@admin.register(Franchise)
+class Franchise(ImportExportModelAdmin):
+    pass
+@admin.register(VideoGameFranchise)
+class VideoGameFranchise(ImportExportModelAdmin):
+    pass
 #Franchise Genre Mappings
-admin.site.register(FranchiseGenreMapping)
-admin.site.register(VideoGameFranchiseGenreMapping)
+@admin.register(FranchiseGenreMapping)
+class FranchiseGenreMapping(ImportExportModelAdmin):
+    pass
+@admin.register(VideoGameFranchiseGenreMapping)
+class VideoGameFranchiseGenreMapping(ImportExportModelAdmin):
+    pass
 
 #Company Franchise Mappings
 admin.site.register(FranchiseCompanyMapping)
 admin.site.register(VideoGameFranchiseCompanyMapping)
 
 #Franchise Subcategory Mappings
-admin.site.register(FranchiseSubcategory)
-admin.site.register(VideoGameFranchiseSubcategory)
+@admin.register(FranchiseSubcategory)
+class FranchiseSubcategory(ImportExportModelAdmin):
+    pass
+@admin.register(VideoGameFranchiseSubcategory)
+class VideoGameFranchiseSubcategory(ImportExportModelAdmin):
+    pass
 @admin.register(FilmFranchiseSubcategoryMapping)
 class FilmFranchiseSubcategoryMappingAdmin(ImportExportModelAdmin):
     pass
@@ -98,9 +123,15 @@ admin.site.register(BookFranchiseSubcategoryMapping)
 admin.site.register(WebSeriesFranchiseSubcategoryMapping)
 
 #Consoles
-admin.site.register(Console)
-admin.site.register(ConsoleVersion)
-admin.site.register(VideoGameConsoleMapping)
+@admin.register(Console)
+class Console(ImportExportModelAdmin):
+    pass
+@admin.register(ConsoleVersion)
+class ConsoleVersion(ImportExportModelAdmin):
+    pass
+@admin.register(VideoGameConsoleMapping)
+class VideoGameConsoleMapping(ImportExportModelAdmin):
+    pass
 
 #Additional Images
 admin.site.register(MiscImages)

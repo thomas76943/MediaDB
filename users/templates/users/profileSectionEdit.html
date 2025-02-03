@@ -55,7 +55,7 @@
                         <li id="entry_{{ entry.id }}" class="ui-state-default">
                             <div class="bottomOverlay">
                                 <a class="item" href="/films/{{ entry.film.slug }}">
-                                    <img class="item posterSmall" src="{{entry.film.poster.url}}" alt="{{entry.film.title}}">
+                                    <img class="item posterSmall" src="{{entry.film.posterSmall.url}}" alt="{{entry.film.title}}">
                                 </a>
                                 <div class="content">
                                    <button id="f-{{ entry.film.slug }}" onClick="remove(this.id)" class="btn btn-danger btn-raised" value="Remove">Remove</button>

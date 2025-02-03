@@ -58,7 +58,7 @@
                 <ul class="hs full">
                     {% for f in films %}
                         <a href="/films/{{ f.film.slug }}">
-                            <img class="item posterSmall" src="{{ f.film.poster.url }}" alt="{{ f.film.title }}">
+                            <img class="item posterSmall" src="{{ f.film.posterSmall.url }}" alt="{{ f.film.title }}">
                         </a>
                     {% endfor %}
                 </ul>

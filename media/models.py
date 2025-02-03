@@ -7,29 +7,29 @@ from django.utils.text import slugify
 
 #---People and Roles---------------------------------------------------------------------------------------------------#
 class Person(models.Model):
-    firstName = models.CharField(max_length=500, default='NoFirstNameSpecified')
-    surname = models.CharField(max_length=500, blank=True)
+    name = models.CharField(max_length=500, default='NoFirstNameSpecified')
     DoB = models.DateField(blank=True, null=True)
     alive = models.BooleanField(default=True)
     DoD = models.DateField(blank=True, null=True)
     bio = models.CharField(max_length=1000, default='', blank=True)
-    image = models.ImageField(default='MissingIcon.png', upload_to='people', blank=True)
+    image = models.ImageField(default='MissingIcon.png', upload_to='peopleImages', blank=True)
+    imageSmall = models.ImageField(default='MissingIcon.png', upload_to='peopleImages', blank=True, null=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
     tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
 
     def __str__(self):
-        return (self.firstName + " " + self.surname)
+        return (self.name)
 
     #Method to Get the person's full name
     def getFullName(self):
-        return (self.firstName + " " + self.surname)
+        return (self.name)
 
     #Overwritten save method to populate the slugfield based on the name and DoB of the person
     def save(self, *args, **kwargs):
         super().save()
         if not self.slug:
             if self.DoB:
-                self.slug = slugify(self.getFullName() + "-" + str(self.DoB.year))
+                self.slug = slugify(self.getFullName() + "-" + str(self.tmdbid))
             else:
                 self.slug = slugify(self.getFullName())
         super(Person, self).save(*args, **kwargs)
@@ -48,13 +48,26 @@ class PersonRole(models.Model):
         verbose_name = "Person - Role Type"
         verbose_name_plural = "People - Role Types"
 
+
+class Department(models.Model):#
+    department = models.CharField(max_length=500, default='NoDepartmentNameSpecified')
+
+    def __str__(self):
+        return self.department
+    class Meta:
+        verbose_name = "Person - Department"
+        verbose_name_plural = "People - Departments"
+
 #---Companies and Roles------------------------------------------------------------------------------------------------#
 class Company(models.Model):
-    name = models.CharField(max_length=500, default='NoFilmStudioNameSpecified')
+    name = models.CharField(max_length=500, default='NoCompanyNameSpecified')
     baseCountry = models.CharField(max_length=500, blank=True)
     dateFounded = models.DateField(blank=True, null=True)
+    description = models.CharField(max_length=2000, blank=True)
+    parentCompany = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True, editable=True)
     image = models.ImageField(upload_to='companyLogos', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20, blank=True, editable=True)
 
     def __str__(self):
         return self.name
@@ -89,8 +102,9 @@ class Film(models.Model):
     synopsis = models.CharField(max_length=500, blank=True)
     budget = models.IntegerField(null=True, blank=True)
     boxOffice = models.IntegerField(null=True, blank=True)
-    poster = models.ImageField(upload_to='posters', blank=True)
-    cover = models.ImageField(upload_to='coverImages', blank=True)
+    poster = models.ImageField(upload_to='filmPosters', blank=True)
+    posterSmall = models.ImageField(upload_to='filmPosters', null=True, blank=True)
+    cover = models.ImageField(upload_to='filmCoverImages', blank=True)
     trailerVideoPath = models.CharField(max_length=500, blank=True)
     slug = models.SlugField(max_length=150, null=True, blank=True, editable=True)
     tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
@@ -118,26 +132,106 @@ class Film(models.Model):
 
 class Television(models.Model):
     title = models.CharField(max_length=500, default='NoTelevisionTitleSpecified')
-    ongoing = models.BooleanField(default=False)
     release = models.DateField(default=timezone.now)
-    end = models.DateField(default=timezone.now, blank=True, null=True)
+    ongoing = models.BooleanField(default=False)
     synopsis = models.CharField(max_length=500, default='', blank=True)
-    seasons = models.IntegerField(default=1)
-    episodes = models.IntegerField(default=1)
-    trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
-    poster = models.ImageField(default='', upload_to='posters', blank=True)
-    cover = models.ImageField(default='', upload_to='coverImages', blank=True)
+    seasonCount = models.IntegerField(default=1, null=True, blank=True)
+    episodeCount = models.IntegerField(default=1, null=True, blank=True)
+    poster = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
+    posterSmall = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
+    cover = models.ImageField(default='', upload_to='televisionCoverImages', blank=True)
     slug = models.SlugField(max_length=150, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
 
     #Overwritten save method to populate the slugfield based on the television series' title and release date
     def save(self, *args, **kwargs):
         super().save()
         if not self.slug:
-            self.slug = slugify(self.title + "-" + str(self.release))
+            self.slug = slugify(self.title + "-" + self.tmdbid)
         super(Television, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
+
+    def getPoster(self):
+        getSeason = TelevisionSeason.objects.filter(televisionSeries=self,seasonNumber=1).first()
+        return getSeason.poster.url
+
+    def getFirstAirDate(self):
+        getSeasonOne = TelevisionSeason.objects.filter(televisionSeries=self, seasonNumber=1).first()
+        getEpisodeOne = TelevisionEpisode.objects.filter(televisionSeason=getSeasonOne, episodeNumber=1).first()
+        return getSeasonOne.release
+
+    def getStartingYear(self):
+        getSeasonOne = TelevisionSeason.objects.filter(televisionSeries=self, seasonNumber=1).first()
+        getEpisodeOne = TelevisionEpisode.objects.filter(televisionSeason=getSeasonOne, episodeNumber=1).first()
+        return getSeasonOne.release.year
+
+    def getEndingYear(self):
+        getLastSeason = TelevisionSeason.objects.filter(televisionSeries=self).order_by('-seasonNumber').first()
+        getLastEpisode = TelevisionEpisode.objects.filter(televisionSeason=getLastSeason, episodeNumber=1).first()
+        return getLastSeason.release.year
+
+    def getPosterSmall(self):
+        getSeason = TelevisionSeason.objects.filter(televisionSeries=self).first()
+        return getSeason.posterSmall.url
+
+    class Meta:
+        verbose_name = "Television"
+        verbose_name_plural = "Television"
+
+
+class TelevisionSeason(models.Model):
+    title = models.CharField(max_length=500, null=True, blank=True, editable=True)
+    televisionSeries = models.ForeignKey(Television, on_delete=models.CASCADE, default=1)
+    release = models.DateField(default=timezone.now, null=True, blank=True)
+    synopsis = models.CharField(max_length=500, null=True, blank=True)
+    seasonNumber = models.IntegerField(default=1)
+    episodeCount = models.IntegerField(default=1)
+    trailerVideoPath = models.CharField(max_length=500, null=True, blank=True)
+    poster = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
+    posterSmall = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
+    cover = models.ImageField(default='', upload_to='televisionCoverImages', null=True, blank=True)
+    slug = models.SlugField(max_length=150, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
+
+    #Overwritten save method to populate the slugfield based on the television series' title and release date
+    def save(self, *args, **kwargs):
+        super().save()
+        if not self.slug:
+            self.slug = slugify(self.televisionSeries.title + "-" + str(self.televisionSeries.tmdbid)) + "-season-" + str(self.seasonNumber)
+        super(TelevisionSeason, self).save(*args, **kwargs)
+
+    def __str__(self):
+        if self.title is None or self.title == "":
+            return (str(self.televisionSeries.title) + " - S" + str(self.seasonNumber))
+        else:
+            return (str(self.televisionSeries.title) + " - " + self.title)
+    class Meta:
+        verbose_name = "Television - Season"
+        verbose_name_plural = "Television - Seasons"
+
+
+class TelevisionEpisode(models.Model):
+    title = models.CharField(max_length=500, default='NoTelevisionEpisodeTitleSpecified')
+    televisionSeason = models.ForeignKey(TelevisionSeason, on_delete=models.CASCADE, default=1)
+    episodeNumber = models.IntegerField(default=1)
+    release = models.DateField(default=timezone.now)
+    synopsis = models.CharField(max_length=500, default='', blank=True)
+    trailerVideoPath = models.CharField(max_length=500, default='', blank=True)
+    stillImage = models.ImageField(default='', upload_to='televisionStills', null=True, blank=True)
+    slug = models.SlugField(max_length=150, blank=True, editable=True)
+    tmdbid = models.CharField(max_length=20,null=True,blank=True,editable=True)
+
+    #Overwritten save method to populate the slugfield based on the television series' title and release date
+    def save(self, *args, **kwargs):
+        super().save()
+        if not self.slug:
+            self.slug = slugify(str(self.televisionSeason.televisionSeries.tmdbid) + "-" + self.televisionSeason.televisionSeries.title) + "-s" + str(self.televisionSeason.seasonNumber) + "-e" + str(self.episodeNumber)
+        super(TelevisionEpisode, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.televisionSeason.televisionSeries.title + " - S" + str(self.televisionSeason.seasonNumber) + " - E" + str(self.episodeNumber)
 
     #Gets the start year of the television series
     def getYear(self):
@@ -148,8 +242,8 @@ class Television(models.Model):
         return self.end.year
 
     class Meta:
-        verbose_name = "Television"
-        verbose_name_plural = "Television"
+        verbose_name = "Television - Episode"
+        verbose_name_plural = "Television - Episodes"
 
 class VideoGame(models.Model):
     title = models.CharField(max_length=500, default='NoVideoGameTitleSpecified')
@@ -413,15 +507,16 @@ class WebSeriesCompanyMapping(models.Model):
 class FilmPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     film = models.ForeignKey(Film, on_delete=models.CASCADE)
-    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE, default=1)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 
     def __str__(self):
-        return (self.person.firstName + " " + self.person.surname + " || " + self.film.title + " || " + self.role.role)
+        return (self.person.name + " || " + self.film.title + " || " + self.role.role)
 
     def getPerson(self):
-        return (self.person.firstName + " " + self.person.surname)
+        return (self.person.name)
 
     class Meta:
         verbose_name = "Films - Person Mapping"
@@ -431,12 +526,13 @@ class TelevisionPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     television = models.ForeignKey(Television, on_delete=models.CASCADE)
     role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
-    episodes = models.IntegerField
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, default=1)
+    episodes = models.IntegerField(default=1, blank=True, null=True)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 
     def __str__(self):
-        return (self.person.firstName + " " + self.person.surname + " || " + self.television.title + " || " + self.role.role)
+        return (self.person.getFullName + " - " + self.television.title + " - " + self.role.role)
 
     def getPerson(self):
         return (self.person.firstName + " " + self.person.surname)
@@ -445,10 +541,40 @@ class TelevisionPersonMapping(models.Model):
         verbose_name = "Television - Person Mapping"
         verbose_name_plural = "Television - Person Mappings"
 
+class TelevisionEpisodePersonMapping(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    televisionEpisode = models.ForeignKey(TelevisionEpisode, on_delete=models.CASCADE)
+    role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, default=1)
+    episodes = models.IntegerField
+    character = models.CharField(max_length=500, default='', blank=True)
+    billing = models.IntegerField(default=1, unique=False)
+    guestCast = models.BooleanField(default=False,blank=True)
+
+    def __str__(self):
+        return (self.person.getFullName()
+                + " - "
+                + self.televisionEpisode.televisionSeason.televisionSeries.title
+                + " - S"
+                + str(self.televisionEpisode.televisionSeason.seasonNumber)
+                + "E"
+                + str(self.televisionEpisode.episodeNumber)
+                + " - "
+                + self.role.role)
+
+    def getPerson(self):
+        return (self.person.getFullName())
+
+    class Meta:
+        verbose_name = "Television Episode - Person Mapping"
+        verbose_name_plural = "Television Episode - Person Mappings"
+
+
 class VideoGamePersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     videogame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)
     role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, default=1)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 
@@ -466,6 +592,7 @@ class BookPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, default=1)
 
     def __str__(self):
         return (self.person.firstName + " " + self.person.surname + " || " + self.book.title + " || " + self.role.role)
@@ -481,6 +608,7 @@ class WebSeriesPersonMapping(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     webSeries = models.ForeignKey(WebSeries, on_delete=models.CASCADE)
     role = models.ForeignKey(PersonRole, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, default=1)
     character = models.CharField(max_length=500, default='', blank=True)
     billing = models.IntegerField(default=1, unique=False)
 

@@ -1,0 +1,83 @@
+{% extends "media/base.html" %}
+{% load media_tags %}
+{% block title %}{{televisionepisode.televisionSeason.televisionSeries.title}} S{{televisionseason.seasonNumber}}{% endblock title %}
+{% block content %}
+
+    <div class="container infoSection">
+        {% if televisionepisode.title %}
+            <h2>{{televisionepisode.title}}</h2>
+        {% endif %}
+        <h5>{{televisionepisode.televisionSeason.televisionSeries.title}}: Season {{televisionepisode.televisionSeason.seasonNumber}} - Episode {{televisionepisode.episodeNumber}}</h5>
+
+
+
+    </div>
+
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/tv/{{ televisionepisode.televisionSeason.televisionSeries.slug }}/seasons">Back to Main Page</a></h6>
+    </div>
+
+    <!-- If there is a poster or a trailer then create parent element for them -->
+    {% if televisionepisode.stillImage or televisionseason.trailerVideoPath %}
+        <div class="container posterTrailerContainer">
+            <div class="row" style="padding: 10px">
+
+                {% if televisionepisode.stillImage %}
+                    <img class="item episodeStillImage" style="float:left; object-fit:cover" src="{{televisionepisode.stillImage.url}}" alt="{{televisionseason.televisionSeries.title}}">
+                {% endif %}
+
+                {% if televisionseason.trailerVideoPath %}
+                    <iframe class="trailer" src={{television.trailerVideoPath}} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!--
+    {% if seasons %}
+        {% for season in seasons %}
+            {% with var=season.seasonNumber %}
+            {% dynamicVariableValue var as var_url %}
+                {% if var_url %}
+                    <div class="container infoSection">
+                        <h5 class="font-weight-bold border-bottom mb-0">Season {{ season.seasonNumber }}</h5>
+                        <div class="scroller">
+                            <ul class="hs full">
+                                {% for episode in var_url %}
+                                    {%  if episode %}
+                                        <a class="item" href="/episode/{{ episode.id }}">
+                                            <img class="item posterSmall" style="object-fit:cover" src="{{episode.stillImage.url}}" alt="S{{season.seasonNumber}}-E{{episode.episodeNumber}}">
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    {% endif %}
+    -->
+
+    {% if castImages %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for actor in castImages %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ actor.person.slug }}">
+                                <img class="item additionalImage" src="{{actor.person.imageSmall.url}}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

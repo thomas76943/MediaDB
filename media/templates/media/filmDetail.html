@@ -25,7 +25,7 @@
             </div>
         </form>
 
-        <h2>{{film.title}} - {{film.id}} </h2>
+        <h2>{{film.title}}</h2>
         <h5>{% if film.rating %}{{ film.rating }} | {% endif %}{% if film.length %}{{ film.length }} mins | {% endif %} {{ film.release }}</h5>
         {% if genres %}
             {% for genre in genres %}
@@ -36,6 +36,7 @@
     </div>
 
     <br>
+
     <!--
     <style>
         .container.ratingBox {
@@ -66,6 +67,7 @@
         height: 260px;
     }
         }
+
 
     @media screen and (max-width: 450px) {
         .cloud-tags {
@@ -131,9 +133,9 @@
                 {% endfor %}
             {% endif %}
 
-            {% if writers %}
+            {% if writersForFrontPage %}
                 <h5 style="padding-top:5px"> Written by:</h5>
-                {% for writer in writers %}
+                {% for writer in writersForFrontPage %}
                     <a style="padding-right:10px" href="/person/{{ writer.person.slug }}"> {{ writer.getPerson }}</a>
                 {% endfor %}
             {% endif %}
@@ -163,18 +165,18 @@
         </div>
     {% endif %}
 
-    {% if cast %}
+    {% if castImages %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/films/{{ film.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for actor in cast %}
+                    {% for actor in castImages %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ actor.person.slug }}">
-                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                                <img class="item additionalImage" src="{{actor.person.imageSmall.url}}" alt="{{actor.getPerson}}">
                             </a>
                             <div class="content">
-                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                                <h6 style="overflow-wrap: normal">{{ actor.person.name }}</h6>
                             </div>
                         </div>
                     {% endfor %}
@@ -195,9 +197,9 @@
     {% if tags %}
         <div class="container infoSection">
             <h5 style="padding-top:5px">Tags:</h5>
-            <ul class="cloud-tags">
+            <ul class="cloud-tags" style="display:flex; flex-wrap: wrap">
                 {% for t in tags %}
-                    <li class="font-weight-bold" style="margin-top:0; padding-right:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
+                    <li class="font-weight-bold" style="margin-top:0; padding-right:10px; margin-bottom:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>

@@ -30,16 +30,16 @@
 
         <h2>{{television.title}}</h2>
         <h5>
-        {{ television.getYear }}
+        {{ television.getStartingYear }}
         {% if television.ongoing == False %}
-            {% if television.getYear != television.getEndYear %}
-                - {{ television.getEndYear }}
+            {% if television.getStartingYear != television.getEndingYear %}
+                - {{ television.getEndingYear }}
             {% endif %}
         {% else %}
             -
         {% endif %}
         </h5>
-        <h5>{{ television.episodes }} Episodes | Seasons: {{ television.seasons }}</h5>
+        <h5>{{ television.seasonCount }} Seasons | {{ television.episodeCount }} Episodes</h5>
 
         {% if genres %}
             {% for genre in genres %}
@@ -50,13 +50,14 @@
 
     <br>
 
+
     <!-- If there is a poster or a trailer then create parent element for them -->
-    {% if television.poster or television.trailerVideoPath or averageRating %}
+    {% if television.getPoster or television.trailerVideoPath or averageRating %}
         <div class="container posterTrailerContainer">
             <div class="row" style="padding: 10px">
 
-                {% if television.poster %}
-                    <img class="item detailPoster" style="float:left" src="{{television.poster.url}}" alt="{{television.title}}">
+                {% if television.getPoster %}
+                    <img class="item detailPoster" style="float:left" src="{{ television.getPoster }}" alt="{{television.title}}">
                 {% endif %}
 
                 {% if television.trailerVideoPath %}
@@ -128,9 +129,13 @@
         </div>
     {% endif %}
 
+    <div class="container infoSection">
+        <h6 style="padding-top:10px"><a href="/tv/{{ television.slug }}/seasons">See Seasons & Episodes </a></h6>
+    </div>
+
     {% if cast %}
         <div class="container infoSection">
-            <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
+            <h5 class="font-weight-bold border-bottom mb-0">Series Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
                     {% for actor in cast %}
@@ -158,7 +163,7 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6 style="padding-top:10px">First Episode Air  Date: {{ television.release }}</h6>
+        <h6 style="padding-top:10px">First Episode Air  Date: {{ television.getFirstAirDate }}</h6>
         {% if television.ongoing == False %}
             <h6 style="padding-top:5px">Final Episode Air Date: {{ television.end }}</h6>
         {% endif %}
@@ -183,7 +188,7 @@
     {% endif %}
 
     <div class="container infoSection">
-        <h6 style="padding-top:10px"><a href="/tv/{{ television.slug }}/crew">See All Details</a></h6>
+        <h6 style="padding-top:10px"><a href="/tv/{{ television.slug }}/crew">See Full Cast & Crew Details</a></h6>
     </div>
 
     {% if images %}

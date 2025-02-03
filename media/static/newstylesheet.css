@@ -191,6 +191,11 @@ code {
   padding-bottom:15px;
 }
 
+.hs.episodeStills {
+  grid-gap: 10px;
+  grid-auto-columns: 300px;
+}
+
 ul {
   padding: 0;
   white-space: nowrap;
@@ -213,6 +218,18 @@ ul {
   max-height:100%;
   word-break: break-all;
 }
+
+.episodeStillImage {
+  height:192px;
+  width:300px;
+  object-fit:cover;
+  border: solid white;
+  border-width: 2px 2px;
+
+  animation: itemEntrance 300ms ease-out;
+  animation-fill-mode: backwards;
+}
+
 
 @keyframes itemEntrance {
     from {
