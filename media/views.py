@@ -882,7 +882,7 @@ def calendar(request):
 #Parameters     - request - the request object containing the GET/POST data and user object
 #Returns        - renders the dataSources.html file with the contents of the context dictionary
 def dataSources(request):
-    #testCrewCredits()
+    #addTVNetworks()
     #addTVData()
     #resetSlugs()
     addTMDBData()
@@ -960,11 +960,12 @@ def browse(request):
     videoGames = VideoGame.objects.all()
     books = Book.objects.all()
     webSeries = WebSeries.objects.all()
-    #people = Person.objects.exclude(image='MissingIcon.png')
 
     allMedia = sorted(list(chain(films, television, videoGames, books, webSeries)), key=attrgetter('id'))
 
     #filteredFilms = filmFilter(request.GET, queryset=allMedia)
+    #filteredTV = televisionFilter(request.GET, queryset=allMedia)
+
     paginated = Paginator(allMedia, 90)
     page_number = request.GET.get('page', 1)
     mediaPageObject = paginated.get_page(page_number)
@@ -1414,7 +1415,8 @@ class PersonDetailView(generic.DetailView):
             fActing.append(fa.film)
         tvActing = []
         for tva in TelevisionEpisodePersonMapping.objects.filter(person=self.object.id).filter(role=8).order_by('-televisionEpisode__televisionSeason__televisionSeries__release'):
-            tvActing.append(tva.televisionEpisode.televisionSeason.televisionSeries)
+            if tva.televisionEpisode.televisionSeason.televisionSeries not in tvActing:
+                tvActing.append(tva.televisionEpisode.televisionSeason.televisionSeries)
         vgActing = []
         for vga in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=8).order_by('-videogame__release'):
             vgActing.append(vga.videogame)
@@ -1432,8 +1434,9 @@ class PersonDetailView(generic.DetailView):
         for fd in FilmPersonMapping.objects.filter(person=self.object.id).filter(department=1).order_by('-film__release'):
             fDirecting.append(fd.film)
         tvDirecting = []
-        for tvd in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=9):
-            tvDirecting.append(tvd.television)
+        for tvd in TelevisionEpisodePersonMapping.objects.filter(person=self.object.id).filter(department=1).order_by('-televisionEpisode__televisionSeason__televisionSeries__release'):
+            if tvd.televisionEpisode.televisionSeason.televisionSeries not in tvDirecting:
+                tvDirecting.append(tvd.televisionEpisode.televisionSeason.televisionSeries)
         vgDirecting = []
         for vgd in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=9).order_by('-videogame__release'):
             vgDirecting.append(vgd.videogame)
@@ -1451,8 +1454,9 @@ class PersonDetailView(generic.DetailView):
             if fw.film not in fWriting:
                 fWriting.append(fw.film)
         tvWriting = []
-        for tvw in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(role=10):
-            tvWriting.append(tvw.television)
+        for tvw in TelevisionEpisodePersonMapping.objects.filter(person=self.object.id).filter(department=2).order_by('-televisionEpisode__televisionSeason__televisionSeries__release'):
+            if tvw.televisionEpisode.televisionSeason.televisionSeries not in tvWriting:
+                tvWriting.append(tvw.televisionEpisode.televisionSeason.televisionSeries)
         vgWriting = []
         for vgw in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(role=10).order_by('-videogame__release'):
             vgWriting.append(vgw.videogame)
@@ -1471,8 +1475,9 @@ class PersonDetailView(generic.DetailView):
             if fp.film not in fProducing:
                 fProducing.append(fp.film)
         tvProducing = []
-        for tvp in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(department=3).exclude(Q(role=175) | Q(role=193) | Q(role=292) | Q(role=293) | Q(role=294) | Q(role=296) | Q(role=299)):
-            tvProducing.append(tvp.television)
+        for tvp in TelevisionEpisodePersonMapping.objects.filter(person=self.object.id).filter(department=3).order_by('-televisionEpisode__televisionSeason__televisionSeries__release'):
+            if tvp.televisionEpisode.televisionSeason.televisionSeries not in tvProducing:
+                tvProducing.append(tvp.televisionEpisode.televisionSeason.televisionSeries)
         vgProducing = []
         for vgp in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(department=3).exclude(Q(role=175) | Q(role=193) | Q(role=292) | Q(role=293) | Q(role=294) | Q(role=296) | Q(role=299)).order_by('-videogame__release'):
             vgProducing.append(vgp.videogame)
@@ -1490,12 +1495,32 @@ class PersonDetailView(generic.DetailView):
         for ba in BookPersonMapping.objects.filter(person=self.object.id).filter(role=12).order_by('-book__release'):
             bookAuthor.append(ba.book)
 
+        stuntsRoleList = [140,164,165,181,182,221]
+
+        fStunts = []
+        #for fs in FilmPersonMapping.objects.filter(Q(role=1)).order_by('-film__release'):
+        for fs in FilmPersonMapping.objects.filter(person=self.object.id).filter(Q(role=140) | Q(role=164) | Q(role=165) | Q(role=181) | Q(role=182) | Q(role=221)).order_by('-film__release'):
+            fStunts.append(fs.film)
+        tvStunts = []
+        for tvs in TelevisionEpisodePersonMapping.objects.filter(person=self.object.id).filter(Q(role=140) | Q(role=164) | Q(role=165) | Q(role=181) | Q(role=182) | Q(role=221)):
+            if tvs.televisionEpisode.televisionSeason.televisionSeries not in tvStunts:
+                tvStunts.append(tvs.televisionEpisode.televisionSeason.televisionSeries)
+        vgStunts = []
+        for vgs in VideoGamePersonMapping.objects.filter(person=self.object.id).filter(Q(role=140) | Q(role=164) | Q(role=165) | Q(role=181) | Q(role=182) | Q(role=221)).order_by('-videogame__release'):
+            vgStunts.append(vgs.videogame)
+        wsStunts = []
+        for wss in WebSeriesPersonMapping.objects.filter(person=self.object.id).filter(Q(role=140) | Q(role=164) | Q(role=165) | Q(role=181) | Q(role=182) | Q(role=221)).order_by('-webSeries__release'):
+            wsStunts.append(wss.webSeries)
+        # All the mappings are combined
+        stuntsAll = list(chain(fStunts, tvStunts, vgStunts, wsStunts))
+        # All the mappings are sorted by the most recent first
+        stunts = sorted(stuntsAll, key=attrgetter('release'), reverse=True)
+
 
         #All mappings where this person was attached with roles 175,193,292,293,294,296 and 299 are retrieved - all related to Casting
         fCasting = []
         for fc in FilmPersonMapping.objects.filter(person=self.object.id).filter(Q(role=175) | Q(role=193) | Q(role=292) | Q(role=293) | Q(role=294) | Q(role=296) | Q(role=299)).order_by('-film__release'):
             fCasting.append(fc.film)
-            print("found:", fc.film)
         tvCasting = []
         for tvc in TelevisionPersonMapping.objects.filter(person=self.object.id).filter(Q(role=175) | Q(role=193) | Q(role=292) | Q(role=293) | Q(role=294) | Q(role=296) | Q(role=299)):
             tvCasting.append(tvc.television)
@@ -1509,7 +1534,6 @@ class PersonDetailView(generic.DetailView):
         castingAll = list(chain(fCasting, tvCasting, vgCasting, wsCasting))
         # All the mappings are sorted by the most recent first
         casting = sorted(castingAll, key=attrgetter('release'), reverse=True)
-        print(casting)
 
         #If the combined, sorted lists of mappings have entries, add them to a roleOrder dictionary
         roleOrder = {}
@@ -1527,6 +1551,8 @@ class PersonDetailView(generic.DetailView):
             roleOrder['Author'] = bookAuthor
         if len(castingAll) > 0:
             roleOrder['Casting'] = casting
+        if len(stuntsAll) > 0:
+            roleOrder['Stunts'] = stunts
 
         #Sort the roleOrder dictionary based on the number of items
         #(ie: the person's categories will be sorted by how many mappings there are of each type)
@@ -1578,8 +1604,21 @@ class CompanyDetailView(generic.DetailView):
 
         #Gather context information for a company's consoles, films television, books, web series and franchises
         context['consoles'] = Console.objects.filter(developer=self.object.id).order_by('-release')
-        context['films'] = FilmCompanyMapping.objects.filter(company=self.object.id).order_by('film__release')
-        context['television'] = TelevisionCompanyMapping.objects.filter(company=self.object.id)
+
+        # make sure films are not repeated (if the company is attached to a film in multiple roles)
+        films = []
+        for f in FilmCompanyMapping.objects.filter(company=self.object.id).order_by('film__release'):
+            if f not in films:
+                films.append(f)
+        context['films'] = films
+
+        # make sure tv shows are not repeated (if the company is attached to a show in multiple roles)
+        tv = []
+        for show in TelevisionCompanyMapping.objects.filter(company=self.object.id).order_by('television__tmdbid'):
+            if show.television not in tv:
+                tv.append(show.television)
+        context['television'] = tv
+
         context['books'] = BookCompanyMapping.objects.filter(company=self.object.id).order_by('book__release')
         context['webseries'] = WebSeriesCompanyMapping.objects.filter(company=self.object.id).order_by('webSeries__release')
         context['franchises'] = FranchiseCompanyMapping.objects.filter(company=self.object.id)
@@ -1695,12 +1734,13 @@ class FranchiseDetailView(generic.DetailView):
                 #Retrieve the media items mapped to this subcategory
                 SubCat_F = FilmFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
                 SubCat_TV = TelevisionFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
+                SubCat_TV_S = TelevisionSeasonFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
                 SubCat_VG = VideoGameFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
                 SubCat_B = BookFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
                 SubCat_WS = WebSeriesFranchiseSubcategoryMapping.objects.filter(franchiseSubcategory__parentFranchise=self.object.id).filter(franchiseSubcategory__title=subcategories[x].title)
 
                 #Collect and sort all the media for that subcategory based on the 'orderInFranchise' field
-                completeSubCategory = sorted(list(chain(SubCat_F, SubCat_TV, SubCat_VG, SubCat_B, SubCat_WS)), key=attrgetter('orderInFranchise'))
+                completeSubCategory = sorted(list(chain(SubCat_F, SubCat_TV, SubCat_TV_S, SubCat_VG, SubCat_B, SubCat_WS)), key=attrgetter('orderInFranchise'))
                 #Dynamic context name for the subcategory in the template
                 context[subcategories[x].title] = completeSubCategory
 
@@ -1733,7 +1773,7 @@ class FranchiseDetailView(generic.DetailView):
 
             if crew != None:
                 #Filter the people mappings to just the actors
-                cast = crew.filter(role=1)
+                cast = crew.filter(role=8)
                 for mapping in cast:
                     #For each cast member, add them to a dictionary and keep a counter of how many media items they have acted in
                     if mapping.person not in franchiseActors:
@@ -1742,7 +1782,7 @@ class FranchiseDetailView(generic.DetailView):
                         franchiseActors[mapping.person] += 1
 
                 #Filter the people mappings to just the producers
-                producers = crew.filter(role=6)
+                producers = crew.filter(department=3)
                 for mapping in producers:
                     #For each producer, add them to a dictionary and keep a counter of how many media items they have produced
                     if mapping.person not in franchiseProducers:
@@ -1751,8 +1791,11 @@ class FranchiseDetailView(generic.DetailView):
                         franchiseProducers[mapping.person] += 1
 
         #Sorting the actor and producer dictionaries by how many mappings there are per person before passing this to the context
-        context['franchiseActors'] = dict(sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True))
-        context['franchiseProducers'] = dict(sorted(franchiseProducers.items(), key=operator.itemgetter(1), reverse=True))
+        sortedFranchiseActors = dict(sorted(franchiseActors.items(), key=operator.itemgetter(1), reverse=True))
+        context['franchiseActors'] = dict(itertools.islice(sortedFranchiseActors.items(), 30))
+
+        sortedFranchiseProducers = dict(sorted(franchiseProducers.items(), key=operator.itemgetter(1), reverse=True))
+        context['franchiseProducers'] = dict(itertools.islice(sortedFranchiseProducers.items(), 30))
 
         return context
 
@@ -1952,22 +1995,51 @@ class TVDetailView(generic.UpdateView):
         context = super().get_context_data(**kwargs)
         #Collect the context for this film item
         context['genres'] = TelevisionGenreMapping.objects.filter(television=self.object.id).order_by('genre__title')
-        context['cast'] = TelevisionPersonMapping.objects.filter(role=1, television=self.object.id).order_by('billing')
         context['showrunners'] = TelevisionPersonMapping.objects.filter(role=4, television=self.object.id)
         context['writers'] = TelevisionPersonMapping.objects.filter(role=3, television=self.object.id)
         context['producers'] = TelevisionPersonMapping.objects.filter(role=6, television=self.object.id).order_by('billing')
-        context['networks'] = TelevisionCompanyMapping.objects.filter(role=3, television=self.object.id)
-        context['productionCompanies'] = TelevisionCompanyMapping.objects.filter(role=2, television=self.object.id)
+        context['networks'] = TelevisionCompanyMapping.objects.filter(role=9,television=self.object.id)
+        context['productionCompanies'] = TelevisionCompanyMapping.objects.filter(role=7,television=self.object.id)
+        context['tags'] = TelevisionTagMapping.objects.filter(television=self.object.id)
         context['images'] = TelevisionImages.objects.filter(television=self.object.id)
 
         #context['episodes'] = TelevisionEpisode.objects.filter(televisionseason.televisionSeries=self.object.id).order_by('seasonNumber')
+
+        fullCastCrewList = TelevisionEpisodePersonMapping.objects.filter(televisionEpisode__televisionSeason__televisionSeries=self.object.id)
+        cast = fullCastCrewList.filter(role=8)
+        crew = fullCastCrewList.exclude(role=8)
+
+        # only sum up number of appearances for episodes not in S0 (specials, behind the scenes)
+        castWithoutS0 = []
+        for c in cast:
+            if c.televisionEpisode.televisionSeason.seasonNumber != 0:
+                castWithoutS0.append(c)
+
+        castEpisodeCountDict = {}
+        uniquePeopleList = []
+        for tpm in castWithoutS0:
+            if tpm.person not in castEpisodeCountDict:
+                uniquePeopleList.append(tpm.person)
+                if tpm.character:
+                    castEpisodeCountDict[tpm.person] = [1,[tpm.character]]
+                else:
+                    castEpisodeCountDict[tpm.person] = [1,[]]
+            else:
+                castEpisodeCountDict[tpm.person][0] += 1
+                #if person already in list but character name is new:
+                if tpm.character:
+                    if tpm.character not in castEpisodeCountDict[tpm.person][1]:
+                        castEpisodeCountDict[tpm.person][1].append(tpm.character)
+
+        #Sorting the cast dictionary by the number of episodes they appear in
+        sortedShowActors = dict(sorted(castEpisodeCountDict.items(), key=operator.itemgetter(1), reverse=True))
+        context['cast'] = dict(itertools.islice(sortedShowActors.items(), 50))
 
         # Retrieve list of seasons for this TV show
         seasons = TelevisionSeason.objects.filter(televisionSeries=self.object.id).order_by('seasonNumber')
         context['seasons'] = seasons
 
         if seasons != None:
-
             #for season in range(seasons.count()):
             for index,season in enumerate(seasons):
                 listOfEpisodes = TelevisionEpisode.objects.filter(televisionSeason=season).order_by('episodeNumber')
@@ -1977,7 +2049,12 @@ class TVDetailView(generic.UpdateView):
         franchises = []
         for x in TelevisionFranchiseSubcategoryMapping.objects.filter(television=self.object.id):
             if x.television.id == self.object.id:
-                franchises.append(x.franchiseSubcategory.parentFranchise)
+                if x.franchiseSubcategory.parentFranchise not in franchises:
+                    franchises.append(x.franchiseSubcategory.parentFranchise)
+        for x in TelevisionSeasonFranchiseSubcategoryMapping.objects.filter(televisionSeason__televisionSeries=self.object.id):
+            if x.televisionSeason.televisionSeries.id == self.object.id:
+                if x.franchiseSubcategory.parentFranchise not in franchises:
+                    franchises.append(x.franchiseSubcategory.parentFranchise)
         context['franchises'] = franchises
 
         #Retrieve the rating
@@ -2027,10 +2104,11 @@ class TVEpisodeDetailView(generic.DetailView):
             if cast.person.image is not None and cast.person.image != 'MissingIcon.png':
                 castImages.append(cast)
 
+        crew = TelevisionEpisodePersonMapping.objects.filter(televisionEpisode=self.object.id).order_by('billing').exclude(role=8)
+
         context['fullCast'] = fullCast
         context['castImages'] = castImages[:60]
-
-
+        context['crew'] = crew
 
         return context
 

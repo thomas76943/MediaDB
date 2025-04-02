@@ -117,6 +117,7 @@ class FilmFranchiseSubcategoryMappingAdmin(ImportExportModelAdmin):
     pass
 
 admin.site.register(TelevisionFranchiseSubcategoryMapping)
+admin.site.register(TelevisionSeasonFranchiseSubcategoryMapping)
 admin.site.register(VideoGameFranchiseSubcategoryMapping)
 admin.site.register(VideoGameVideoGameFranchiseSubcategoryMapping)
 admin.site.register(BookFranchiseSubcategoryMapping)

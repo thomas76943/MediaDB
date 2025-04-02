@@ -22,7 +22,7 @@
                     {% for key, val in franchiseActors.items %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ key.slug }}">
-                                <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
+                                <img class="item additionalImage" src="{{key.imageSmall.url}}" alt="{{key.getFullName}}">
                             </a>
                             <div class="content">
                                 <h6 style="overflow-wrap: normal">{{ val }} - {{ key.getFullName }}</h6>
@@ -42,7 +42,7 @@
                     {% for key, val in franchiseProducers.items %}
                         <div class="bottomOverlay">
                             <a class="item" href="/person/{{ key.slug }}">
-                                <img class="item additionalImage" src="{{key.image.url}}" alt="{{key.getFullName}}">
+                                <img class="item additionalImage" src="{{key.imageSmall.url}}" alt="{{key.getFullName}}">
                             </a>
                             <div class="content">
                                 <h6 style="overflow-wrap: normal">{{ val }} - {{ key.getFullName }}</h6>
@@ -71,7 +71,12 @@
                                     {% endif %}
                                     {%  if entry.television != NULL %}
                                         <a class="item" href="/tv/{{ entry.television.slug }}">
-                                        <img class="item posterSmall" src="{{entry.television.poster.url}}" alt="{{entry.television.title}}">
+                                        <img class="item posterSmall" src="{{entry.television.getPosterSmall}}" alt="{{entry.television.title}}">
+                                        </a>
+                                    {% endif %}
+                                    {%  if entry.televisionSeason != NULL %}
+                                        <a class="item" href="/tv/{{ entry.televisionSeason.televisionSeries.slug }}">
+                                        <img class="item posterSmall" src="{{entry.televisionSeason.posterSmall.url}}" alt="{{entry.televisionSeason.televisionSeries.title}} S{{entry.televisionSeason.seasonNumber}}">
                                         </a>
                                     {% endif %}
                                     {%  if entry.videoGame != NULL %}

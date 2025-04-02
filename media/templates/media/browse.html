@@ -116,7 +116,7 @@
         <hr>
         <ul class="auto-grid" style="padding-top: 10px">
             {% for media in mediaPageObject %}
-                {% if media.poster or media.image %}
+                {% if media.poster or media.getPosterSmall %}
                     <li class="module" style="list-style-type: none; white-space: normal">
                         {% with media|classname as modelclass %}
 
@@ -136,7 +136,7 @@
                                         <img class="item posterSmall seen" src="{{media.poster.url}}" alt="{{media.title}}">
                                         Seen
                                     {% else %}
-                                        <img class="item posterSmall" src="{{media.poster.url}}" alt="{{media.title}}">
+                                        <img class="item posterSmall" src="{{media.getPosterSmall}}" alt="{{media.title}}">
                                     {% endif %}
                                 </a>
 

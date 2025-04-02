@@ -21,13 +21,13 @@
         <div class="carousel-inner">
 
           <div class="carousel-item active">
-              <a href="/tv/daredevil-2015-04-10">
+              <a href="/tv/marvels-daredevil-61889">
                 <img class="carousel" style="content: url(https://mediadb-bucket.s3-us-west-2.amazonaws.com/carouselImages/daredevil-banner-2.jpg)">
               </a>
           </div>
 
           <div class="carousel-item">
-            <a href="/tv/the-mandalorian-2019-11-01">
+            <a href="/tv/the-mandalorian-82856">
                 <img class="carousel" style="content: url(https://mediadb-bucket.s3.amazonaws.com/extraImages/mandalorian-banner.jpg)">
             </a>
           </div>
@@ -72,7 +72,7 @@
                 {% for series in highestRatedShows %}
                     <div class="bottomOverlay">
                         <a href="/tv/{{ series.media.slug }}">
-                            <img class="item posterSmall" src="{{series.media.poster.url}}" alt="{{series.media.title}}">
+                            <img class="item posterSmall" src="{{series.media.getPosterSmall}}" alt="{{series.media.title}}">
                             <div class="content">
                                 <h6 class="font-weight-bold" >
                                     <div class="below" style="display: inline-block" id="{{ forloop.counter }}"></div>
@@ -117,7 +117,7 @@
             <ul class="hs full">
                 {% for television in tens %}
                     <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    <img class="item posterSmall" src="{{television.getPosterSmall}}" alt="{{television.title}}">
                     </a>
                 {% endfor %}
             </ul>
@@ -130,7 +130,7 @@
             <ul class="hs full">
                 {% for television in naughties %}
                     <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    <img class="item posterSmall" src="{{television.getPosterSmall}}" alt="{{television.title}}">
                     </a>
                 {% endfor %}
             </ul>
@@ -143,7 +143,7 @@
             <ul class="hs full">
                 {% for television in nineties %}
                     <a href="/tv/{{ television.slug }}">
-                    <img class="item posterSmall" src="{{television.poster.url}}" alt="{{television.title}}">
+                    <img class="item posterSmall" src="{{television.getPosterSmall}}" alt="{{television.title}}">
                     </a>
                 {% endfor %}
             </ul>

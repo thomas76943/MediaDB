@@ -1,25 +1,20 @@
 {% extends "media/base.html" %}
+{% load media_tags %}
 {% block title %}{{television.title}}{% endblock title %}
 {% block content %}
 
         {% if television.cover %}
             <style type="text/css">
-
-            .blur {
-                background-image: url("{{ television.cover.url }}");
-                padding-bottom: 50px;
-            }
-
+                .blur {
+                    background-image: url("{{ television.cover.url }}");
+                    padding-bottom: 50px;
+                }
             </style>
-
             <div class="blur"></div>
         {% endif %}
 
-
     <br>
-
     <div class="container titleSection">
-
         <form id="listForm">
             {% csrf_token %}
             <div style="float:right" class="plus-toggle" id="addListToggle">
@@ -39,7 +34,7 @@
             -
         {% endif %}
         </h5>
-        <h5>{{ television.seasonCount }} Seasons | {{ television.episodeCount }} Episodes</h5>
+        <h5>{{ television.seasonCount }} Season{% if television.seasonCount > 1 %}s{%endif%} | {{ television.episodeCount }} Episodes</h5>
 
         {% if genres %}
             {% for genre in genres %}
@@ -122,10 +117,14 @@
         </div>
     {% endif %}
 
-    {% if television.synopsis %}
+    {% if television.synopsis or televsion.getFirstAirDate  %}
         <div class="container infoSection">
             <h5 style="padding-top:5px">Synopsis:</h5>
             <h6>{{ television.synopsis }}</h6>
+            <h6 style="padding-top:10px">First Episode Air  Date: {{ television.getFirstAirDate }}</h6>
+                {% if television.ongoing == False %}
+                    <h6 style="padding-top:5px">Final Episode Air Date: {{ television.getLastAirDate }}</h6>
+                {% endif %}
         </div>
     {% endif %}
 
@@ -138,13 +137,14 @@
             <h5 class="font-weight-bold border-bottom mb-0">Series Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for actor in cast %}
+                    {% for key,val in cast.items %}
                         <div class="bottomOverlay">
-                            <a class="item" href="/person/{{ actor.person.slug }}">
-                                <img class="item additionalImage" src="{{actor.person.image.url}}" alt="{{actor.getPerson}}">
+                            <a class="item" href="/person/{{ key.slug }}">
+                                <img class="item additionalImage" src="{{key.imageSmall.url}}" alt="{{key.getPerson}}">
                             </a>
                             <div class="content">
-                                <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                                <h6 style="margin:1px;padding:1px;overflow-wrap: normal">{{ key.getFullName }}</h6>
+                                <h8 style="margin:1px;padding:1px;">{{ val.0 }} Episode{% if val.0 > 1 %}s{% endif %}</h8>
                             </div>
                         </div>
                     {% endfor %}
@@ -161,13 +161,6 @@
             {% endfor %}
         </div>
     {% endif %}
-
-    <div class="container infoSection">
-        <h6 style="padding-top:10px">First Episode Air  Date: {{ television.getFirstAirDate }}</h6>
-        {% if television.ongoing == False %}
-            <h6 style="padding-top:5px">Final Episode Air Date: {{ television.end }}</h6>
-        {% endif %}
-    </div>
 
     {% if productionCompanies %}
         <div class="container infoSection">
@@ -187,9 +180,68 @@
         </div>
     {% endif %}
 
-    <div class="container infoSection">
-        <h6 style="padding-top:10px"><a href="/tv/{{ television.slug }}/crew">See Full Cast & Crew Details</a></h6>
-    </div>
+    {% if seasons %}
+        {% for season in seasons %}
+            {% with var=season.seasonNumber %}
+            {% dynamicVariableValue var as var_url %}
+                {% if var_url %}
+                    <div class="container infoSection">
+                        <h5 class="font-weight-bold border-bottom mb-0">
+                            {% if season.title %}
+                            {{ season.title }}
+                            {% else %}
+                            Season {{ season.seasonNumber }}
+                            {% endif %}
+                        </h5>
+                        <div class="scroller">
+                            {% if season.posterSmall %}
+                                <img class="item posterSmall season" style="float:left; margin-right:20px" src="{{ season.posterSmall.url }}" alt="{{season.seasonNumber}}">
+                            {% endif %}
+                            <ul class="hs episodeStills">
+                                {% for episode in var_url %}
+                                    {%  if episode.stillImage %}
+                                        <div class="bottomOverlay">
+                                            <a href="/tv/episode/{{ episode.slug }}">
+                                                <img class="episodeStillImage"
+                                                     {% if episode.stillImage %}
+                                                        src="{{episode.stillImage.url}}"
+                                                     {% endif %}
+                                                     alt="S{{season.seasonNumber}}-E{{episode.episodeNumber}}">
+                                            </a>
+                                            <div class="content">
+                                                {% if season.seasonNumber != 0 %}
+                                                    <h6 style="margin:1px;overflow-wrap: normal">S{{ episode.televisionSeason.seasonNumber}} E{{episode.episodeNumber}} -
+                                                {% endif %}
+                                                {% if episode.title %} '{{ episode.title }}' {% endif %}</h6>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    {% endif %}
+
+    {% if tags %}
+        <div class="container infoSection">
+            <h5 style="padding-top:5px">Tags:</h5>
+            <ul class="cloud-tags" style="display:flex; flex-wrap: wrap">
+                {% for t in tags %}
+                    <li class="font-weight-bold" style="margin-top:0; padding-right:10px; margin-bottom:10px"><a class="cloud-tags" href="/tag/{{t.tag.name}}"> {{t.tag.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <script>
+        $(function(){
+            $(".cloud-tags").prettyTag({randomColor:true});
+        });
+        </script>
+
+    {% endif %}
 
     {% if images %}
         <div class="container infoSection">

@@ -252,6 +252,12 @@ ul {
 
 }
 
+.item.posterSmall.season {
+  border-width: 2px 2px;
+  height:192px;
+
+}
+
 .item.posterSmall.winner {
   border: solid gold;
   border-width: 3px 3px;

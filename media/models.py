@@ -28,10 +28,7 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         super().save()
         if not self.slug:
-            if self.DoB:
-                self.slug = slugify(self.getFullName() + "-" + str(self.tmdbid))
-            else:
-                self.slug = slugify(self.getFullName())
+            self.slug = slugify(self.getFullName() + "-" + str(self.tmdbid))
         super(Person, self).save(*args, **kwargs)
 
     class Meta:
@@ -137,6 +134,7 @@ class Television(models.Model):
     synopsis = models.CharField(max_length=500, default='', blank=True)
     seasonCount = models.IntegerField(default=1, null=True, blank=True)
     episodeCount = models.IntegerField(default=1, null=True, blank=True)
+    trailerVideoPath = models.CharField(max_length=500, null=True, blank=True)
     poster = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
     posterSmall = models.ImageField(default='', upload_to='televisionPosters', null=True, blank=True)
     cover = models.ImageField(default='', upload_to='televisionCoverImages', blank=True)
@@ -157,10 +155,21 @@ class Television(models.Model):
         getSeason = TelevisionSeason.objects.filter(televisionSeries=self,seasonNumber=1).first()
         return getSeason.poster.url
 
+    def getPosterSmall(self):
+        getSeason = TelevisionSeason.objects.filter(televisionSeries=self,seasonNumber=1).first()
+        return getSeason.posterSmall.url
+
     def getFirstAirDate(self):
         getSeasonOne = TelevisionSeason.objects.filter(televisionSeries=self, seasonNumber=1).first()
         getEpisodeOne = TelevisionEpisode.objects.filter(televisionSeason=getSeasonOne, episodeNumber=1).first()
         return getSeasonOne.release
+
+    def getLastAirDate(self):
+        seasons = TelevisionSeason.objects.filter(televisionSeries=self)
+        getlastSeason = seasons.latest('id')
+        getLastEpisodes = TelevisionEpisode.objects.filter(televisionSeason=getlastSeason)
+        getlastEpisode = getLastEpisodes.latest('id')
+        return getlastEpisode.release
 
     def getStartingYear(self):
         getSeasonOne = TelevisionSeason.objects.filter(televisionSeries=self, seasonNumber=1).first()
@@ -171,10 +180,6 @@ class Television(models.Model):
         getLastSeason = TelevisionSeason.objects.filter(televisionSeries=self).order_by('-seasonNumber').first()
         getLastEpisode = TelevisionEpisode.objects.filter(televisionSeason=getLastSeason, episodeNumber=1).first()
         return getLastSeason.release.year
-
-    def getPosterSmall(self):
-        getSeason = TelevisionSeason.objects.filter(televisionSeries=self).first()
-        return getSeason.posterSmall.url
 
     class Meta:
         verbose_name = "Television"
@@ -232,6 +237,9 @@ class TelevisionEpisode(models.Model):
 
     def __str__(self):
         return self.televisionSeason.televisionSeries.title + " - S" + str(self.televisionSeason.seasonNumber) + " - E" + str(self.episodeNumber)
+
+    def getParentShow(self):
+        return self.televisionSeason.televisionSeries.title
 
     #Gets the start year of the television series
     def getYear(self):
@@ -708,6 +716,19 @@ class TelevisionFranchiseSubcategoryMapping(models.Model):
     class Meta:
         verbose_name = "Television - Franchise  Subcategory Mapping"
         verbose_name_plural = "Television - Franchise  Subcategory Mappings"
+
+class TelevisionSeasonFranchiseSubcategoryMapping(models.Model):
+    televisionSeason = models.ForeignKey(TelevisionSeason, on_delete=models.CASCADE)
+    franchiseSubcategory = models.ForeignKey(FranchiseSubcategory, on_delete=models.CASCADE)
+    orderInFranchise = models.IntegerField(default=1)
+
+    def __str__(self):
+        return (self.franchiseSubcategory.title + " - " + str(self.orderInFranchise) + " - " + self.televisionSeason.televisionSeries.title + " - S" + str(self.televisionSeason.seasonNumber))
+
+    class Meta:
+        verbose_name = "Television Season - Franchise  Subcategory Mapping"
+        verbose_name_plural = "Television Season - Franchise  Subcategory Mappings"
+
 
 class VideoGameFranchiseSubcategoryMapping(models.Model):
     videoGame = models.ForeignKey(VideoGame, on_delete=models.CASCADE)

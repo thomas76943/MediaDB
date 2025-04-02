@@ -10,6 +10,7 @@
 
     <div class="container infoSection">
         <h2 style="padding-top: 5px">{{company.name}}</h2>
+        <h5>{{company.tmdbid}}</h5>
         {% if company.baseCountry %}
             <h5>Based in: {{ company.baseCountry }}</h5>
         {% endif %}
@@ -72,9 +73,9 @@
             <h5 class="font-weight-bold border-bottom mb-1">Television</h5>
             <div class="scroller">
                 <ul class="hs full">
-                    {% for t in television %}
-                        <a href="/tv/{{ t.television.slug }}">
-                            <img class="item posterSmall" src="{{ t.television.poster.url }}" alt="{{ t.television.title }}">
+                    {% for tv in television %}
+                        <a href="/tv/{{ tv.slug }}">
+                            <img class="item posterSmall" src="{{ tv.getPosterSmall }}" alt="{{ tv.title }}">
                         </a>
                     {% endfor %}
                 </ul>

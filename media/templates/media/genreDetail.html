@@ -44,7 +44,7 @@
                 <ul class="hs full">
                     {% for series in tv %}
                         <a href="/tv/{{ series.television.slug }}">
-                        <img class="item posterSmall" src="{{series.television.poster.url}}" alt="{{series.television.title}}">
+                        <img class="item posterSmall" src="{{series.television.getPosterSmall}}" alt="{{series.television.title}}">
                         </a>
                     {% endfor %}
                 </ul>

@@ -17,14 +17,14 @@ class filmFilter(django_filters.FilterSet):
             'title','rating','release'
         ]
 
-#class televisionFilter(django_filters.FilterSet):
-#
-#    date = DateFilter(field_name="release", lookup_expr="gte", label="Release After")
-#    class Meta:
-#        model = Television
-#        fields = [
-#            'release'
-#        ]
+class televisionFilter(django_filters.FilterSet):
+
+    date = DateFilter(field_name="seasonCount", lookup_expr="gte", label="Season Count")
+    class Meta:
+        model = Television
+        fields = [
+        'seasonCount'
+        ]
 
 class videoGameFilter(django_filters.FilterSet):
 

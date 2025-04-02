@@ -8,7 +8,8 @@
             <h2>{{televisionepisode.title}}</h2>
         {% endif %}
         <h5>{{televisionepisode.televisionSeason.televisionSeries.title}}: Season {{televisionepisode.televisionSeason.seasonNumber}} - Episode {{televisionepisode.episodeNumber}}</h5>
-
+        <h6>Released: {{televisionepisode.release}}</h6>
+        {% if televisionepisode.length %} <h6>{{televisionepisode.length}} mins</h6> {% endif %}
 
 
     </div>
@@ -33,32 +34,6 @@
         </div>
     {% endif %}
 
-    <!--
-    {% if seasons %}
-        {% for season in seasons %}
-            {% with var=season.seasonNumber %}
-            {% dynamicVariableValue var as var_url %}
-                {% if var_url %}
-                    <div class="container infoSection">
-                        <h5 class="font-weight-bold border-bottom mb-0">Season {{ season.seasonNumber }}</h5>
-                        <div class="scroller">
-                            <ul class="hs full">
-                                {% for episode in var_url %}
-                                    {%  if episode %}
-                                        <a class="item" href="/episode/{{ episode.id }}">
-                                            <img class="item posterSmall" style="object-fit:cover" src="{{episode.stillImage.url}}" alt="S{{season.seasonNumber}}-E{{episode.episodeNumber}}">
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endwith %}
-        {% endfor %}
-    {% endif %}
-    -->
-
     {% if castImages %}
         <div class="container infoSection">
             <h5 class="font-weight-bold border-bottom mb-0">Cast <a style="float:right" href="/tv/{{ television.slug }}/crew">See Full Cast & Crew</a></h5>
@@ -71,6 +46,27 @@
                             </a>
                             <div class="content">
                                 <h6 style="overflow-wrap: normal">{{ actor.person.getFullName }}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if crew %}
+        <div class="container infoSection">
+            <h5 class="font-weight-bold border-bottom mb-0">Crew</h5>
+            <div class="scroller">
+                <ul class="hs full">
+                    {% for crewMember in crew %}
+                        <div class="bottomOverlay">
+                            <a class="item" href="/person/{{ crewMember.person.slug }}">
+                                <img class="item additionalImage" src="{{crewMember.person.imageSmall.url}}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 style="overflow-wrap: normal">{{ crewMember.person.getFullName }}</h6>
+                                <h6 style="overflow-wrap: normal">{{ crewMember.role }}</h6>
                             </div>
                         </div>
                     {% endfor %}

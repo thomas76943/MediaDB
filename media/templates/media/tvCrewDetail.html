@@ -55,13 +55,21 @@
     {% if cast %}
         <div class="container infoSection">
             <h5>Cast:</h5>
-                {% for actor in cast %}
-                    <a href="/person/{{ actor.person.slug }}">{{actor.getPerson}}</a>
-                    {% if actor.character %} - {{ actor.character }}{% endif %}
+                {% for key,val in cast.items %}
+                    <a href="/person/{{ key.slug }}">{{ key.getFullName }} - </a>
+                    {% for character in val.1 %}
+                        {{character}}
+                        {% if not forloop.last%}, {% endif %}
+                    {%endfor%}
+                    - {{ val.0 }} Episode{% if val.0 > 1 %}s{% endif %}
                     <br>
                 {% endfor %}
         </div>
     {% endif %}
+
+
+
+
 
     {% if franchises %}
         <div class="container infoSection">

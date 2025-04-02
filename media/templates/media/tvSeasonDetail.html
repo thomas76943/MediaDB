@@ -38,6 +38,9 @@
                             {% endif %}
                         </h5>
                         <div class="scroller">
+                            {% if season.posterSmall %}
+                                <img class="item posterSmall season" style="float:left; margin-right:20px" src="{{ season.posterSmall.url }}" alt="{{season.seasonNumber}}">
+                            {% endif %}
                             <ul class="hs episodeStills">
                                 {% for episode in var_url %}
                                     {%  if episode %}
